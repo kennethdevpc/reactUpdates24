@@ -1,9 +1,16 @@
-import Card from './components/Card';
+import Card, { CardBody } from './components/Card';
+import List from './components/List';
 
 function App() {
+  const list = ['Goku', 'vegeta', 'krilim', 'gohan', 'picoro'];
+
   return (
     <div>
-      <Card body={'mensaje dese el App.tsx'} />;
+      <CardBody title={'titulo'} text="mi texto es " />;{/* <Card body="Hola soy body" /> */}
+      <Card>
+        <CardBody title={'titulo'} text="mi texto es " />
+        <List data={list} />
+      </Card>
     </div>
   );
 }

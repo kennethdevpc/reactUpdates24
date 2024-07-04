@@ -6,7 +6,11 @@ React:
   settings2: formatter
   texto: define a deffault fomrmatter.. y selecciono prettier
 
-  Autorename tag extension: intalar 
+    //extensiones
+
+  -Autorename tag: para que al inicio y al final cambei la etiqueta
+  -ES7+ React/Redux/React-Native snippets: para poder que autocomplete el export default 
+  
 
   n: si voy a la terminal me voy a enonctrar corriendo el archivo:
   3:35:39 p. m. [vite] hmr update /src/Titulo.tsx 
@@ -159,6 +163,161 @@ React:
         );
       }
 
+10) si quiero varias propiedades:
+  u:react-app\src\components\Card.tsx
+  n: el signo ? (question mark), en una interfaz hace que esta no sea obligatoria pasarsele 
+  s:
+    interface CardBodyProps {
+      title: string;
+      text?: string;
+    }
+
+    export function CardBody(props: CardBodyProps) {
+      const { title, text } = props;
+      return (
+        <>
+          <h5 className="card-title">{title}</h5>
+          <p className="card-text">{text}</p>
+        </>
+      );
+    }
+  10.1) pasandole a CardBodyProps las propiedades:
+    u:  react-app\src\App.tsx
+    s:
+      import CardBody from './components/Card';
+
+      function App() {
+        return (
+          <div>
+            <CardBody title={'titulo'} text="mi texto es " />;
+          </div>
+        );
+      }
+      export default App;
+
+11) pasandole propiedad children a el componente hijo:
+  u: react-app\src\App.tsx
+  s: Card>mandndo propiedad desde children</Card>
+
+  u: react-app\src\components\Card.tsx
+  n: ojo la palabra "children" ya viene definida como propiedad propia de react 
+  entonces no se puede usar esa palabra como un ombre de una propiedad
+  s: interface Props {
+      children: string; //nombre incambiable 
+      body?: string;
+    }
+
+    function Card(props: Props) {
+      const { body, children } = props; // se sugiere usar destructuring
+      return (
+          <div className="card-body">{children}</div>
+      )
+  11.1) pasandole Un componente a otro componente por medio del children
+
+      U:react-app\src\App.tsx
+      s:
+      <Card>
+        <CardBody title={'titulo'} text="mi texto es " />
+      </Card>
+
+      n: sin emabrgo me mandra este error: 
+      This JSX tag's 'children' prop expects type 'string'
+       which requires multiple children, but only a single 
+       child was provided.
+
+    11.1.2) entonces para evitar el error debo buscar una propiedad
+    pra la interfaz:
+      u: react-app\src\components\Card.tsx
+      s:
+        interface Props {
+          children: React.ReactNode; //-----Agregadoforma1
+          body?: string;
+        }
+
+        function Card(props: Props) {
+          const { body, children } = props; // se sugiere usar destructuring
+          return (
+              <div className="card-body">{children}</div>
+          );
+        }
+
+      s: forma2:
+        import { ReactNode } from "react";  //
+        interface Props {
+          children: ReactNode;
+          body?: string;
+        }
+
+12) creando un componente de lista:
+  n: creo el componente lista
+  U: react-app\src\components\List.tsx
+  s:
+      type Props = {
+        data: string[]; //---esto sera un arreglo de string
+      };
+
+      function List({ data }: Props) {
+        return (
+          <div>
+            <ul className="list-group">
+              {data.map((item, index) => (
+                <li key={index} className="list-group-item">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
+      export default List;
+  12.2) para el ejemplo solo le pasara la key el mismo elemento
+      <ul className="list-group">
+        {data.map((elemento) => (
+          <li key={elemento} className="list-group-item">
+            {elemento}
+          </li>
+        ))}
+      </ul>
+
+  12.3) ahora hago el llamado de ese comoponente
+    u: react-app\src\App.tsx
+    s: 
+      function App() {
+        const list = ['Goku', 'vegeta', ];
+        return (
+            <List data={list} />
+        )
+      }
+
+    
 
 
 
+
+
+      
+
+node:
+-Exportar formas
+  1- export function CardBody(props: CardBodyProps) {
+    importa: import v{ CardBody } from './components/Card';
+  2-export default Card;
+    importa: import Card from './components/Card';
+  3; importando varias: import Card, { CardBody } from './components/Card';
+
+-teclados:
+  * CTRL+ d: si queiro seleccionar avarios textos iguales presiono CTRL+ d y va colocando un cursor al final de cada palabra
+  * CTRL+ spacio: me muestra opciones
+  * ctrl+alt+r : permite sacar las opciones de snippets (abreviatura pra crear codigo de react)
+
+-snipepts:
+  * tsrfce: creates a react copotnent
+
+-interface: contiene el nombre y el tipo de las propiedades que se le pasan a una funcion o las variables para saber que tipo son
+            las interfaces se pueden definir:
+            forma1:   
+              type Props = {};
+            forma2:
+              interface Props = {};   
+-
