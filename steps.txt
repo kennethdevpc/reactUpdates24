@@ -289,8 +289,124 @@ React:
             <List data={list} />
         )
       }
+13) Eventos
+  u:
+  s:
+     <li
+            onClick={() => console.log('evento', elemento)}
+            key={elemento}
+            className="list-group-item"
+            value={elemento}
+          >
+            {elemento}
+          </li>
+  13.1) convenciones de Eventos
+     import { MouseEvent } from 'react';  //---agregado es usado para el evento
 
+      type Props = {
+        data: string[];
+      };
+
+      function List({ data }: Props) {
+
+        //---------------------convencion 
+
+        const handleClick = (e: MouseEvent) => {
+          console.log('evento', e);
+        };
+        return (
+          <div>
+            <ul className="list-group">
+              {data.map((elemento) => (
+                //------------el handleclick aqui toma el evento 
+                <li onClick={handleClick} key={elemento} className="list-group-item" value={elemento}>
+                  {elemento}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+    13.2) si le quiero pasar informacion diferente al evento
+      s:
+        const handleClick = (e: string) => {
+        console.log('evento', e);
+        };
+          return (
+            <div>
+              <ul className="list-group">
+                {data.map((elemento) => (
+              <li onClick={()=>handleClick(elemento)} //----le paso el elemento aqui hago la arrow function 
+                )))
+14) estados
+  n: react por si solo no conoce las variables por lo tanto 
+  si no las conoce si se hace un cambio en alguna variable
+  que se este usando en alguna parte del html, entonces 
+  no se va a reflejar en el front
+  ejem:
+
+  function List({ data }: Props) {
+    let index = 4;  //-----------variable
+    const handleClick = (e: number) => {
+      index = e; //---------funcion que cambia el valor de la varible
+      console.lo('evento', index);
+    };
+   return (
+        <div>
+          <ul className="list-group">
+            {data.map((elemento, i) => (
+              <li
+                onClick={() => handleClick(i)} //-----💥evento que hace llamado a funcion que cambai vaeriable
+                key={elemento}
+
+                //-------💥Uso de la variable "index", para poner o no el active
+                className={`list-group-item ${i === index ? 'active' : ''}`}
+
+                value={elemento}
+              > {elemento} </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    n: como se puede observar se usa el index en el atributo "className" 
+    sin embargo esto no refleja ningun cambio en el servidor, ya que 
+    react Se encarga de ver que elemnto cambio en el DOM y avisarle al ReactDOM
+    pero entonces react no puede con solo la funcion handleClick
+    reconocer si esa variable cambio, por lo tanto debe de usar una
+    funcionalidad que permita reconocer que esa variable cambio 
+
+  14.1) Uso del useState
+
+    u:react-app\src\components\List.tsx
+    s:
     
+      function List({ data }: Props) {
+        //index es la variable, setIndex es la funcion que modifica la variable
+        const [index, setIndex] = useState(-10);//----- 💥 Uso del useState
+        const handleClick = (e: number) => {
+          setIndex(e); //----------💥Uso de la funcion que cambia el valor 
+                                    de la variable, y que es a su vez detectable por react
+        };
+        return (
+          <div>
+            <ul className="list-group">
+              {data.map((elemento, i) => (
+                <li
+                  onClick={() => handleClick(i)}
+                  key={elemento}
+                  className={`list-group-item ${i === index ? 'active' : ''}`}
+                  value={elemento}
+                >
+                  {elemento}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
 
 
 
@@ -320,4 +436,20 @@ node:
               type Props = {};
             forma2:
               interface Props = {};   
--
+-Eventos:
+  -onClick: este es el mismo onclick de Html
+    <li
+            onClick={() => console.log('evento', elemento)}
+            key={elemento}
+            className="list-group-item"
+            value={elemento}
+          >
+-como saber el typo si no lo se por ejemplo:
+  s: onClick={(e) => handleClick()}
+  n: si me posisiono sobre el "e" me va mostrar 
+  "(parameter) e: React.MouseEvent<HTMLLIElement, MouseEvent>"
+  asi ya se que es de typo React.MouseEvent
+
+-react uso de varialbles en atributos Html
+  1- uso de llaves o "Curly brackets"
+   className={`list-group-item ${elemento === '1' ? 'active' : ''}`}
