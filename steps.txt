@@ -506,3 +506,24 @@ node:
   el componente que recibe una funcion usa el nombre onSelect()
   el componente que manda la funcion nombra a su funcion "handleSelect":
   <List data={list} onSelect={handleSelect} />
+
+-react conceptos:
+  -state: los estados pueden mutar 
+  -props: son inmutables
+
+  -truthy y falsy
+    falsy: false, o , '', undefined, null
+    {123 && 'numeros '} //como si hay algo en la izquierda (true) de && se imprime lo de la derecha
+      {'hay string' && ' string texto'} //como si hay algo en la izquierda (true) de && se imprime lo de la
+      derecha
+      {undefined && 'sundefined'} //como esta indefinido no imprime nada
+      {null && 'null'} //como esta null no imprime nada
+      {false && 'false'} //como esta false no imprime nada
+      {'' && 'string vacio'} //como esta VACIO no imprime nada
+      {0 && 'soy cero '} // el cero es un problema ya que en esta ocasion imprime el cero
+      // por eso si no quiero que aparezca un cero debo evaluar la respuesta con un true o flase:
+        {list2.length && 'soy lista vacia'} //esto imprimiria cero "o"
+        n: pero como lo que queiro es que si es cero no imprima nada:
+        tengo que evaluar que no sea cero 
+        {list2.length !== 0 && 'si hay algo en la lista'}
+

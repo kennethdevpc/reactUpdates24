@@ -3,6 +3,7 @@ import List from './components/List';
 
 function App() {
   const list = ['Goku', 'vegeta', 'krilim', 'gohan', 'picoro'];
+  const list2: string[] = [];
 
   const handleSelect = (elemento: string) => {
     console.log('Imprimiendo', elemento);
@@ -12,6 +13,15 @@ function App() {
   };
   return (
     <div>
+      {123 && 'numeros '}
+      {'hay string' && ' string texto'}
+      {undefined && 'sundefined'}
+      {null && 'null'}
+      {false && 'false'}
+      {'' && 'string vacio'}
+      {0 && 'soy cero '}
+      {list2.length && 'si hay algo en la lista'}
+      {list2.length !== 0 && 'si hay algo en la lista'}
       <CardBody title={'titulo'} text="mi texto es " />;{/* <Card body="Hola soy body" /> */}
       <Card>
         <CardBody title={'titulo'} text="mi texto es " />
