@@ -557,7 +557,7 @@ React:
   
 19) andole estilos 
   19.1.1)
-  linestyles:
+  linestyles: En estos estilos se cambia los nombres de los estilos con camelcase
   u:react-app\src\components\Button.tsx
   s:
     
@@ -587,6 +587,97 @@ React:
           </button>
         );
       }
+  19.2) Usando css : aqui si se usa el nombre de los estilos sin el camel case
+    creo un directorio para el componete
+    u:react-app\src\components\Button\
+    n: luego muevo el componente button a el componente
+    y creo el archivo css
+   
+    u: react-app\src\components\Button\Button.css 
+    s: ejemplo:
+      button {
+        background-color: green;
+      }
+
+    19.2.3) ahor apara usarlo
+    u: react-app\src\components\Button\index.tsx
+    s:
+      import './Button.css';
+    
+  19.3) moules.css
+    n: primero que todo el archivo de css se renombra como:
+    Button.module.css
+    u: react-app\src\components\Button\Button.module.css
+    s: 
+      .button {
+        background-color: rgb(128, 2, 0);
+      }
+
+    OJO: si quiero agreagar un estilo, debo crearlo como clase:
+    osea ".button " ya que si le pongo "button " sin el clase
+    lo que hara es darle a el estilo a todos lo elementos nativos "button"
+    entonces 
+  
+   19.3.2) 
+    s://y se le asigna una variable que contendra los estilos
+    
+     import styles from './Button.module.css'; //----importa el estilo en una variable "styles" 
+     se puede nombrar como desee
+
+     function Button({ isLoading, children, onClick }: Props) {
+      return (
+        <button
+          type="button"
+          className={styles.button} //---usa el "styles.button" para llamar a esa clase 
+          // className={isLoading ? `btn btn-primary` : `btn btn-secondary`}
+        >
+          {isLoading ? 'cargando...' : children}
+        </button>
+      );
+    }
+
+    19.3.3) combinando stilos con modules.css
+      u: react-app\src\components\Button\Button.module.css
+      s:
+        .button {  //----estilo1
+          background-color: rgb(128, 2, 0);
+        }
+
+        .padded { //----estilo2
+          padding: 10px 30px;
+        }
+      
+      19.3.3.2) al querer combinarlos 
+        u:  react-app\src\components\Button\index.tsx
+        s:
+          import styles from './Button.module.css'; //----importo igualmente
+
+          function Button({ isLoading, children, onClick }: Props) {
+            return (
+              <button
+                type="button"
+
+                //--------forma 1 de unir los estilos (recomendada)
+                className={[styles.button, styles.padded].join(' ')} 
+                //--------forma 2 de unir los estilos
+                // className={`${styles.button} ${styles.padded}`}
+              >
+                {isLoading ? 'cargando...' : children}
+              </button>
+            );
+          }
+
+
+
+
+
+
+    
+
+
+
+
+
 
     
 
@@ -669,5 +760,35 @@ node:
 - operador ternario : ? , con el operador ternario
  no hay que tener cuidado con el cero "0"
 
+-sobre la infraestructura
+  n: react por defecto si dejamos el componente como "index.tsx"
+  ejm: react-app\src\components\Button\index.tsx
+  lo que hace react es que ese componente (obiamente debe estar dentro de un directorio con el nombre que reresenta ese componete)
+  entonces react lo qe hace es que ese componete no es necesario importarlo con un nombre duplicado y nis siquiera hy que escribir "index" ejemplo
+    u: react-app\src\App.tsx
+    s:
+    import Button from './components/Button';
+
+  n: si el componente se hubiera guardado como 
+  u: react-app\src\components\Button\Button
+  n: entonces se huiera importado como:
+    u: react-app\src\App.tsx
+    s:
+    import Button from './components/Button/Button';
 
 
+
+javascrip:
+  slice: 
+  // cuando hay un slice en un array, se crea un nuevo array con los elementos seleccionados
+  // const arr = [1, 2, 3, 4, 5];
+  // const newArr = arr.slice(1, 3);
+  // console.log(newArr); // [2, 3]
+  // console.log(arr); // [1, 2, 3, 4, 5]
+
+  join:
+  // cuando hay un join en un array , se unen todos los elementos del array en un solo string,
+  // separados por el string que se pasa como argumento
+  // ya que el join develve siempre un string,
+  //ejemplo:  const array = ['1', '2', '3', 'carlos'];
+  //console.log(array.join(' ')); // 1 2 2 carlos
