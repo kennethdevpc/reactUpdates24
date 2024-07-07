@@ -6,9 +6,15 @@ type Props = {
   children: ReactNode;
 };
 
+const styles = {
+  margin: '10px',
+  backgroundColor: 'red',
+};
+
 function Button({ isLoading, children, onClick }: Props) {
   return (
     <button
+      style={styles}
       onClick={onClick}
       disabled={isLoading}
       type="button"

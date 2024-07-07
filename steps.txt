@@ -555,6 +555,44 @@ React:
 
   n: el botton es el mismo que se creo en 17 solo que se utiliza ys se le manda las funciones
   
+19) andole estilos 
+  19.1.1)
+  linestyles:
+  u:react-app\src\components\Button.tsx
+  s:
+    
+    function Button({ isLoading, children, onClick }: Props) {
+      return (
+        <button
+          style={{ margin: '5px' }}  //------asi recibe el estilo en linea
+        >
+          {isLoading ? 'cargando...' : children}
+        </button>
+      );
+    }
+  19.1.2)
+    forma2 con una variable:
+    s:
+      const styles = {  //---se agrega dentro de un objeto 
+        margin: '10px',
+        backgroundColor: 'red',
+      };
+
+      function Button({ isLoading, children, onClick }: Props) {
+        return (
+          <button
+            style={styles} // dentro de Curly brackets
+          >
+            {isLoading ? 'cargando...' : children}
+          </button>
+        );
+      }
+
+    
+
+
+
+
 
 
       
