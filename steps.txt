@@ -196,6 +196,7 @@ React:
       export default App;
 
 11) pasandole propiedad children a el componente hijo:
+  mucho cuidado "children" es en minusculas
   u: react-app\src\App.tsx
   s: Card>mandndo propiedad desde children</Card>
 
@@ -451,8 +452,87 @@ React:
         </div>
       );
     }
-          
 
+16) renderizado condicional:
+  n: ahora si pongo el renderizado pero evalauando un condicional:
+  condicionea.:
+  u: react-app\src\App.tsx
+  s: //-----------condicional que dependiendo si va renderizar 
+   const contenido = (e: string) =>
+      list.length ? (
+        <>
+          <h1>hola la longitud si existe y el dato recolectado es: {e}</h1>
+          <List data={list} onSelect={handleSelect} />
+        </>
+      ) : (<h2>sin elemento para mostrar</h2> );
+
+    return (
+      {contenido('yo soy el dato ')} //----usando la funcion
+    )
+
+  s: //si no queiro mostrar nada pues solo:
+   le dejo vacio o uso el operador "short operator"
+   list2.length ? (
+      <>
+      aqui muestra algo
+      </>
+    ) : (
+      ''  // aqui ya no muestra nada
+    );
+    
+17) Creando un botton y cambiar un estado para cambiarle el color:
+  n:forma1 dentro del mismo compoente:
+  s:
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const handleClick = () => {
+      setIsLoading(true);
+    };
+    return (
+        <button
+          onClick={handleClick}
+          disabled={isLoading}
+          type="button"
+          className={isLoading ? `btn btn-primary` : `btn btn-secondary`}
+        >
+          {isLoading ? 'cargando...' : 'presiona'}
+        </button>
+    )
+
+  17.1) forma 2 creando un componente botton
+  
+  u: react-app\src\App.tsx
+  s:
+    const [isLoading, setIsLoaging] = useState<boolean>(false);
+    const handleClick = () => {
+        setIsLoaging(true);
+    };
+    return (
+    <Button isLoading={isLoading} onClick={handleClick}>
+          press here
+    </Button>
+    )
+  17.2) 
+    u: react-app\src\components\Button.tsx
+    s:
+      import { ReactNode } from 'react';
+      type Props = {
+        isLoading: boolean;
+        onClick: () => void;  //este tipo no devuelve nada 
+        children: ReactNode;  //esto hace que pueda leer en el children elementos tambien 
+      };
+      function Button({ isLoading, children, onClick }: Props) {
+        return (
+          <button
+            onClick={onClick}
+            disabled={isLoading}
+            type="button"
+            className={isLoading ? `btn btn-primary` : `btn btn-secondary`}
+          >
+            {isLoading ? 'cargando...' : children}
+          </button>
+        );
+      }
+      export default Button;
 
 
 
@@ -474,6 +554,7 @@ node:
 
 -snipepts:
   * tsrfce: creates a react copotnent
+    //typescript react functional component export
 
 -interface: contiene el nombre y el tipo de las propiedades que se le pasan a una funcion o las variables para saber que tipo son
             las interfaces se pueden definir:
@@ -511,7 +592,7 @@ node:
   -state: los estados pueden mutar 
   -props: son inmutables
 
-  -truthy y falsy
+  -truthy y falsy (el short operator (&&), hay que tener cuidado si el valor es cero )
     falsy: false, o , '', undefined, null
     {123 && 'numeros '} //como si hay algo en la izquierda (true) de && se imprime lo de la derecha
       {'hay string' && ' string texto'} //como si hay algo en la izquierda (true) de && se imprime lo de la
@@ -526,4 +607,9 @@ node:
         n: pero como lo que queiro es que si es cero no imprima nada:
         tengo que evaluar que no sea cero 
         {list2.length !== 0 && 'si hay algo en la lista'}
+
+- operador ternario : ? , con el operador ternario
+ no hay que tener cuidado con el cero "0"
+
+
 

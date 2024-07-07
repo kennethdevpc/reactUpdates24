@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import Card, { CardBody } from './components/Card';
+import Button from './components/Button';
 import List from './components/List';
 
 function App() {
@@ -8,9 +10,23 @@ function App() {
   const handleSelect = (elemento: string) => {
     console.log('Imprimiendo', elemento);
   };
-  const handleSelect2 = (elemento: string) => {
-    console.log('Texteando', elemento);
+
+  const contenido = (e: string) =>
+    list2.length ? (
+      <>
+        <h1>hola la longitud si existe</h1>
+        <h1>hola la longitud si existe y el dato recolectado es: {e}</h1>
+        <List data={list} onSelect={handleSelect} />
+      </>
+    ) : (
+      ''
+    );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const handleClick = () => {
+    setIsLoading(true);
   };
+
   return (
     <div>
       {123 && 'numeros '}
@@ -26,7 +42,20 @@ function App() {
       <Card>
         <CardBody title={'titulo'} text="mi texto es " />
         <List data={list} onSelect={handleSelect} />
-        <List data={list} onSelect={handleSelect2} />
+        {contenido('yo soy el dato ')}
+
+        <Button isLoading={isLoading} onClick={handleClick}>
+          press here
+        </Button>
+
+        <button
+          onClick={handleClick}
+          disabled={isLoading}
+          type="button"
+          className={isLoading ? `btn btn-primary` : `btn btn-secondary`}
+        >
+          {isLoading ? 'cargando...' : 'presiona'}
+        </button>
       </Card>
     </div>
   );
