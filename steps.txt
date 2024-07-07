@@ -535,6 +535,26 @@ React:
       export default Button;
 
 
+18) gestion de estado para eliminar y agregar a una lista 
+  s:
+    const [data, setData] = useState<string[]>(['Goku', 'vegeta', 'krilim', 'gohan', 'picoro']);
+
+      const addMinion = () => { //-----para agregar 
+        setData([...data, 'Minion']);
+      };
+      const delMinion = () => {  //-----para eliminar 
+        setData(data.slice(0, data.length - 1));
+      };
+      return (
+        <Card>
+          <Button onClick={addMinion}>Agregar</Button>
+          <Button onClick={delMinion}>Eliminar</Button>
+          <List data={data} ></List>
+        </Card>
+      );
+
+  n: el botton es el mismo que se creo en 17 solo que se utiliza ys se le manda las funciones
+  
 
 
       
