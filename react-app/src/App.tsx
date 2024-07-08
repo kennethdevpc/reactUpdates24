@@ -18,8 +18,12 @@ function App() {
   };
   return (
     <Card>
-      <Button onClick={addMinion}>Agregar</Button>
-      <Button onClick={delMinion}>Eliminar</Button>
+      <Button isLoading={true} onClick={addMinion}>
+        Agregar
+      </Button>
+      <Button isLoading={false} onClick={delMinion}>
+        Eliminar
+      </Button>
       <List data={data} onSelect={handleSelect}></List>
     </Card>
   );
