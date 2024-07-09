@@ -1,48 +1,30 @@
 import { ReactNode } from 'react';
-import styles from './Button.module.css';
 import styled from 'styled-components';
 import { FaRegThumbsUp } from 'react-icons/fa';
 
 type BtnProps = {
-  isLoading?: boolean;
+  sent?: boolean;
 };
 
 const Btn = styled.button<BtnProps>`
-  background-color: ${(props) => (props.isLoading ? 'red' : 'blue')};
-  padding: 100px 30px;
-  color: rgb(100, 60, 301);
+  background-color: ${(props) => (props.sent ? 'red' : '#ff6347')};
+  padding: 8px 12px;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 `;
 
 type Props = {
-  isLoading?: boolean;
+  sent?: boolean;
   onClick: () => void;
   children: ReactNode;
 };
 
-// const styles = {
-//   margin: '10px',
-//   backgroundColor: 'red',
-// };
-
-function Button({ isLoading, children, onClick }: Props) {
-  // const className = [
-  //   isLoading ? `btn btn-primary` : `btn btn-secondary`,
-  //   styles.button,
-  //   styles.padded,
-  // ].join(' ');
+function Button({ sent, onClick }: Props) {
   return (
-    <Btn
-      isLoading={isLoading}
-      // style={styles}
-      onClick={onClick}
-      disabled={isLoading}
-      // type="button"
-      // className={[styles.button, styles.padded].join(' ')}
-      // className={`${styles.button} ${styles.padded}`}
-      // className={isLoading ? `btn btn-primary` : `btn btn-secondary`}
-      // className={className}
-    >
-      {isLoading ? 'cargando...' : children}
+    <Btn sent={sent} onClick={onClick} disabled={sent}>
+      {sent ? 'enviado' : 'enviar'}
       <FaRegThumbsUp color="red" size={50} />
     </Btn>
   );

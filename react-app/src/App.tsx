@@ -1,47 +1,62 @@
 import { useState } from 'react';
 import Card, { CardBody } from './components/Card';
 import Button from './components/Button';
-import List from './components/List';
-import Alert from './components/Alert';
+// import List from './components/List';
+// import Alert from './components/Alert';
 
 function App() {
-  const [data, setData] = useState<string[]>(['Goku', 'vegeta', 'krilim', 'gohan', 'picoro']);
-
-  const handleSelect = (elemento: string) => {
-    console.log('presiono sobre ', elemento);
+  //----------------------------------------------------
+  const [sent, setSent] = useState<boolean>(false);
+  const handleClick = () => {
+    setSent(true);
   };
 
-  const addMinion = () => {
-    setData([...data, 'Minion']);
-  };
-  const delMinion = () => {
-    setData(data.slice(0, data.length - 1));
-  };
-
-  const [status, setStatus] = useState<boolean>(false);
-  const toggleStatus = () => {
-    setStatus(!status);
-  };
   return (
     <Card>
-      <Button isLoading={true} onClick={addMinion}>
-        Agregar
+      <Button sent={sent} onClick={handleClick}>
+        Enviar
       </Button>
-      <Button isLoading={false} onClick={delMinion}>
-        Eliminar
-      </Button>
-      <List data={data} onSelect={handleSelect}></List>
-
-      <Alert onClick={toggleStatus} status={status}>
-        Alerta
-        <h2>hola soy una alerta</h2>
-        <Button isLoading={false} onClick={delMinion}>
-          Eliminar
-        </Button>
-      </Alert>
     </Card>
   );
 
+  //----del punto  23 para atras----------
+  // const [data, setData] = useState<string[]>(['Goku', 'vegeta', 'krilim', 'gohan', 'picoro']);
+
+  // const handleSelect = (elemento: string) => {
+  //   console.log('presiono sobre ', elemento);
+  // };
+
+  // const addMinion = () => {
+  //   setData([...data, 'Minion']);
+  // };
+  // const delMinion = () => {
+  //   setData(data.slice(0, data.length - 1));
+  // };
+
+  // const [status, setStatus] = useState<boolean>(false);
+  // const toggleStatus = () => {
+  //   setStatus(!status);
+  // };
+  // return (
+  //   <Card>
+  //     <Button isLoading={true} onClick={addMinion}>
+  //       Agregar
+  //     </Button>
+  //     <Button isLoading={false} onClick={delMinion}>
+  //       Eliminar
+  //     </Button>
+  //     <List data={data} onSelect={handleSelect}></List>
+
+  //     <Alert onClick={toggleStatus} status={status}>
+  //       Alerta
+  //       <h2>hola soy una alerta</h2>
+  //       <Button isLoading={false} onClick={delMinion}>
+  //         Eliminar
+  //       </Button>
+  //     </Alert>
+  //   </Card>
+  // );
+  //----------------------------------------------------
   //----del punto  17 para  atras----------
   //   const list = ['Goku', 'vegeta', 'krilim', 'gohan', 'picoro'];
   //   const list2: string[] = [];
