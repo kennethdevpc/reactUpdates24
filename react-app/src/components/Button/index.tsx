@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import styles from './Button.module.css';
 import styled from 'styled-components';
+import { FaRegThumbsUp } from 'react-icons/fa';
 
 type BtnProps = {
   isLoading?: boolean;
@@ -42,6 +43,7 @@ function Button({ isLoading, children, onClick }: Props) {
       // className={className}
     >
       {isLoading ? 'cargando...' : children}
+      <FaRegThumbsUp color="red" size={50} />
     </Btn>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Card, { CardBody } from './components/Card';
 import Button from './components/Button';
 import List from './components/List';
+import Alert from './components/Alert';
 
 function App() {
   const [data, setData] = useState<string[]>(['Goku', 'vegeta', 'krilim', 'gohan', 'picoro']);
@@ -16,6 +17,11 @@ function App() {
   const delMinion = () => {
     setData(data.slice(0, data.length - 1));
   };
+
+  const [status, setStatus] = useState<boolean>(false);
+  const toggleStatus = () => {
+    setStatus(!status);
+  };
   return (
     <Card>
       <Button isLoading={true} onClick={addMinion}>
@@ -25,6 +31,14 @@ function App() {
         Eliminar
       </Button>
       <List data={data} onSelect={handleSelect}></List>
+
+      <Alert onClick={toggleStatus} status={status}>
+        Alerta
+        <h2>hola soy una alerta</h2>
+        <Button isLoading={false} onClick={delMinion}>
+          Eliminar
+        </Button>
+      </Alert>
     </Card>
   );
 
