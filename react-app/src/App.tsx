@@ -14,7 +14,7 @@ function App() {
   return (
     <Card>
       <Button sent={sent} onClick={handleClick}>
-        Enviar
+        Enviar Children
       </Button>
     </Card>
   );

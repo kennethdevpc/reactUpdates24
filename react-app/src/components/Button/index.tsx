@@ -1,6 +1,10 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { FaRegThumbsUp } from 'react-icons/fa';
+//modules.css
+import styles from './Button.module.css';
+import { IoIosSend } from 'react-icons/io';
+import { FaCheck } from 'react-icons/fa';
 
 type BtnProps = {
   sent?: boolean;
@@ -13,6 +17,10 @@ const Btn = styled.button<BtnProps>`
   color: white;
   border-radius: 4px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #e5bcb4;
+  }
 `;
 
 type Props = {
@@ -21,12 +29,28 @@ type Props = {
   children: ReactNode;
 };
 
-function Button({ sent, onClick }: Props) {
+function Button({ sent, onClick, children }: Props) {
   return (
-    <Btn sent={sent} onClick={onClick} disabled={sent}>
-      {sent ? 'enviado' : 'enviar'}
-      <FaRegThumbsUp color="red" size={50} />
-    </Btn>
+    <div>
+      <Btn sent={sent} onClick={onClick} disabled={sent}>
+        <FaRegThumbsUp color="red" size={50} />
+      </Btn>
+      <br />
+      <br />
+
+      <button
+        disabled={sent}
+        onClick={onClick}
+        className={[styles.btn, styles.btnPrimary].join(' ')}
+      >
+        {sent ? 'enviado' : `${children}`}
+        {sent ? (
+          <FaCheck color="green" className={styles.icon} />
+        ) : (
+          <IoIosSend color="blue" className={styles.icon} />
+        )}
+      </button>
+    </div>
   );
 }
 
