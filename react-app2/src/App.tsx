@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Anidadas from './components/Anidadas';
 
 function App() {
   console.log('App');
@@ -25,6 +26,9 @@ function App() {
 
   return (
     <>
+      <Anidadas />
+      ---------------
+      <br />
       {products.map((product) => (
         <h1>{product.name}</h1>
       ))}
