@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Anidadas from './components/Anidadas';
+import ArrayDeObjetos from './components/ArrayDeObjetos';
 
 function App() {
   console.log('App');
@@ -26,6 +27,9 @@ function App() {
 
   return (
     <>
+      <ArrayDeObjetos />
+      ---------------
+      <br />
       <Anidadas />
       ---------------
       <br />
@@ -34,7 +38,6 @@ function App() {
       ))}
       <h1>hhhhh</h1>
       {new Date().getTime()}
-      <button onClick={handleClick}>Enviar</button>
       <button onClick={handleClick2}>Enviar2</button>
     </>
   );
