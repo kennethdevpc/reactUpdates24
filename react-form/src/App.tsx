@@ -1,10 +1,10 @@
 import Form from './components/Form';
-import FormControlled from './components/FormControlled';
+import FormReactHook from './components/FormReactHook';
 
 function App() {
   return (
     <div className="container">
-      <FormControlled />
+      <FormReactHook />
     </div>
   );
 }
