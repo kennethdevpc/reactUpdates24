@@ -1,10 +1,10 @@
 import Form from './components/Form';
-import FormReactHook from './components/FormReactHook';
+import FormReactHookResolver from './components/FormReactHookResolver';
 
 function App() {
   return (
     <div className="container">
-      <FormReactHook />
+      <FormReactHookResolver />
     </div>
   );
 }
