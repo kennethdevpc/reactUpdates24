@@ -5,7 +5,7 @@ function CMS() {
     <div className="container">
       <div className="row">
         <div className="col">
-          <ContactForm />;
+          <ContactForm />; hooo
         </div>
       </div>
       <div className="row">
