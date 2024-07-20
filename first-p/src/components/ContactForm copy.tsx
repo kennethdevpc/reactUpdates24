@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { formSchema } from '../schemas/form'; //para el esquema de zod
-import { form } from '../schemas/form'; //para el esquema de zod
+import { contactSchema } from '../schemas/contact'; //para el esquema de zod
+import { contact } from '../schemas/contact'; //para el esquema de zod
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from './Input';
 
@@ -34,7 +34,6 @@ function ContactForm() {
   // };
 
   return (
-
     // <form onSubmit={handleSubmit(onsubmit)}>
     //   <div className="mb-3">
     //     <label htmlFor="name" className="form-label">

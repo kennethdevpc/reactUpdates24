@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { formSchema } from '../schemas/form'; //para el esquema de zod
-import { form } from '../schemas/form'; //para el esquema de zod
+import { contactSchema } from '../schemas/contact'; //para el esquema de zod
+import { contact } from '../schemas/contact'; //para el esquema de zod
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from './Input';
 import Button from './Button';
@@ -9,12 +9,12 @@ import Button from './Button';
 type Props = {};
 
 function ContactForm({}: Props) {
-  const methods = useForm<form>({ resolver: zodResolver(formSchema) }); //---video
+  const methods = useForm<contact>({ resolver: zodResolver(contactSchema) }); //---video
   const {
     handleSubmit,
     formState: { errors },
   } = methods;
-  const onsubmit = (data: form) => {
+  const onsubmit = (data: contact) => {
     console.log('submit');
     console.log('data', data);
   };

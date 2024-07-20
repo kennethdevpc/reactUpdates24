@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 type Props = {
   name: string;
   children: React.ReactNode;
-};
+} & { id: string };
 
 function Input({ name, children }: Props) {
   const { register } = useFormContext();
