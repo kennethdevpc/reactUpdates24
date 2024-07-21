@@ -35,7 +35,12 @@ function ContactForm({ onSubmit }: Props) {
           name={'type'}
         ></Select>
 
-        <Button variant={'primary'}>Enviar</Button>
+        <Button type={'submit'} variant={'primary'}>
+          Enviar
+        </Button>
+        <Button onClick={() => methods.reset()} variant={'secondary'}>
+          Limpiar
+        </Button>
       </form>
     </FormProvider>
   );

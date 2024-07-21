@@ -15,12 +15,12 @@ function CMS() {
     <div className="container">
       <div className="row">
         <div className="col">
-          <ContactForm onSubmit={addContact} />; hooo
+          <ContactForm onSubmit={addContact} />
         </div>
       </div>
       <div className="row">
         <div className="col">
-          <ContactTable contacts={contacts} onClick={deleteContact} />;
+          <ContactTable contacts={contacts} onClick={deleteContact} />
         </div>
       </div>
     </div>
