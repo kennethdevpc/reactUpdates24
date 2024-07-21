@@ -1,35 +1,34 @@
 import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 
+type User = {
+  //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+  id: number;
+  name: string;
+};
+
 function App() {
-  const [user, setUser] = useState<string>();
+  const [user, setUser] = useState<User[]>([]);
   useEffect(() => {
-    console.log('ejecutando hook---', user);
+    const url = 'https://jsonplaceholder.typicode.com/users';
+    fetch(url)
+      .then((response) => response.json() as Promise<User[]>) //----aqui lo que hace es convertir la data,//con un tyo de dato especifico , para que no quede any
+      .then((data) => {
+        //-----------------este paso de pasar los datos devueltos a un tipo se llama "How to deserialize JSON object into an interface"
+        setUser(data);
+      });
   }, []); //--si no se coloca nada solo se eejecuta una vez
-  //--------ejecucion una sola vez
-  // -sin dependencias podria caer en un bucle infinito
-  // // const [user, setUser] = useState<string[]>([]);
-  // // useEffect(() => {
-  // //   console.log('ejecutando solo una vez');
-  // //   setUser(['hola', 'mundo']);
-  // // }, []); //---se le agrega el [] para que solo se ejecute una vez
-  //--------para el desmonte
-  // // useEffect(() => {
-  // //   console.log('useEffect', document.title);
-  // //   document.title = 'cambie el titulo';
-  // //   return () => {
-  // //     //---para el desmonte uso el return
-  // //     console.log('se ejecut despues del desmonte ');
-  // //   };
-  // // });
 
   return (
-    <h1>
-      <button onClick={() => setUser('--nuevo estado del user--')}>Cambiar el estado </button>hola
-      mundo
-    </h1>
+    <>
+      <ul>
+        {user.map((user) => (
+          <li key={user.id}>
+            <h1>{user.name}</h1>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
