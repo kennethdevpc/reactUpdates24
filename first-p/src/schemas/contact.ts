@@ -1,4 +1,6 @@
 import { z } from 'zod';
+export const contactTypeOptions = ['Familiar', 'Trabajo', 'Amigo', 'Otros'] as const;
+
 export const contactSchema = z.object({
   name: z
     .string()
@@ -15,6 +17,8 @@ export const contactSchema = z.object({
     // .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' })
     .min(1, { message: 'el Correo es requerido' })
     .email('correo invalido'),
+
+  type: z.enum(contactTypeOptions),
 });
 
 export type contact = z.infer<typeof contactSchema> & { id: string };

@@ -5,6 +5,8 @@ import { contact } from '../schemas/contact'; //para el esquema de zod
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from './Input';
 import Button from './Button';
+import Select from './Select';
+import { contactTypeOptions } from '../schemas/contact';
 
 type Props = {
   onSubmit: (contact: contact) => void;
@@ -26,17 +28,11 @@ function ContactForm({ onSubmit }: Props) {
         <Input name="name">Nombre</Input>
         <Input name="lastname">Apellido</Input>
         <Input name="email">Correo</Input>
-
-        <div className="form-floating">
-          <select className="form-select" aria-label="Default select example">
-            {/* <option selected>select option</option> */}
-            <option value="1">Familiar</option>
-            <option value="2">Trabajo</option>
-            <option value="3">Amigo</option>
-            <option value="3">Otros</option>
-          </select>
-          <label htmlFor="floatingSelect">Texto flotante</label>
-        </div>
+        <Select
+          options={contactTypeOptions}
+          defaultMessage={'--selecciona el typo--'}
+          label={'Tipo '}
+        ></Select>
 
         <Button variant={'primary'}>Enviar</Button>
       </form>
