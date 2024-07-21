@@ -32,6 +32,7 @@ function ContactForm({ onSubmit }: Props) {
           options={contactTypeOptions}
           defaultMessage={'--selecciona el typo--'}
           label={'Tipo '}
+          name={'type'}
         ></Select>
 
         <Button variant={'primary'}>Enviar</Button>
