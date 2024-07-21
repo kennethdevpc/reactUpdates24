@@ -3,48 +3,32 @@ import { contact } from '../schemas/contact';
 
 type Props = {
   contacts: contact[];
+  onClick: (id: string) => void;
 };
 
-function ContactTable({ contacts }: Props) {
+function ContactTable({ contacts, onClick }: Props) {
   return (
     <div>
-      <table className="table">
+      <table className="table table-striped table-hover">
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Email</th>
           </tr>
         </thead>
         <tbody>
-          {contacts.map((e, i) => {
+          {contacts.map((e) => {
             return (
-              <tr>
-                <th scope="row">{i}</th>
+              <tr onClick={() => onClick(e.id)} key={e.id} style={{ cursor: 'pointer' }}>
+                <th scope="row">{e.id}</th>
                 <td>{e.name}</td>
                 <td>{e.lastname}</td>
                 <td>{e.email}</td>
               </tr>
             );
           })}
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colSpan={2}>Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
         </tbody>
       </table>
     </div>

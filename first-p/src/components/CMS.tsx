@@ -20,7 +20,7 @@ function CMS() {
       </div>
       <div className="row">
         <div className="col">
-          <ContactTable contacts={contacts} />;
+          <ContactTable contacts={contacts} onClick={deleteContact} />;
         </div>
       </div>
     </div>
