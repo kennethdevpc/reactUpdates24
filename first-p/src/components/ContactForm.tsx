@@ -6,19 +6,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Input from './Input';
 import Button from './Button';
 
-type Props = {};
+type Props = {
+  onSubmit: (contact: contact) => void;
+};
 
-function ContactForm({}: Props) {
+function ContactForm({ onSubmit }: Props) {
   const methods = useForm<contact>({ resolver: zodResolver(contactSchema) }); //---video
   const { handleSubmit } = methods;
-  const onsubmit = (data: contact) => {
-    console.log('submit');
-    console.log('data', data);
-  };
+  // const onsubmit = (data: contact) => {
+  //   console.log('submit');
+  //   console.log('data', data);
+  //   onSubmit(data);
+  //   // setContacts([...contacts, data]);
+  // };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onsubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Input name="name">Nombre</Input>
         <Input name="lastname">Apellido</Input>
         <Input name="email">Correo</Input>

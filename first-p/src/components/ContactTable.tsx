@@ -1,8 +1,11 @@
 import React from 'react';
+import { contact } from '../schemas/contact';
 
-type Props = {};
+type Props = {
+  contacts: contact[];
+};
 
-function ContactTable({}: Props) {
+function ContactTable({ contacts }: Props) {
   return (
     <div>
       <table className="table">
@@ -15,6 +18,16 @@ function ContactTable({}: Props) {
           </tr>
         </thead>
         <tbody>
+          {contacts.map((e, i) => {
+            return (
+              <tr>
+                <th scope="row">{i}</th>
+                <td>{e.name}</td>
+                <td>{e.lastname}</td>
+                <td>{e.email}</td>
+              </tr>
+            );
+          })}
           <tr>
             <th scope="row">1</th>
             <td>Mark</td>
