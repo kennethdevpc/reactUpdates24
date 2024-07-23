@@ -9,7 +9,7 @@ import useUsers from './hooks/useUsers';
 // };
 
 function App() {
-  const { user, loading, error } = useUsers();
+  const { users, loading, error } = useUsers();
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -20,7 +20,7 @@ function App() {
   return (
     <>
       <ul>
-        {user.map((user) => (
+        {users.map((user) => (
           <li key={user.id}>
             <h1>{user.name}</h1>
           </li>

@@ -6,49 +6,34 @@ type User = {
   name: string;
 };
 export default function useUsers() {
-  const [user, setUser] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
+    const controller = new AbortController(); //-------funcion que viene en los navegadores para cancelar peticiones
+    const { signal } = controller; //-------Esto es un objeto que se le pasa a la peticion fetch tal como se le pasan por ejemplo un POST, GET, etc
+
     async function hook() {
       const url = 'https://jsonplaceholder.typicode.com/users';
       setLoading(true);
       try {
-        const response = await fetch(url); //---1
+        const response = await fetch(url, { signal }); //----le paso el objeto signal a la peticion fetch
         if (!response.ok) {
           //------------------2
-          throw new Error(`${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: User[] = await response.json(); //---3
-        setUser(data); //---4
+        setUsers(data); //---4
+        setError(undefined); //------con el undefined limpio el error, para que no mande errores si se vuelve a cargar la pagina
       } catch (error) {
         setError((error as Error).message); //---5
       } finally {
         setLoading(false); //---6
       }
-
-      // fetch(url) //----1 sin async await(SAA)
-      //   .then((response) => {
-      //     if (!response.ok) {
-      //       //--2 sin async await(SAA)
-      //       throw new Error(`${response.status}`);
-      //     }
-      //     return response.json() as Promise<User[]>; //--3-SAA
-      //   })
-      //   .then((data) => {
-      //     //----4-SAA
-      //     setUser(data);
-      //   })
-      //   .catch((error: Error) => {
-      //     setError(error.message); //--5-SAA
-      //   })
-      //   .finally(() => {
-      //     setLoading(false);//---6-SAA
-      //   });
     }
-
     hook();
+    return () => controller.abort(); //-----------cancelo la peticion
   }, []); //--si no se coloca nada solo se eejecuta una vez
-  return { user, loading, error };
+  return { users, loading, error };
 }
