@@ -16,7 +16,13 @@ type User = {
 
 function App() {
   const url = 'https://jsonplaceholder.typicode.com/users';
-  const { loading, error, data: users, addData: addUser } = useHttpData<User>(url);
+  const {
+    loading,
+    error,
+    data: users,
+    addData: addUser,
+    deleteData: deleteUser,
+  } = useHttpData<User>(url);
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -28,6 +34,7 @@ function App() {
     <>
       <ul>
         <button onClick={() => addUser({ name: 'chanco' })}>Enviar nuevo </button>
+        <button onClick={() => deleteUser(1)}>delete 11 </button>
         {users.map((user) => (
           <li key={user.id}>
             <h1>{user.name}</h1>
