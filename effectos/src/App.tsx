@@ -10,7 +10,7 @@ import useHttpData from './hooks/useHttpData';
 
 type User = {
   //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
-  id?: number;
+  id?: number | string;
   name: string;
 };
 
@@ -22,6 +22,7 @@ function App() {
     data: users,
     addData: addUser,
     deleteData: deleteUser,
+    updateData: updateUser,
   } = useHttpData<User>(url);
   if (loading) {
     return <p>Loading...</p>;
@@ -35,6 +36,7 @@ function App() {
       <ul>
         <button onClick={() => addUser({ name: 'chanco' })}>Enviar nuevo </button>
         <button onClick={() => deleteUser(1)}>delete 11 </button>
+        <button onClick={() => updateUser({ id: 1, name: 'chanchoooo' })}>update 11 </button>
         {users.map((user) => (
           <li key={user.id}>
             <h1>{user.name}</h1>
