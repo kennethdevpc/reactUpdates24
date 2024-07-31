@@ -1,12 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { Grid, GridItem } from '@chakra-ui/react';
 import Header from './components/Header';
 import SideNav from './components/SideNav';
 import MainContent from './components/MainContent';
+import { set } from 'react-hook-form';
+import axios from 'axios';
+import { CategoriesResponse, Category } from './types';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+  const [data, setData] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    setLoading(true);
+    axios
+      .get<CategoriesResponse>(url, { signal })
+      // .then((re) => { //----sin destructuracion
+      .then(({ data }) => {
+        // setData(re.data.meals); //----sin destructuracion
+        setData(data.meals);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
 
   return (
     <Grid
