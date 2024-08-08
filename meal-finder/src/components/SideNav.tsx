@@ -1,6 +1,6 @@
 import React from 'react';
 import { Category } from '../types';
-import { Box, Heading, Link, StackDivider, VStack } from '@chakra-ui/react';
+import { Box, Heading, Link, SkeletonText, StackDivider, VStack } from '@chakra-ui/react';
 import { color } from 'framer-motion';
 
 type Props = {
@@ -16,7 +16,10 @@ const selectedProps = {
   fontWeight: 'bold',
 };
 function SideNav({ categories, loading, selectedCategory: selected, setSelectedCategory }: Props) {
-  return (
+  console.log(loading);
+  return loading ? (
+    <SkeletonText mt="4" noOfLines={8} spacing="4" skeletonHeight="2" />
+  ) : (
     <>
       <Heading color="green.400" fontSize={12} fontWeight="bold" mb="4">
         CATEGORIAS

@@ -16,22 +16,31 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    let ignore = false;
     const controller = new AbortController();
     const { signal } = controller;
-
     setLoading(true);
     axios
       .get<CategoriesResponse>(url, { signal })
       // .then((re) => { //----sin destructuracion
       .then(({ data }) => {
         // setData(re.data.meals); //----sin destructuracion
-        setData(data.meals);
+        if (!ignore) {
+          //----si tiene que ignorar entonces no vuelve a setear
+          setData(data.meals);
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (!ignore) {
+          //----si tiene que ignorar entonces no vuelve a setear
+          setLoading(false);
+        }
       });
 
-    return () => controller.abort();
+    return () => {
+      ignore = true; //----cuando se sale o termina el proceso(la 1era vez) entonces pone en true pa que no vuelva a ejecutar el set de react
+      controller.abort();
+    };
   }, []);
 
   return (
