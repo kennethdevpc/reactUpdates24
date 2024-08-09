@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import { Grid, GridItem } from '@chakra-ui/react';
 import Header from './components/Header';
@@ -6,42 +6,22 @@ import SideNav from './components/SideNav';
 
 import MainContent from './components/MainContent';
 import { set } from 'react-hook-form';
-import axios from 'axios';
-import { CategoriesResponse, Category } from './types';
+import { Category, Meal } from './types';
+import useHttpData from './hooks/useHttpData';
+
+const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+const defaultCategory: Category = { strCategory: 'Beef' };
+
+const makeMealUrl = (category: Category) =>
+  `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category.strCategory}`;
 
 function App() {
-  const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
-  const [selectedCategory, setSelectedCategory] = useState<Category>({ strCategory: 'Beef' });
-  const [data, setData] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
 
-  useEffect(() => {
-    let ignore = false;
-    const controller = new AbortController();
-    const { signal } = controller;
-    setLoading(true);
-    axios
-      .get<CategoriesResponse>(url, { signal })
-      // .then((re) => { //----sin destructuracion
-      .then(({ data }) => {
-        // setData(re.data.meals); //----sin destructuracion
-        if (!ignore) {
-          //----si tiene que ignorar entonces no vuelve a setear
-          setData(data.meals);
-        }
-      })
-      .finally(() => {
-        if (!ignore) {
-          //----si tiene que ignorar entonces no vuelve a setear
-          setLoading(false);
-        }
-      });
+  const { data, loading } = useHttpData<Category>(url);
+  const { data: dataMeal, loading: loadingMeal } = useHttpData<Meal>(makeMealUrl(defaultCategory));
 
-    return () => {
-      ignore = true; //----cuando se sale o termina el proceso(la 1era vez) entonces pone en true pa que no vuelva a ejecutar el set de react
-      controller.abort();
-    };
-  }, []);
+  console.log('data:', { dataMeal });
 
   return (
     <Grid
