@@ -42,8 +42,8 @@ function App() {
           loading={loading}
         ></SideNav>
       </GridItem>
-      <GridItem pl="2" bg="green.300" area={'main'}>
-        <MainContent></MainContent>
+      <GridItem p="4" bg="gray.300" area={'main'}>
+        <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>
       </GridItem>
     </Grid>
   );
