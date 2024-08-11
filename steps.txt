@@ -613,7 +613,7 @@ React:
         background-color: rgb(128, 2, 0);
       }
 
-    OJO: si quiero agreagar un estilo, debo crearlo como clase:
+    OJO: si quiero agregar un estilo, debo crearlo como clase:
     osea ".button " ya que si le pongo "button " sin el clase
     lo que hara es darle a el estilo a todos lo elementos nativos "button"
     entonces 
@@ -635,6 +635,24 @@ React:
         </button>
       );
     }
+      19.3.2.2)
+      NOTA:
+      es bueno usar los module.css (sobre css puro ya que no usa camelCase)
+      y ademas porporque se evita que dos clases choquen entre si ya que automaticamente se le asigna un hash
+      por ejemplo el boton queda asi :
+
+      result:
+        <button type="button" class=" _button_1tq4n_1 _padded_1tq4n_9">Agregar</button>
+
+      n:
+        como se observa la clase ".button" 
+        queda con un " _ "y al final un "_1tq4n_1 _padded_1tq4n_9"
+        _button_1tq4n_1 _padded_1tq4n_9
+
+        de esta manera no se mezclan las clases 
+
+
+
 
     19.3.3) combinando stilos con modules.css
       u: react-app\src\components\Button\Button.module.css
@@ -661,29 +679,1679 @@ React:
                 className={[styles.button, styles.padded].join(' ')} 
                 //--------forma 2 de unir los estilos
                 // className={`${styles.button} ${styles.padded}`}
+
+                //--------forma 3 de unir los estilos cuando queremos añadir etlos de manera dinamica
+              
+                 className={[
+                  isLoading ? `btn btn-primary` : `btn btn-secondary`, //-------agrego lo normal de antes
+                  styles.button, //-------le sigo agregando en el array los estilos 
+                  styles.padded, //-------le sigo agregando en el array los estilos 
+                ].join(' ')}
+              
               >
                 {isLoading ? 'cargando...' : children}
               </button>
             );
           }
+      19.3.3.3) si depronto ya es muy grande los estilos puedo obtar por guardarlos en una variable
+          s:
+            import styles from './Button.module.css';
+          
+            function Button({ isLoading, children, onClick }: Props) {
+            const className = [  //--------creo esta constante
+                isLoading ? `btn btn-primary` : `btn btn-secondary`,
+                styles.button,
+                styles.padded,
+              ].join(' ');
+
+            return (
+              <button
+                className={className} //--------agrego a aqui 
+              >
+                {isLoading ? 'cargando...' : children}
+              </button>
+            );
+          }
+            
+
+20) css en js 
+  es la forma en que se tiene todo en un mismo archivo 
+  para esto se usara una libreria:
+  c:
+    npm i styled-components
+  n: si por alguna razon hay un error señalando que no estan los typos 
+  voy a instalarle los typos:
+  c: 
+    npm i @types/styled-components
+
+
+  20.1) usando en el botton : 
+    u: react-app\src\components\Button\index.tsx
+    s:
+      import styled from 'styled-components';
+
+      const Btn = styled.button`  //------agrego los estilos aqui  con las Backtick (Acento grave o comilla invertida)
+        background-color: rgb(33, 35, 31);
+        padding: 100px 30px;
+        color: rgb(100, 60, 301);
+      `;
+      function Button({ isLoading, children, onClick }: Props) {
+        return (
+          <Btn //----------le cambio aqui el nombre a este componente
+            onClick={onClick}
+            disabled={isLoading}
+          >
+            {isLoading ? 'cargando...' : children}
+          </Btn>
+        );
+      }
+
+      20.1.2) entonces el resultado sera:
+        resultado:
+          <button type="button" class="sc-imWZod eKsCXj btn btn-secondary">Agregar</button>
+        n: como se observa se agregan "sc-imWZod eKsCXj" clases de manera dinamica
+
+
+  20.2) pasandole propiedades a ese estilopaa poder asi cambiar los estilos
+    u: react-app\src\components\Button\index.tsx
+    s:
+      import { ReactNode } from 'react';
+      import styled from 'styled-components';
+
+      type BtnProps = {  //----agrego la propiedad de el Btn
+        isLoading?: boolean;
+      };
+
+      const Btn = styled.button<BtnProps>`  //----agrego el typo de las propiedades que se le daran a aeste Btn
+        background-color: ${(props) => (props.isLoading ? 'red' : 'blue')};  //agrego la logica normal usando la propiedad pasada
+        padding: 100px 30px;
+        color: rgb(100, 60, 301);
+      `;
+
+      ...
+      ..
+
+      function Button({ isLoading, children, onClick }: Props) {
+         return (
+          <Btn
+            isLoading={isLoading}
+            onClick={onClick}
+            disabled={isLoading}
+            >
+            {isLoading ? 'cargando...' : children}
+          </Btn>
+        );
+      }
+      export default Button;
+
+    20.2.2) voy ahora si y le paso en el componente donde llamo al componente boton
+
+      u:react-app\src\App.tsx
+      s:
+        import Button from './components/Button';
+        ...
+        ..
+        .
+        return (
+          <Card>
+          //----------le paso el isloading
+            <Button isLoading={true} onClick={addMinion}>
+              Agregar
+            </Button>
+            <Button isLoading={true} onClick={delMinion}>
+              Eliminar
+            </Button>
 
 
 
+21) biblotecas que mas utilizare:
+Bootstrap-> react.bootstrap
+tailwind-> usa la biblioteca Deisy UI
+BulmaCss-> react bulma
+Chakra UI -> especifica de react 
+
+--------------despues del video 
+
+22) react icons
+  c: npm install react-icons
+
+  22.1) uso: 
+    u:
+    s:
+     import { FaRegThumbsUp } from 'react-icons/fa';
+
+      return(
+       <FaRegThumbsUp color="red" size={50} /> //-----asi se haria el uso 
+      )
+
+23) ejercicio cambio color boton:
+  u:  react-app\src\App.tsx
+  s:
+   function App() {
+    const [status, setStatus] = useState<boolean>(false);
+    const toggleStatus = () => {
+      setStatus(!status);
+    };
+    return (
+      
+      <Alert onClick={toggleStatus} status={status}>
+        Alerta
+      </Alert>
+
+    )
+   }
+   23.1) creo el componente:
+    u:react-app\src\components\Alert\index.tsx
+    s:
+      import { ReactNode } from 'react';
+      import styles from './Alert.module.css';
+      type Props = {
+        children: ReactNode;
+        status: boolean;
+        onClick: () => void;
+      };
+
+      function Alert({ status, onClick }: Props) {
+        return (
+          <div
+            className={[styles.alert, status ? styles.alertPrimary : styles.alertSecondary].join(' ')}
+            onClick={onClick}
+          >
+            Alert {status ? 'true' : 'false'}
+               {children}
+          </div>
+        );
+      }
+
+      export default Alert;
+    23.2) creo los estilos:
+      u: react-app\src\components\Alert\Alert.module.css
+      s:
+        .alert {
+          padding: 10px 15px;
+          border-radius: 5px;
+          border-width: 1px;
+          border-style: solid;
+          color: #fff;
+        }
+
+        .alertPrimary {
+          background-color: red;
+          border-color: darkred;
+        }
+        .alertSecondary {
+          background-color: rgb(0, 0, 255);
+          border-color: darkred;
+        }
 
 
 
+24) creando un boton y agregndole hover, icono y estado 
+  u: react-app\src\components\Button\Index.tsx
+  s: 
+      import { ReactNode } from 'react'; //------importo el typo
+      import styled from 'styled-components';  //----para con el stiled component
+      import { FaRegThumbsUp } from 'react-icons/fa';
+      //modules.css
+      import styles from './Button.module.css'; //---para estilos con component.modules
+      import { IoIosSend } from 'react-icons/io'; 
+      import { FaCheck } from 'react-icons/fa';
+
+      //---------propiedades para styled component
+      type BtnProps = {
+        sent?: boolean;
+      };
+
+      const Btn = styled.button<BtnProps>`
+        background-color: ${(props) => (props.sent ? 'red' : '#ff6347')};
+        padding: 8px 12px;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {  //--------------para agregarle al boton una funcionalida mas
+          background-color: #e5bcb4;
+        }
+      `;
+       //---------fin propiedades para styled component
+
+      type Props = {
+        sent?: boolean;
+        onClick: () => void;
+        children: ReactNode;
+      };
+
+      function Button({ sent, onClick, children }: Props) {
+        return (
+          <div>
+          //------------boton con styled componentes
+            <Btn sent={sent} onClick={onClick} disabled={sent}>
+              <FaRegThumbsUp color="red" size={50} />
+            </Btn>
+            <br />
+            <br />
+          //------------boton con module componentes
+
+            <button
+              disabled={sent}
+              onClick={onClick}
+              className={[styles.btn, styles.btnPrimary].join(' ')}
+            >
+              {sent ? 'enviado' : `${children}`}
+              {sent ? (
+                <FaCheck color="green" className={styles.icon} />
+              ) : (
+                <IoIosSend color="blue" className={styles.icon} />
+              )}
+            </button>
+          </div>
+        );
+      }
+
+      export default Button;
+
+25) Como usar el useState cuando se tiene relacion en las variables( objeto de estados)
+  ejm: modificando el 
+    const [name, setName] = useState('carlos');
+    const [lastName, setLastName] = useState('perez');
+
+  n: como si hay relacion aqui, entonces lo que hare es 
+    colocarlo dentro de un objeto
+  s:
+    const [user, setUser] = useState({ name: 'Carlos', lastName: 'perez' });
+    const handleClick = () => {
+     setUser({ ...user, name: 'JuanCambiado' }); //-----cambiando el estado de el objeto 
+    };
+
+  ejm2: // agregando un objeto a el array de objetos
+    const [products, setProducts] = useState([
+       { name: 'shoes', price: 20 },
+       { name: 'shirts',price: 30 },
+      ]);
+
+    const handleClick = () => {
+      let newProducts = [...products, { name: 'pants', price: 40 }];
+      setProducts(newProducts);
+    };
+26) cambiando propiedades de objeto que se encuentran anidadas
+  u:react-app2\src\components\Anidadas.tsx
+  s:
+    function Anidadas() {
+      const [product, setProducts] = React.useState({
+        name: 'Pizza', price: 20,
+        addreess: {street: 'calle 1',number: 123},
+      });
+      const handleClick = () => {
+        setProducts({
+          ...product,
+          addreess: {
+            ...product.addreess,
+            street: 'calle 6',
+          },
+        });
+      };
+
+      return (
+        <div>
+          <h1>{product.name}</h1>
+          <h2>{product.addreess.street}</h2>
+          <h2>{product.addreess.number}</h2>
+          <button onClick={handleClick}>Enviar</button>
+        </div>
+      );
+    }
+
+27) cambiando propiedades de ARRAY DE OBJETOS
+  n:-para agregar se hace son el spread operator
+    -para modificar se hace con el map
+    -para eliminar con el filter
+  U: react-app2\src\components\ArrayDeObjetos.tsx
+  s:en el script
+    //----Agregando 1 objeto mas al array
+      const handleClick = () => {
+        setProducts([
+          ...product,
+          {
+            id: 3,
+            name: 'Hamburguesa',
+            price: 30,
+          },
+        ]);
+      };
+      //----Agregando 1 objeto mas al array pero al principio
+      const handleClick2 = () => {
+        setProducts([
+          {
+            id: 4,
+            name: 'Hamburguesa',
+            price: 30,
+          },
+          ...product,
+        ]);
+      };
+      //modificando un valor de un objeto:
+      //en este caso se cambia el nombre del producto con id 2, se hace con map
+      //ya que devuelve un nuevo array con los cambios, osea un nuevo array
+      const handleClick3 = () => {
+        const newArray = product.map((product) => {
+          return product.id == 2 ? { ...product, name: 'perroArreglado' } : product;
+        });
+        setProducts(newArray);
+      };
+      //eliminando un objeto
+      const handleClick4 = () => {
+        const newArray = product.filter((product) => {
+          return product.id !== 2;
+        });
+        setProducts(newArray);
+      };
+28) Compartiendo estados a elementos
+  u: react-app3\src\App.tsx
+  s:
+    import { useState } from 'react';
+    import ProductDashboard from './components/ProductDashboard';
+    import ProductList from './components/ProductList';
+    import Button from './components/Button';
+
+    function App() {
+      const [products, setProducts] = useState([
+        { id: 1, name: 'Product 1', price: 100 },
+        { id: 2, name: 'Product 2', price: 200 },
+        { id: 3, name: 'Product 3', price: 300 },
+      ]);  //-------creo el estado 
+      const handleClick = () => {
+        const newProduct = { id: 4, name: 'Product 4', price: 400 };
+        setProducts([...products, newProduct]);
+      };//-------cambiador del estado
+
+      return (
+        <>
+        //pasandole al los componenetes
+          <ProductDashboard amount={products.length}> </ProductDashboard>
+          <Button onClick={handleClick}>Enviar</Button>
+          <ProductList products={products}></ProductList>
+        </>
+      );
+    }
+
+    export default App;
+  28.2) ahora creo el button 
+   u: react-app3\src\components\Button.tsx
+   s: 
+      import { ReactNode } from 'react';
+      type Props = { //-------la interface 
+        children: ReactNode;
+        onClick: () => void;
+      };
+      function Button({ onClick, children }: Props) { //----uso ahora si el esas props
+        return <button onClick={onClick}>{children}</button>;
+      }
+      export default Button;
+
+  28.3) crelo la lista:
+    u: 
+    s: 
+        import React from 'react';
+        type Product = { //-------un Product es un obj y tiene varios tipos de varibles
+          id: number;
+          name: string;
+          price: number;
+        };
+        type Props = {//-----arre
+          products: Product[];//----es de tipo arreglo de Product
+        };
+        function ProductList({ products }: Props) {
+          return (
+            <div>
+              <ul>
+                {products.map((product) => (
+                  <li key={product.id}>
+                    <span>{product.name}</span>
+                    <span>{product.price}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+
+        export default ProductList;
+
+29) Ejercicio agrear, liminar, vaciar estado
+  u: react-app4
+
+30) Formularios
+  n: se utiliza la biblioteca react hook form que usa 
+  las referencias (no controlado)  o el onChange(controlado)
+  ya que esto rerenderiza solo el cmpo que se cambia y no tooodo
+  el formulario
+
+   u: react-form
+
+  30.0) Formularios no controlado:
+    -hacemos uso del hook "useRef", para ver el cambio en un campo cuando se haga submit
+    u:react-form\src\components\form.tsx
+    n: es importante saber que el useRef usa:
+      s:
+    //-------se define la variable useRef
+      const nameRef = useRef<HTMLInputElement>(null); //recibe un null o un html inicial
+    //-------para hacer el lllamado en una funcion:
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+      event.preventDefault();
+      const data = {
+        //------se usa el ".current" para llamar el dato
+        name: nameRef.current?.value,
+        lastname: lastnameRef.current?.value,
+      };
+    //-------en el html se usa asi:
+      return (
+        <form onSubmit={handleSubmit}>
+          ...
+            ...//------aqui usa el nombre del useRef
+            <input ref={nameRef} name="nombre" type="text" id="name" className="form-control" />
+          </div>
+          <div className="mb-3">
+            ....
+            ..
+            <input ref={lastnameRef} type="text" id="lastname" className="form-control" />
+          </div>
+          <button className="btn btn-primary">Enviar</button>
+        </form>
+      );
+  30.1) forma como yo hacia con el e.target.value
+      s: //funcion como hago el llamado al hacer submit:
+      function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const input = form.elements.namedItem('lastname') as HTMLInputElement;
+        console.log('el input', input.value);
     
-
-
-
-
-
-
     
+      30.1.2) para en las input que cada vez que hay un cambio 
+      en ese input se ejetute esa funcion (esto esta en js, toca averiguar como es en TS)
+        s:
+        function handleOnChange(e) {
+            setInput({
+              ...input,
+              [e.target.name]: e.target.value,
+            });
+            setErrors(handleValidacion({ ...input, [e.target.name]: e.target.value }));
+            console.log(input);
+          }
+
+        //html
+         <input
+            type="text"
+            value={input.name}
+            name="name"
+            placeholder=" Nombre..."
+            onChange={(e) => handleOnChange(e)}
+
+  30.2)formularios controlados
+    u:react-form\src\components\FormControlled.tsx
+    s:
+      //creo un estado
+        const [user, setUser] = useState({ name: '', lastname: '' });
+     // tambien le puedo pasar datos iniciales:
+        const [user, setUser] = useState({ name: 'nombre', lastname: 'apellido' });
+
+     
+      //en los input puedo colocar:
+
+        <input
+          //-----la funcion que cada ez uqe hay un cambio llena el user
+          onChange={(e) => setUser({ ...user, name: e.target.value })}
+          name="nombre"
+          type="text"
+          id="name"
+           value={user.lastname} //-----le paso el value inicial 
+          className="form-control"
+        />
+    30.2.2) ahora la forma en la cual se usa una funcion para todas
+      s:
+      //uso una funcion 
+          function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+            console.log('escribiendo', event.target.name, event.target.value);
+            setUser({ ...user, [event.target.name]: event.target.value });
+          }
+      //en el html uso:
+        <input
+          //forma larga
+          // onChange={(e) => setUser({ ...user, lastname: e.target.value })}
+          //----forma corta usando la funcion 
+          onChange={(e) => handleChange(e)}
+          type="text"
+          id="lastname"
+          name="lastname"
+           value={user.lastname} //-----le paso el value inicial 
+          className="form-control"
+        />
+  30.3) React hook form 
+    c: npm i react-hook-form@7.51.3
+    u:react-form\src\components\FormReactHook.tsx
+    s:
+      //contiene todos los metodos
+        const form = useForm();
+
+    30.3.2) 
+     //para hacer el uso de las opciones primero registro el elemento 
+       dentro del formulario 
+      s: 
+       function FormReactHook() {
+        const { register } = useForm();
+        
+         return (
+          <form onSubmit={(e) => e.preventDefault()}>
+            ...
+            ..
+            //-----Aqui lo primero que se hace es registrar este input
+              <input {...register('name')}  type="text" id="name" className="form-control" />
+              <input {...register('lastname')}  type="text" id="lastname" className="form-control" />
+            ...
+       }
+      //----explicacion ------------
+       n: Ese register(<input {...register('name')} />)
+       podria devolver algo asi como:
+        
+        {
+          name: 'name',
+          ref: someFunction,
+          onChange: someFunction,
+          onBlur: someFunction
+        }
+        Es decir:
+        <input
+            name="name"
+            ref={someFunction}
+            onChange={someFunction}
+            onBlur={someFunction}
+          />
+       n:
+        el spread operator trae con sigo eso
+      //----fin explicacion ------------
+
+
+    30.3.3) ahora para obtener los datos de ese
+     campo registrado:
+     s: 
+      function FormReactHook() {
+        //----obtergo el handleSubmit
+        const { register, handleSubmit } = useForm();
+
+        return (
+          <form  //-------aquie l handle submit posee la info del register
+            () vealo como el "event" del onclick)
+              onSubmit={
+                handleSubmit((data) =>console.log("informacion Obtenida desde el 'register'", data)
+              )}
+          >
+            <div className="mb-3">
+
+    30.3.4) validaciones con el "register"
+     obtengo la funcionalidad "formState"
+     *max,
+     *min,
+     *pattern(expresiones regulares), 
+     * validate: (value) => (value.length < 4 ? 'largo minimo 4' : true),
+
+      s:
+        const { ....... formState } = useForm();
+        //puedo ver el error en
+        console.log(formState.errors);
+
+        ...
+        ..
+        <input
+          {...register('name', { //----agrego las validaciones
+            required: 'Este campo es requerido',
+            minLength: { value: 2, message: 'Mínimo 2 caracteres' },
+            maxLength: { value: 10, message: 'No más de 10 caracteres' },
+          })}
+          type="text"
+          id="name"
+          className="form-control"
+        />
+      30.3.4.2) para usar la Destructuracion anidada
+        s: --forma 1 
+          type Form = { //----creo este typo para que acepte estos
+            name: string;
+            lastname: string;
+          };
+          
+          const {register,
+                handleSubmit,
+                formState: { errors }
+                } = useForm<Form>(); //----le agrego el typo pa que no ponga eror con "name" y "lastname"
+          console.log(errors);
+          //uso el el html:
+          {errors.name && <span>{errors?.name?.message}</span>}
+
+        s: -- forma2 sin usar el interface o typo
+                
+          const {register,
+                handleSubmit,
+                formState: { errors }
+                } = useForm();
+          console.log(errors);
+
+          //uso el el html:
+          {errors.name && <span>{errors?.name?.message?.toString()}</span>}
+    30.3.5) colocando la funcion del handle submit en una cfuncion aparte
+      s:
+        //---el onsubmit solo se ejecuta si no hya errores  
+        //---osea el handleSubmit se ejecuta colo cuando esa bien todo 
+        const onsubmit = (data: Form) => console.log("informacion Obtenida desde el 'register'", data);
+        return (
+          //----------pasandole el submit
+            <form onSubmit={handleSubmit(onsubmit)}>
+31) biblioteca para manejo de formularios muy pesados
+  biblioteca Sopara validacion por schema
+  joi, yup y zod
+  uzaremos ZOD:
+  c:
+    npm i zod@3.22.4
+  n: creo la carpeta y el archivo:
+  u: react-form\src\schemas\user.ts
+
+  s: 
+      import { z } from 'zod';
+      export const userSchema = z.object({
+        name: z
+          .string({ required_error: 'Nombre es requerido' })
+          .min(3, { message: 'longitud minima 3' })
+          .max(20),
+        lastname: z
+          .string({ required_error: 'Apellido es requerido' })
+          .min(3, { message: 'longitud minima 3' })
+          .max(20),
+        amount: z
+          .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' })
+          .min(1, { message: 'el campo es requerido' }),
+      });
+
+  31.2) ahora utilizo esto en el formulario
+    u: react-form\src\components\FormReactHook.tsx
+    s: 
+      import { userSchema } from '../schemas/user'; //-----importo ese schema creado 
+      function FormReactHook() {
+        //----usando react hook se sigue utilizando ya que ZOD se usa con "react hook form"
+        type Form = { name: string; lastname: string; };
+        const { register, handleSubmit,formState: { errors },
+        } = useForm<Form>();
+
+        const onsubmit = (data: Form) => {
+          try { //--------Uso un try catch para usar el codigo de ZOD
+            const x = userSchema.parse(data);  //----uso ese schema
+            console.log('sin eerror', x);
+
+          } catch (error) {
+            //me salia este error 'error' is of type 'unknown'.ts(18046)
+            //lo que entiendo es que se debe colocar como una instancia de Error
+            //o fix the error, you need to explicitly type the error variable as Error so that TypeScript recognizes it as an error object.
+            console.log(`${(error as Error).message}`);
+
+            if (error instanceof Error && 'errors' in error) {
+              console.log('Form data is invalid', error.message);
+            } else {
+              console.log('Unknown error occurred', error);
+            }
+          }
+        };
+
+        return (
+          <form onSubmit={handleSubmit(onsubmit)}> //---llamo el onsubmit
+            <div className="mb-3">
+              ...
+              ..
+              <input
+                {...register('name' )}
+                type="text"
+                id="name"
+                className="form-control"
+              />
+        )
+  31.3) ahora si utilizando la biblioteca de resolver
+    n: me permite que ese zog o esos errores del Zog puedan manejarse mejor
+    u: https://github.com/react-hook-form/resolvers
+
+    c: npm install @hookform/resolvers@3.3.4
+    s:
+      import { zodResolver } from '@hookform/resolvers/zod';
+      import { userSchema } from '../schemas/user'; //---uso el mismo schema
+
+      function FormReactHookResolver() {
+          type Form = {
+            name: string;
+            lastname: string;
+          };
+          const {
+            register,
+            handleSubmit,
+            formState: { errors },
+          } = useForm<Form>({
+            resolver: zodResolver(userSchema),
+          });
+          
+          console.log('.....', errors);
+
+          const onsubmit = (data: Form) => {
+            console.log('data', data);
+          };
+
+          return (
+          <form onSubmit={handleSubmit(onsubmit)}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                Nombre
+              </label>
+              <input {...register('name')} type="text" id="name" className="form-control" />
+              {errors.name && <span>{errors?.name?.message}</span>}
+            </div>
+
+              <input {...register('lastname')} type="text" id="lastname" className="form-control" />
+                {errors.lastname?.message ?? <p>{errors?.name?.message}</p>}
+            .
+            .
+            .)
+    31.4) ahorrandose la duplicidad de typos 
+      u:react-form\src\schemas\user.ts
+      s: 
+        export type userForm = z.infer<typeof userSchema>;
+
+      31.4.2) voy al formulario 
+        u: react-form\src\components\FormReactHookResolver.tsx
+        s: 
+          import { userForm } from '../schemas/user';
+          //borro esto 
+               // type Form = {
+               //   name: string;
+               //   lastname: string;
+               // };
+          const {
+              register,
+              handleSubmit,
+              formState: { errors },
+            } = useForm<userForm>({ //------cambio por este typo
+              resolver: zodResolver(userSchema),
+            });
+              //------cambio por este typo
+             const onsubmit = (data: userForm) => {
+              console.log('data', data);
+              // console.log("informacion Obtenida desde el 'register'", data);
+            };
+
+32) si quiero reutilizar mi boton 
+  u: first-p\src\components\Input.tsx
+  s:
+      import React from 'react';
+      type variant = 'primary' | 'secondary' | 'danger' | 'warning';
+      type Props = {
+        variant?: variant;
+        children: React.ReactNode;
+      };
+      function Button({ children, variant = 'primary' }: Props) {
+        return (
+          <button type="submit" className={`btn btn-${variant} m-3`}>
+            {children}
+          </button>
+        );
+      }
+      export default Button;
+
+ 32.3) 
+  u: first-p\src\components\ContactForm.tsx
+  s:  
+    import Input from './Input';
+
+    <Input {...register('name')} />
+33) pasando el error al campo inPut, 
+  FORMA1
+    u:first-p\src\components\ContactForm.tsx
+    s:  
+      function ContactForm({}: Props) {
+        ...
+        const {
+          handleSubmit,
+          formState: { errors },//---sacando el error
+        } = methods;
+      
+      return (
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onsubmit)}>
+          <Input name="name" errors={errors}> //----AQUI LE PASO EL ERROR
+            Nombre
+          </Input>
+
+    u: first-p\src\components\Input copy.tsx
+    s:
+      type Props = {
+        name: string;
+        children: React.ReactNode;
+        errors: FieldErrors<contact>;//----aqui este es el tipo para la propiedad error
+      };
+
+      function Input({ name, children, errors }: Props) { //--importo la propiedad
+        ...
+        return (
+          <div className="mb-3">
+          ....//-----ahora si hago el uso del error
+            {errors?.name?.message ?? <p>{errors?.name?.message}</p>}
+          </div>
+        );}
+
+  FORMA2 
+    n: usando la funcionaliad "getFieldState", se utiiza en el 
+    componente el cual hace o mustra las validaciones para este caso "input"
+    u:first-p\src\components\Input.tsx
+    s: 
+    function Input({ name, children }: Props) {
+
+      //-----importo el  "formState, getFieldState" 
+      const { register, formState, getFieldState } = useFormContext();
+      //----- hago el uso para obtener el error del atributo "name" que traiga
+      const { error } = getFieldState(name, formState);
+
+       return (
+          <div className="mb-3">
+            ....
+            ..//-------mostrando el mensaje
+            {error?.message && <p className="text-danger">{error.message}</p>}
+          </div>
+        );
+      )
+34) reset de formularion con react hook rom:
+  u: first-p\src\components\contactForm.tsx
+  s: la funcion que modifica o resetea el formulario es:
+  s: methods.reset({name:"luna"})
+
+  n: puede resetiar todo o por ejemplo ponerle 
+  a una propiedad especifica un valor ejm propiedad "nombre":"luna"
+      
+      <Button onClick={()=>methods.reset({name:"luna"})  } variant={'secondary'}>Limpiar</Button>
+
+  n: resteo total no le paso nada
+  s:
+   <Button onClick={() => methods.reset()} variant={'secondary'}>
+  34.1) tenr en cuenta que si hay varios botones es necesario
+   especificarle que es un "submit" y el resto typo "button" ya
+   que por defecto viene submit 
+    u: first-p\src\components\Button.tsx
+
+    s: //------defino por dfecto que puede tener de opciones 
+      type ButtonType = 'button' | 'submit' | 'reset'; //---opcines disponibles
+      type Props = {
+       ....
+       ..
+        type: buttonType;
+      };
+      //-----------((((type = 'button' ))))---de esta manera me deja poner por defecto "button"
+      function Button({ children, variant = 'primary', onClick, type = 'button' }: Props) {
+          return (
+            <button type={type} onClick={onClick} className={`btn btn-${variant} m-3`}>
+              {children}
+            </button>
+          );
+        }
+
+      34.1.2) llamando el botton y pasandole los tipos:
+      u: first-p\src\components\contactForm.tsx
+      s:
+       <Button type={'submit'} variant={'primary'}>
+          Enviar
+        </Button>
+        <Button onClick={() => methods.reset()} variant={'secondary'}>
+          Limpiar
+        </Button>
+
+35) Efectos
+      funcion pura: cunado lo que e pasamos unas propiedades siempre devolvera el mismo jsx
+      funcion impura: efecto: si esa fucnion toca una api reste,consola, local storage, entonces a eso se le llama efecto 
+
+    UseEffect: 
+      -1)Se ejecuta despues de renderizar en el dom
+      -tiene una posibilidad de limpieza, es decir retorna una funcion una vez se ha desmontado
+      -tiene un sistema de dependencias: 
+        * Se ejecuta con el primer renderizado
+        * cuando se actualiza
+        * cuando react va dejar de mostrar el componente (cuando se desmonta el componente)
+      -no puedes usar async await directamente
+
+    35.1) 
+      -1) Para poder ejecutar un use efect despues del primer renderizado inicial 
+        s:
+          useEffect(() => {
+            console.log('useEffect', document.title);
+            document.title = 'cmabie el titlr';
+          });
+      -2) Ejecucion despues des del desmonte
+        s:
+          useEffect(() => {
+    
+            return () => { //-------segun entendi es con este return 
+              console.log('se ejecut despues del desmonte ');
+            };
+          });
+      -3) dependencias:
+        n: si por ejemplo se cambia algun estado entonces 
+        se ejecutara o re volvera a renderizar la pagina donde estemos
+        con lo cual e hook de UseEffect se ejecura cada vez que se renderiza, 
+        y por lo mismo si no hay dependencias se podria caer en un bucle infinito
+        es decir si por ejemplo dentro de un useEffect tengo la funcion de
+        setiar un estado entonces si se setea se renderiza nuevamente y por lo tanto vuelve a setear y se queda trabado:
+        ejem:
+          s:
+            const [user, setUser] = useState<string[]>([]);
+            useEffect(() => { //-----useEffect se ecuta una vez se renderiza por primera vez
+            setUser(['hola', 'mundo']); //----Aqui entonces error porque esto se ejecutaria infinatas veces
+            });                        //--- ya que cada vez que seteo buelve y renderiza por lo tanto vuelve y ejecuta el hook 
+            return <h1>hola mundo</h1>;
+          3.1) ejecucion 1 sola vez:
+            s:
+               const [user, setUser] = useState<string[]>([]);
+                useEffect(() => {
+                  console.log('ejecutando solo una vez');
+                  setUser(['hola', 'mundo']);
+                }, []);//---se le agrega el [] para que solo se ejecute una vez
+          3.2) ejecucion cuando cambie un estado
+            -ojo aqui se ejecutara si o si el hook una sola vez 
+             y despues las veces que cambie el estado agregado como dependencia
+             
+             *) ejecucion sin dependenci de estado:
+              s:
+                const [user, setUser] = useState<string>();
+                  useEffect(() => {
+                    console.log('ejecutando hook---', user);
+                  }, []); //-----si no se coloca nada solo se ejecuta una vez
+                return ( //-------por mas que de click en setUser aqui no ejecutara nuevamente el useEffect
+                      <button onClick={() => setUser('--nuevo estado del user--')}>Cambiar el estado </button>hola
+                      mundo
+                  );
+
+             Retorno por consola:
+             App.tsx:9 ejecutando hook--- undefined
+             App.tsx:9 ejecutando hook--- undefined
+                
+             *) Ejecucion ahora si le agrego el estado 
+              s:
+                const [user, setUser] = useState<string>();
+                  useEffect(() => {
+                    console.log('ejecutando hook---', user);
+                  }, [user]); 
+
+                return (
+                    <h1>
+                      <button onClick={() => setUser('--nuevo estado del user--')}>Cambiar el estado </button>hola
+                      mundo
+                    </h1>
+                  );
+              Retorno por consola:
+              App.tsx:9 Ejecutando hook--- undefined
+              App.tsx:9 ejecutando hook--- undefined
+              App.tsx:9 ejecutando hook--- --nuevo estado del user--
+
+36) promesas
+  n: vamos a trabajar con el api de json placeholder
+  url: https://jsonplaceholder.typicode.com/users
+  u: effectos\src\App.tsx
+  s: 
+      import { useEffect, useState } from 'react';
+      import './App.css';
+
+      type User = {
+        //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+        id: number;
+        name: string;
+      };
+
+      function App() {
+        const [user, setUser] = useState<User[]>([]);
+        useEffect(() => {
+          const url = 'https://jsonplaceholder.typicode.com/users';
+          fetch(url)
+            .then((response) => response.json() as Promise<User[]>) //----aqui lo que hace es convertir la data,//con un tyo de dato especifico , para que no quede any
+            .then((data) => {
+              //-----------------este paso de pasar los datos devueltos a un tipo se llama "How to deserialize JSON object into an interface"
+              setUser(data);
+            });
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+
+        return (
+          <>
+            {user.map((user) => (
+              <div key={user.id}>
+                <h1>{user.name}</h1>
+              </div>
+            ))}
+          </>
+        );
+      }
+
+      export default App;
+
+  36.2) Estado de cargando
+    u: effectos\src\App.tsx
+    s: 
+      ...
+      const [loading, setLoading] = useState<boolean>(false);
+        useEffect(() => {
+          const url = 'https://jsonplaceholder.typicode.com/users';
+          setLoading(true);//-----Aqui cuando llame los dato va ponerse en cargando 
+
+          fetch(url)
+            .then((response) => response.json() as Promise<User[]>) //----aqui lo que hace es convertir la data,//con un tyo de dato especifico , para que no quede any
+            .then((data) => {
+              //-----------------este paso de pasar los datos devueltos a un tipo se llama "How to deserialize JSON object into an interface"
+              setUser(data);
+            })
+            .finally(() => { //-----una vez finalice el seteo o si hay un error pone el estado en falso osea y ano estara cargando nada
+              setLoading(false);
+            });
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+
+        if (loading) {  //----pone el mensajito si esta cargando los datos aun 
+          return <p>Loading...</p>;
+        }
+  36.3) Estado de error 
+    s: 
+       const [error, setError] = useState<string>();
+       useEffect(() => {
+          const url = 'https://jsonplaceholder.typicode.com/users';
+          setLoading(true);
+
+       fetch(url)
+        .then((response) => {
+          if (!response.ok) { //----errores de consulta differentes a 200 , como 300 ,400 ,500, ya que el catch no lee eso
+            throw new Error(`${response.status}`);//---lanza un error para que pueda ser leido con el catch 
+          }
+          return response.json() as Promise<User[]>;
+        })
+            .then((data) => {
+              setUser(data);
+            })
+            .catch((error: Error) => { //----aqui toma los errores del servidor pero si no se hace el "response.ok" no detectaria los 300 , 400 , 500 
+              setError(error.message); //----setea el mensaje 
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        }, []);
+        if (error && !loading) {
+          return <p>Ha ocurrido un Error: {error}</p>;
+        }
+
+37) custom hooks, por convencion llevan un "use" al inicio
+  -Nosotros podemos utilizr o 
+  reutilizar la logica de lo anterior asi:
+
+  creo el archivo:
+  u: effectos\src\hooks\useUsers1.ts
+  s: 
+    import { useEffect, useState } from 'react';
+
+      type User = {
+        //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+        id: number;
+        name: string;
+      };
+      export default function useUsers() {
+        const [user, setUser] = useState<User[]>([]);
+        const [loading, setLoading] = useState<boolean>(false);
+        const [error, setError] = useState<string>();
+        useEffect(() => {
+          const url = 'https://jsonplaceholder.typicode.com/users';
+          setLoading(true);
+
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`${response.status}`);
+              }
+              return response.json() as Promise<User[]>;
+            })
+
+            //----aqui lo que hace es convertir la data,//con un tyo de dato especifico , para que no quede any
+            .then((data) => {
+              //-----------------este paso de pasar los datos devueltos a un tipo se llama "How to deserialize JSON object into an interface"
+              setUser(data);
+            })
+            .catch((error: Error) => {
+              setError(error.message);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+        return { user, loading, error }; //-----retorno esto para que sea usado la funcion app.tsx 
+      }
+  
+  37.2) voya a el app.tsx
+    u: effectos\src\App.tsx
+    s:
+      import useUsers from './hooks/useUsers';
+      .....
+      ...
+      function App() {
+        //---------importo el customHook
+        const { user, loading, error } = useUsers();
+        if (loading) {
+          return <p>Loading...</p>;
+        }
+        if (error && !loading) {}}
+        ......
+38) uso del "async await" sin el ".then"
+  u: effectos\src\hooks\useUsers2.ts
+  s:
+      export default function useUsers() {
+      const [user, setUser] = useState<User[]>([]);
+      const [loading, setLoading] = useState<boolean>(false);
+      const [error, setError] = useState<string>();
+
+      useEffect(() => {
+        async function hook() {
+          const url = 'https://jsonplaceholder.typicode.com/users';
+          setLoading(true);
+          try {
+            const response = await fetch(url); //---1
+            if (!response.ok) {
+              //------------------2
+              throw new Error(`${response.status}`);
+            }
+            const data: User[] = await response.json(); //---3
+            setUser(data); //---4
+          } catch (error) {
+            setError((error as Error).message); //---5
+          } finally {
+            setLoading(false); //---6
+          }
+          //sin el async await
+          // fetch(url) //----1 sin async await(SAA)
+          //   .then((response) => {
+          //     if (!response.ok) {
+          //       //--2 sin async await(SAA)
+          //       throw new Error(`${response.status}`);
+          //     }
+          //     return response.json() as Promise<User[]>; //--3-SAA
+          //   })
+          //   .then((data) => {
+          //     //----4-SAA
+          //     setUser(data);
+          //   })
+          //   .catch((error: Error) => {
+          //     setError(error.message); //--5-SAA
+          //   })
+          //   .finally(() => {
+          //     setLoading(false);//---6-SAA
+          //   });
+        }
+        hook();
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+        return { user, loading, error };
+      }
+
+39) cancelacion de hook:en el punto 35 se hablo de 
+      cancelacion de los hooks en las dependencias
+  n: ahora se puede usar una funcion llamada "AbortCOntroller"
+    que me permite cancelar hooks 
+  u: effectos/src/hooks/useUsers2.ts
+  s:
+    import { useEffect, useState } from 'react';
+
+      type User = {
+        //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+        id: number;
+        name: string;
+      };
+      export default function useUsers() {
+        const [users, setUsers] = useState<User[]>([]);
+        const [loading, setLoading] = useState<boolean>(false);
+        const [error, setError] = useState<string>();
+
+        useEffect(() => {
+          const controller = new AbortController(); //-------funcion que viene en los navegadores para cancelar peticiones
+          const { signal } = controller; //-------Esto es un objeto que se le pasa a la peticion fetch tal como se le pasan por ejemplo un POST, GET, etc
+
+          async function hook() {
+            const url = 'https://jsonplaceholder.typicode.com/users';
+            setLoading(true);
+            try {
+              const response = await fetch(url, { signal }); //----le paso el objeto signal a la peticion fetch
+              if (!response.ok) {
+                //------------------2
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data: User[] = await response.json(); //---3
+              setUsers(data); //---4
+              setError(undefined);//------con el undefined limpio el error, para que no mande errores si se vuelve a cargar la pagina
+            } catch (error) {
+              setError((error as Error).message); //---5
+            } finally {
+              setLoading(false); //---6
+            }
+          }
+          hook();
+          return () => controller.abort(); //-----------cancelo la peticion
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+        return { users, loading, error };
+      }
+
+40) custom hook acotado para poder hacer le llamado tanto a usuarios como a otras cosas
+  u: effectos\src\hooks\useFetchData.ts
+  s:
+    import { useEffect, useState } from 'react';
+
+      export default function useFetchData<T>(url: string) {
+        const [data, setData] = useState<T[]>([]);
+        const [loading, setLoading] = useState<boolean>(false);
+        const [error, setError] = useState<string>();
+
+        useEffect(() => {
+          const controller = new AbortController(); //-------funcion que viene en los navegadores para cancelar peticiones
+          const { signal } = controller; //-------Esto es un objeto que se le pasa a la peticion fetch tal como se le pasan por ejemplo un POST, GET, etc
+
+          async function hook() {
+            // const url = 'https://jsonplaceholder.typicode.com/users';
+            setLoading(true);
+            try {
+              const response = await fetch(url, { signal }); //----le paso el objeto signal a la peticion fetch
+              if (!response.ok) {
+                //------------------2
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data: T[] = await response.json(); //---3
+              setData(data); //---4
+              setError(undefined); //------con el undefined limpio el error, para que no mande errores si se vuelve a cargar la pagina
+            } catch (error) {
+              setError((error as Error).message); //---5
+            } finally {
+              setLoading(false); //---6
+            }
+          }
+          hook();
+          return () => controller.abort(); //-----------cancelo la peticion
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+        return { data, loading, error };
+      }
+  40.1) ---para hcer el llamado del codigo acotado:
+    u: effectos\src\App.tsx
+    s:
+      import './App.css';
+      import useFetchData from './hooks/useFetchData';
+      type User = { //-----uso aqui mi tipo 
+        //----al verificar la api veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+        id: number;
+        name: string;
+      };
+
+      function App() {
+        const url = 'https://jsonplaceholder.typicode.com/users';
+        const { data: users, loading, error } = useFetchData<User>(url);//----le paso el url y el tipo
+
+41) agregando elementos, modificando el custum hook par que agregue elementos
+  n: existe una estrategia para agregar elementos que se llama "optimistic ui"  
+  * la forma convencional: 
+      quiero agregar----llamo api----actualizo el estado 
+  * optimistic UI:
+      quiero agregar----actualizo el estado----llamo api pa guardar---si hay error revertimos lo que fallo, ---sino lo dejo como esta
+
+  u: effectos\src\hooks\useHttpData.ts
+  s:
+     import { useEffect, useState } from 'react';
+
+      export default function useHttpData<T>(url: string) {
+        const [data, setData] = useState<T[]>([]);
+        const [loading, setLoading] = useState<boolean>(false);
+        const [error, setError] = useState<string>();
+
+        useEffect(() => {
+          const controller = new AbortController(); //-------funcion que viene en los navegadores para cancelar peticiones
+          const { signal } = controller; //-------Esto es un objeto que se le pasa a la peticion fetch tal como se le pasan por ejemplo un POST, GET, etc
+
+          async function hook() {
+            // const url = 'https://jsonplaceholder.typicode.com/users';
+            setLoading(true);
+            try {
+              const response = await fetch(url, { signal }); //----le paso el objeto signal a la peticion fetch
+              if (!response.ok) {
+                //------------------2
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data: T[] = await response.json(); //---3
+              setData(data); //---4
+              setError(undefined); //------con el undefined limpio el error, para que no mande errores si se vuelve a cargar la pagina
+            } catch (error) {
+              setError((error as Error).message); //---5
+            } finally {
+              setLoading(false); //---6
+            }
+          }
+          hook();
+          return () => controller.abort(); //-----------cancelo la peticion
+        }, []); //--si no se coloca nada solo se eejecuta una vez
+
+        const addData = async (element: T) => {
+          const initialData = [...data]; //----pongo los datos iniciales por si llegase a cambiar los datos en el futuro
+          //--------le pongo un id provicional luego se reemplazara
+          setData([{ id: 0, ...element }, ...data]); //---agrego primero el nuevo elemento y luego los que vienen del fetch
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json', //----permite enviar datos(element) en formato json , no se requeire para axios o con esta api
+              },
+              body: JSON.stringify(element),
+            });
+            if (!response.ok) {
+              setData(initialData); //----si hay un error vuelvo a los datos iniciales
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            //---una vez que devuelva la respuesta la api
+            const saveData = await response.json(); //----esta si es la respuesta de la api la recibo en formato json
+            //forma de respuesta api1, esta api devuelve el elemento y un id junto
+            setData([saveData, ...initialData]); //---si la respuesta de la api debuelve el objeto con todo osea el id y el elemento
+            //forma de respuesta api2:  setData([{ id: saveData, ...element }, ...initialData]); //---si la respuesta de la api debuelve solo el id, tocaria agregarle el elemento
+            // forma de respuesta api3: setData([{ ...saveData, ...element }, ...initialData]); //---si la respuesta de la api debuelve un objeto con la propiedad de id (pero sin el elemento), tambien se le agrega el elemento
+          } catch (error) {
+            setError((error as Error).message);
+          }
+        };
+        return { data, loading, error, addData };
+      }
+
+42) borrando elementos:
+  n:se agrego el typo ID ya que a pesar que tiene el tipo User que tiene un id , ese ID no lo reconocio 
+
+  u:effectos\src\hooks\useHttpData.ts
+  s:
+    import { useEffect, useState } from 'react';
+
+      interface ID {
+        //---este ID tuve que ponerlo ya que no lo reconocia en el id el T no entiendo porque
+        id: number | string;
+      }
+      export default function useHttpData<T extends ID>(url: string) {
+        //----debo extender desde el ID para que el id sea reconocido
+        const [data, setData] = useState<T[]>([]);
+        const [loading, setLoading] = useState<boolean>(false);
+        const [error, setError] = useState<string>();
+        ....
+        ...
+        const deleteData = async (id: number) => {
+          const initialData = [...data];
+          setData(data.filter((element) => element.id !== id)); //---si no huiera extendido desde ID no podria acceder a id
+          try {
+            const response = await fetch(`${url}/${id}`, {
+              method: 'DELETE',
+            });
+            if (!response.ok) {
+              setData(initialData);
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+          } catch (error) {
+            setError((error as Error).message);
+          }
+        };
+
+        return { data, loading, error, addData, deleteData };
+      }
+
+43) actualizando elementos
+  u: effectos\src\hooks\useHttpData.ts
+  s: 
+       const updateData = async (updatedElement: T) => {
+        const initialData = [...data];
+        setData(data.map((el) => (el.id === updatedElement.id ? updatedElement : el)));
+        try {
+          const response = await fetch(`${url}/${updatedElement.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedElement),
+          });
+          if (!response.ok) {
+            setData(initialData);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } catch (error) {
+          setError((error as Error).message);
+        }
+      };
+
+      return { data, loading, error, addData, deleteData, updateData };
+
+  43.2) para llamar la funcion en el app.tsx:
+    u: effectos\src\App.tsx
+    s:
+          const {
+            updateData: updateUser,
+          } = useHttpData<User>(url);
+           return (
+                <button onClick={() => updateUser({ id: 1, name: 'chanchoooo' })}>update 11 </button>
+           )
+
+44) el uso del AXIOS en vez de "fetch.then" y "fetch con async await"
+    u:   proyecto-meal-finder.txt
+    ub: 3)Uso de AXIOS 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     
+
+        
+
+
+
+
+
+
+
+
+Teoria react:
+  - Actualizacion de estado:
+    React lo primero que hace es verificar la informacion que se actualizara 
+    ejm: setCount(count + 1); luego  actualizar los estado en su totalidad  PERO LO hace
+    CUANDO SE RENDERIZA, por eso cuando imprimo inmediatamente ejm:
+    const [count, setCount] = useState(0);
+      const handleClick = () => {
+        setCount(count + 1);
+        console.log('count:', count); // "count: 0"
+      }
+    luego en el segundo render si podria aparecer  // "count: 1"
+  - Hooks:
+    En el nivel  mas alto(osea no anidado) se debe colocar los hooks y nuna anidados dentro de un if, for , while 
+    ya que asi react no puede hacer seguimiento de los estados
+    usestate: detecta el estado
+    useRef: si hay un cambio en un elemento con ese useRef de una toma ese valor
+  
+  -Estado de memoria: 
+    en react no es recomendable tener variables, que queden en memoria:
+    ejmp:
+      u: react-app2\src\App.tsx
+      s:
+        import { useState } from 'react';
+        let variableFuera=0; //----variable que quedara en memoria
+        function App() {
+          const handleClick = () => { 
+          variableFuera=(variableFuera + 1); //----aumentandole valor a variable 
+          }
+        }
+    problema de est: Si lo hago asi si vuelvo a usar este componente, o quiero volver a usarlo
+    entonces esa variabel tmabien quedara con el dato anterior osea no quedara separado, 
+    por eso es mejor usarlo como hook
+  -Detalles del useState.para modificar arrays y objetos, mutables e inmutables
+    algo muy importante es que react en su useState, no va a modificar un estado
+    si lo que se hace es pasarle el mismo estado inicial pero modificado, 
+    osea no va renderizar nuevamente por si solo, ejemplo:
+      s:
+        function App() {
+          const [products, setProducts] = useState([
+            { name: 'shoes', price: 20 },
+            { name: 'shirts', price: 30 },
+          ]);
+         const handleClick = () => {
+            products.push({ name: 'pants', price: 40 }); //----como aqui le pasa el mismo "products" 
+            setProducts(products);                       //pero ahora lo modificado, entonces react 
+                                                         //no vuelve a renderizar, y soo cuando vuelva a renderizar mostrara ese valor
+          };
+          return (
+            <>
+              {products.map((product) => (
+                <h1>{product.name}</h1>//------solo renderiza shoes y shirts asi presione el boton 
+              ))}
+              <button onClick={handleClick}>Enviar</button>
+
+            </>
+          );
+        }
+
+    n:Estado de arrays:  entonces para arreglar esto la forma es pasarle un nuevo array
+    podria tomar el array anterior y colocarlo en una nueva variable 
+      s: //-forma 1
+         const handleClick = () => {
+            products.push({ name: 'pants', price: 40 });
+           🖐️ //let newProducts = products;  //------OJO aqui no crea un nuevo array , NO HACERLO ASI 
+            let newProducts = [...products];  //------aqui cre un nuevo array 
+            setProducts(newProducts);
+          };
+
+        //FORMA 2: 
+         const handleClick = () => {
+            let newProducts = [...products, { name: 'pants', price: 40 }];
+            setProducts(newProducts);
+          };
+        //FORMA3
+          const handleClick = () => {
+            let newProducts = products.concat({ name: 'pants', price: 40 });
+            setProducts(newProducts);
+          };
+        //FORMA4
+           const handleClick = () => {
+              setProducts((previEstadoDeProducts) => [...previEstadoDeProducts, { name: 'pants', price: 40 }]);
+           };
+
+      ejemplo para objetos:
+      const [user, setUser] = useState({ name: 'Carlos', lastName: 'perez' });
+          const handleClick = () => {
+          setUser({ ...user, name: 'JuanCambiado' }); //-----cambiando el estado de el objeto 
+        };
+        
+  -para poder poner un estado de array en vacio:
+    ejm:
+    const empty = () => {
+      setProducts([]);
+    };
+
+  -COportamiento en formulario, refresca automaticamente
+    event.preventDefault(); //esto lo que hace es prevenir que se refresque
+                            // inmediatamente el Html en le servidor(evita refrecar la pagina)
+                            // y asi no puedo ver la info 
+  -Valor por defecto en las propiedades cuando se le pas a componentes:
+    u: first-p\src\components\Button.tsx
+    s:
+      //--estos son los valores que tendra como aceptables
+      type variant = 'primary' | 'secondary' | 'danger' | 'warning';
+
+      type Props = {
+        variant?: variant;  //----se crea esa interface
+        children: React.ReactNode;
+      };
+        //----------variant se le pasa aqui en las props y tendra como defecto "primary"
+      function Button({ children, variant = 'primary' }: Props) {
+        return (
+          <button type="submit" className={`btn btn-${variant} m-3`}>
+            {children}
+          </button>
+        );
+      }
+  -agregandole una propiedad a un typo (interface)
+    si por ejemplo queiro agregar a una interface otro campo entonces puedo 
+    agregarlo con "&"
+    ejemplo:
+    type Props = {
+      name: string;
+      children: React.ReactNode;
+    }&{id: string};
+
+    n: en el ejercicio 
+      u: first-p\src\schemas\contact.ts
+    n: tuvimos que agregarle un id pero no lo podiamos agregar
+    como una validacion porque no se necesitaba validar
+    entonces se agrego como una propiedad adicional:
+    s:
+      ....
+      ..
+      export type contact = z.infer<typeof contactSchema> & { id: string };
+  -agregando un enum en la validacion(datos por defecto)
+    u:
+      first-p\src\schemas\contact.ts
+    s: 
+      export const contactSchema = z.object({
+        type: z.enum(['Familiar', 'Trabajo', 'Amigo', 'Otros']),
+
+    si por ejemplo quiero hacer que esos datos quedene ne una constante entonces:
+
+    s:
+      const contactTypeOptions = [
+        'Familiar',
+         'Trabajo', 
+         'Amigo', 
+         'Otros'] as const; //---se le indica que sera una constante, y es asi como Zog permite 
+
+      export const contactSchema = z.object({
+        ...
+        ..
+        type: z.enum(contactTypeOptions), //---aqui entonces se pasa la vaeriable
+      })
+
+  ERROR: The type 'readonly ["Familiar", "Trabajo", "Amigo", "Otros"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+   Significa que en el Select:first-p\src\components\Select.tsx
+   podria que al ser un string[] es mutable:
+    s:
+      type Props = {
+        options: string[]; //---esto es mutable entonces
+                           //como es un enum "readonly" 
+                           //debo indicarle que este string es "readonly"
+      };
+
+    solucion:
+      type Props = {
+        options: readonly string[];
+      };
+
+
+
+  
 
 
       
@@ -696,10 +2364,34 @@ node:
     importa: import Card from './components/Card';
   3; importando varias: import Card, { CardBody } from './components/Card';
 
--teclados:
+-teclados o compandos visual :
   * CTRL+ d: si queiro seleccionar avarios textos iguales presiono CTRL+ d y va colocando un cursor al final de cada palabra
   * CTRL+ spacio: me muestra opciones
   * ctrl+alt+r : permite sacar las opciones de snippets (abreviatura pra crear codigo de react)
+
+  * shift +ctrl + p: Busco Wrap , y me deja colocar o envolver con una etiqueta, me deja envolver codigo html 
+
+-trucos de hmtl: "EMET de visual code me ayuda"
+  -para crear un formulario:
+   s: form>div.mb-3*2>label.form-label+input#name.form-control
+   n: formulrio>un div(clase=mb-3) dosveces(osea dos div)>
+        dentro del div un Label(clase=form-label) ademas(+)
+        un input (id=name, class=form-control)
+   reultado: 
+    <form action="">
+      <div className="mb-3">
+        <label htmlFor="" className="form-label"></label>
+        <input type="text" id="name" className="form-control" />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="" className="form-label"></label>
+        <input type="text" id="name" className="form-control" />
+      </div>
+    </form>
+  -para rear booton:  button.btn.btn-primary
+
+  
+
 
 -snipepts:
   * tsrfce: creates a react copotnent
@@ -757,8 +2449,10 @@ node:
         tengo que evaluar que no sea cero 
         {list2.length !== 0 && 'si hay algo en la lista'}
 
-- operador ternario : ? , con el operador ternario
+Simbolos o caracteres operadores:
+  -operador ternario : ? , con el operador ternario
  no hay que tener cuidado con el cero "0"
+  -spread operator: ...
 
 -sobre la infraestructura
   n: react por defecto si dejamos el componente como "index.tsx"
@@ -776,7 +2470,26 @@ node:
     s:
     import Button from './components/Button/Button';
 
+Componentes react: 
+  <React.StrictMode> : es un verificador para que detecte
+                       posibles errores, ya que si por ejemplo
+                       envio lo mismo por ejemplo 2 y 2 04 o 3y3=6
+                       entonces este componente se encrga que detecte
+                       si al enviar lo miemo simempre no cambia el
+                       comportamiento, este ayuda a quitar la doble
+                       impresion "concole.log" 
 
+                       -detecta componentes impuros
+                        funcion pura: no importa cuantas veces la ejecute retorna el mismo valor, por ejemplo a+b
+                        funcio impura: esta si puede retornar valores diferentes, por ejemplo funcion de fecha
+                                      llamado a apis, llamado a servidores , bases de datos.
+                      
+                       -Busca y dice funcionalidades deprecadas
+
+
+  html en react:
+  - Atributo for: <label for="exampleInputEmail1" className="form-label">
+      en react en vez de for se usa htmlFor
 
 javascrip:
   slice: 
@@ -792,3 +2505,93 @@ javascrip:
   // ya que el join develve siempre un string,
   //ejemplo:  const array = ['1', '2', '3', 'carlos'];
   //console.log(array.join(' ')); // 1 2 2 carlos
+
+  Date:
+  //new Date().getTime());
+
+  Destructuracion anidada:
+      //     const person = {
+      //       name: 'John',
+      //       age: 30,
+      //       address: {
+      //         city: 'New York',
+      //         country: 'USA'
+      //       }
+      //     };
+    //Al Extraer address primero:Si desestructuramos
+    //address directamente, sería así:
+      //          const { address } = person;
+    //Esto nos da
+      //       const address = {
+      //       city: 'New York',
+      //        country: 'USA'
+      //       };
+    //Extraer city y country de address:
+      //        const { city, country } = address;
+    //Juntando ambos pasos, sería:
+      //const { address: { city, country } } = person;
+      //console.log(city , country) //New York USA
+  Destructuracion y cambio de nombre de lo destructurado
+    //
+    //const { loading, error, data: users, addData: addUser } = useHttpData<User>(url);
+    //aqui por ejemplo lo que viene como "data" lo renombro como "users"
+    //y lo que viene como "addData" lo devuelvo como "addUser"
+  
+  
+  
+  Objetos imprimir por key:
+    //si quiero recorrer un objeto y poder por cada key o nombre de variable imprimir
+    //{Object.entries(errors).map(([fieldName, error]) => (
+    //        <p key={fieldName}>{error.message}</p>
+    //      ))}
+  comandos:
+    *) --save: sirve para ada vez que ejecute unn nuevo proyecto lo instale
+
+
+UI concepts:
+header: 
+sideNav
+skeleto: es el loading o elemento de estado de cargando...
+layout:disposición de todos los elementos visuales que la componen
+
+Html:
+  -si quiero puedo hacer calculos para las medidas:
+    s: //height="calc(100vh - 60px)"--->toma el alto total de la pantalla y le resto 60px
+      <GridItem pl="2" bg="pink.300" area={'nav'} height="calc(100vh - 60px)">
+        Nav
+      </GridItem>
+  - en el html de react, si quiero agregarle una logica para que se genere 
+   los atributos segun esa logica
+    u:
+    s:
+      //estilo propuesto
+      const selectedProps = {
+        bgColor: 'blue.400',
+        color: 'white',
+        fontWeight: 'bold',
+      };
+
+
+      function SideNav({ categories, loading }: Props) {
+        const selected = {
+            strCategory: 'Beef',
+          };
+          return (
+            <Link
+                ....
+                ..
+                //------aqui lo que hace es que se compare algo y segun la comparacion 
+                  {...(selected.strCategory === category.strCategory && selectedProps)}
+                >
+   
+  -position absolute, relative, fixed y sticky:
+    position relative
+      el hijo osea el que este debntro puede usar el position absolute y se empieza  mover dentro de contenedor padre mas cercano o el que tnega el relative
+
+    position fixed: se mueve desde el body y se queda ahi quietico
+    position sticky: se mueve desde el padre mas crcano y se queda quietico ahi donde se lo coloque
+      pos="sticky" top="60px"
+      pos="sticky" top={0} zIndex={1}
+      pos="sticky" top={0} zIndex={-1}
+      pos="sticky" top={0} zIndex={0}
+  - overflowY="auto": permite el scroll en el ejej y ,permite que se muestre la barrita

@@ -1,0 +1,547 @@
+chackra:
+  https://v2.chakra-ui.com/docs/components/card/usage
+
+  c:
+    npm i @chakra-ui/react@2.8.2 @emotion/react@11.11.4 @emotion/styled@11.11.5 framer-motion@11.1.7 axios@1.6.8 react-icons@5.0.1 react-hook-form@7.51.3
+
+1) creamos los componentes:
+  meal-finder/src/components/Categories.tsx
+  meal-finder/src/components/Header.tsx
+  meal-finder/src/components/MainContent.tsx
+  meal-finder/src/components/MealCard.tsx
+  meal-finder/src/components/SideNav.tsx
+
+  n: como chacra y toos los frameworks tienen un Modal 
+  entonces para que no se equivoque con el modal de chakra
+  creare un componente modal con un nombre diferente
+
+  meal-finder/src/components/RecipeModal.tsx
+2) creo el Grilla: Una grilla (o grid en inglés) es un sistema de diseño 
+que permite organizar elementos en filas y columnas,
+ creando una estructura visualmente coherente y 
+ ordenada para una página web
+  u: meal-finder\src\App-sinCustomhook.tsx
+  meal-finder\src\App-sinhook.tsx
+  s:
+    //---------------------------------el height se hace un pequeño calculo para que toem el resto de altura y solo le resta la altura de 60px que seria el del header 
+    // // import { useState } from 'react';
+    // // import './App.css';
+    // // import { Grid, GridItem } from '@chakra-ui/react';
+    // // import Header from './components/Header';
+    // // import SideNav from './components/SideNav';
+    // // import MainContent from './components/MainContent';
+    // // function App() {
+    // //   const [count, setCount] = useState(0);
+    // //   return (
+    // //     <Grid
+    // //       templateAreas={`"header header"
+    // //                   "nav main"`}
+    // //       gridTemplateRows={'60px 1fr '}
+    // //       gridTemplateColumns={{ sm: `0 1fr`, md: `250px 1fr` }}
+    // //     >
+    // //       <GridItem pl="2" bg="orange.300" area={'header'}>
+    // //         <Header></Header>
+    // //       </GridItem>
+    // //       <GridItem pl="2" bg="pink.300" area={'nav'} height="calc(100vh - 60px)">
+    // //         <SideNav></SideNav>
+    // //       </GridItem>
+    // //       <GridItem pl="2" bg="green.300" area={'main'}>
+    // //         <MainContent></MainContent>
+    // //       </GridItem>
+    // //     </Grid>
+    // //   );
+    // // }
+    // // export default App;
+
+3)Uso de AXIOS 
+    api: https://www.themealdb.com/
+
+  n: constuyo mi customhook para traer data, aqui si se hace con axios
+  n: inicalmente se puede probar en el App.tsx
+  u: meal-finder\src\App-sinCustomhook.tsx
+  s:
+  // //const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+  // // const [data, setData] = useState([]);
+  // // const [loading, setLoading] = useState<boolean>(false);
+  // // useEffect(() => {
+  // //   const controller = new AbortController();
+  // //   const { signal } = controller;
+
+  // //   setLoading(true);
+  // //   axios
+  // //     .get(url, { signal })
+  // //     // .then((re) => { //----sin destructuracion
+  // //     .then(({ data }) => {
+  // //       // setData(re.data.meals); //----sin destructuracion
+  // //       setData(data.meals);
+  // //     })
+  // //     .finally(() => {
+  // //       setLoading(false);
+  // //     });
+
+  // //   return () => controller.abort();
+  // // }, []);))
+    
+4) ahora tengo que definir los tipos para que no me quede undenied:
+  n: creo el directorio 
+  u: meal-finder\src\types\index.ts
+
+  s: 
+  // // export type Category = {
+  // //   strCategory: string;
+  // // };
+  // // export type CategoriesResponse = {
+  // //   meals: Category[];
+  // // };
+
+
+  4.1) ahora que ya tengo los tipos puedo agregarle los tipos a el codigo 
+    u: meal-finder\src\App-sinCustomhook.tsx
+    s:
+      // // const [data, setData] = useState<Category[]>([]); //----la data va ser un arreglo de category
+      ....
+      ....
+      // // axios
+      // // .get<CategoriesResponse>(url, { signal }) //----La respuesta del api es de tipo "CategoriesResponse"
+
+5) pasandole al SideNav las Categories y listando (stack en chakra)
+  u:  meal-finder\src\App-sinCustomhook.tsx
+  s: 
+    <SideNav categories={data} loading={loading}>
+        </SideNav>
+
+  5.1) creo el SideNav
+    u: meal-finder\src\components\SideNav.tsx
+    s: 
+      // // import React from 'react';
+      // // import { Category } from '../types';
+      // // import { Box, Heading, Link, StackDivider, VStack } from '@chakra-ui/react';
+      // // import { color } from 'framer-motion';
+
+      // // type Props = {
+      // //   categories: Category[];
+      // //   loading: boolean;
+      // // };
+
+      // // const selectedProps = {
+      // //   bgColor: 'blue.400',
+      // //   color: 'white',
+      // //   fontWeight: 'bold',
+      // // };
+      // // function SideNav({ categories, loading }: Props) {
+      // //   const selected = {
+      // //     strCategory: 'Beef',
+      // //   };
+      // //   return (
+      // //     <>
+      // //       <Heading color="green.400" fontSize={12} fontWeight="bold" mb="4">
+      // //         Categories
+      // //       </Heading>
+      // //       <VStack align="stretch">
+      // //         {categories.map((category) => (
+      // //           <Link
+      // //             _hover={{ textDecoration: 'none' }}
+      // //             key={category.strCategory}
+      // //             h="40px"
+      // //             bg="yellow.200"
+      // //             px={2}
+      // //             py={1}
+      // //             borderRadius="5"
+      //-----Este codigo auqi con una logica permite que se den unos estilos dependiendo de esa logica
+      // //             {...(selected.strCategory === category.strCategory && selectedProps)}
+      // //           >
+      // //             {category.strCategory}
+      // //           </Link>
+      // //         ))}
+      // //       </VStack>
+      // //     </>
+      // //   );
+      // // }
+
+      // // export default SideNav;
+
+  5.2) opcio de que cuando de click en un boton se pone azulito o
+    u:
+    s://----creo el estado: 
+      // //  const [selectedCategory, setSelectedCategory] = useState<Category>({ strCategory: 'Beef' });
+      //----Le paso el estado 
+      // //   
+      // //  <SideNav
+      // //    selectedCategory={selectedCategory}
+      // //    setSelectedCategory={setSelectedCategory}
+      // //    categories={data}
+      // //    loading={loading}
+      // //   ></SideNav>
+
+    5.2.2) 
+    u: ahor aen el componente le agrego las propiedades
+    U: meal-finder\src\components\SideNav.tsx
+    s:
+      // // type Props = {
+      // //   categories: Category[];
+      // //   loading: boolean;
+      // //   selectedCategory: Category;
+      // //   setSelectedCategory: (category: Category) => void;
+      // // };
+      ...
+      ..
+      // // function SideNav({ categories, loading, selectedCategory: selected, setSelectedCategory }: Props) {
+      // //    return (
+      // //    <>
+      // //     <Heading color="green.400" fontSize={12} fontWeight="bold" mb="4">
+      // //       CATEGORIAS
+      // //     </Heading>
+      // //    <VStack align="stretch">
+      // //        {categories.map((category) => (
+      // //         <Link
+      // //-----agrego la funcion de cambio de el estado al hacer click en elink 
+      // //            onClick={() => setSelectedCategory(category)}
+            
+
+6) los skeleton o barritas de cargando, (cargamos las categorias )
+  url: https://v2.chakra-ui.com/docs/components/skeleton/usage
+  u:  meal-finder\src\App-sinCustomhook.tsx
+  s:  
+      ////....
+      ////..
+      // // function App() {
+      // // ....
+      // //   useEffect(() => {
+      // //     let ignore = false;  //----Agrego una bandera para que cuando pase la primera vez sea falso 
+      // // ....
+      // //     axios
+      // //       .get<CategoriesResponse>(url, { signal })
+      // //       .then(({ data }) => {
+      // //         if (!ignore) {//----la primera vez falso entonces ejecuta el set, la segunda vez cuando termina el proceso ya no puede entrar
+      // //           //----si tiene que ignorar entonces no vuelve a setear
+      // //           setData(data.meals);
+      // //         }
+      // //       })
+      // //       .finally(() => {
+      // //         if (!ignore) {
+      // //           //----si tiene que ignorar entonces no vuelve a setear
+      // //           setLoading(false);
+      // //         }
+      // //       });
+
+      // //     return () => {
+      // //       ignore = true; //----cuando se sale o termina el proceso(la 1era vez) entonces pone en true pa que no vuelva a ejecutar el set de react
+      // //       controller.abort();
+      // //     };
+      // //   }, []);
+
+      // //   return (
+      // //     <Grid
+      // //       templateAreas={`"header header"
+      // //                   "nav main"`}
+      // //       gridTemplateRows={'60px 1fr '}
+      // //       gridTemplateColumns={{ sm: `0 1fr`, md: `250px 1fr` }}
+      // //       fontSize={14}
+      // //     >
+      // //       <GridItem pl="2" bg="orange.300" area={'header'}>
+      // //         <Header></Header>
+      // //       </GridItem>
+      // //       <GridItem p="5" area={'nav'} height="calc(100vh - 60px)">
+      // //         <SideNav
+      // //           selectedCategory={selectedCategory}
+      // //           setSelectedCategory={setSelectedCategory}
+      // //           categories={data}
+      // //           loading={loading}
+      // //         ></SideNav>
+      // //       </GridItem>
+      // //       <GridItem pl="2" bg="green.300" area={'main'}>
+      // //         <MainContent></MainContent>
+      // //       </GridItem>
+      // //     </Grid>
+      // //   );
+      // // }
+
+      // // export default App;
+      // //))
+  6.1) 
+    u: meal-finder\src\components\SideNav.tsx
+    s:  
+      // //   function SideNav({ categories, loading, selectedCategory: selected, setSelectedCategory }: Props) {
+      // //   console.log(loading);
+      // //   return loading ? ( //---Aqui depende s el estado es o no loading deja ver el skeleton sino solo muestra el resto de contenido
+      // //     <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" /> //----este es el skeleton 
+      // //   ) : (
+      // //     <>
+
+  6.2) explcacion de el porque usar el Flag
+      
+      Flujo Detallado
+      Primera Ejecución del useEffect:
+
+        -Se lanza la petición axios.
+        -Antes de que la petición finalice, el useEffect se limpia (por ejemplo, debido a un desmontaje o re-renderizado del componente), lo que cancela la petición con controller.abort().
+        -Debido a la cancelación, la promesa no resuelve exitosamente, por lo que el then no se ejecuta. Solo el finally se ejecuta con ignore ya en true.
+      Segunda Ejecución del useEffect:
+
+        -Dependiendo de tu aplicación, puede haber una segunda ejecución del useEffect, ya sea por un cambio en el estado del componente, un nuevo renderizado o algún otro motivo.
+        En esta segunda ejecución:
+        -Se lanza una nueva petición axios.
+        -Esta vez, la petición se completa antes de que la función de limpieza del useEffect se ejecute.
+        -Dado que la petición se completó con éxito, el then se ejecuta y ves el log ---1er then.
+
+
+      Primera Ejecución:
+      ---cero then false time: 226.564 → El useEffect empieza.
+      ---3er return false time: 226.564 → La función de limpieza se ejecuta, cancelando la petición.
+      ---2do finally true time: 226.564 → La promesa se cancela y el finally se ejecuta.
+      Segunda Ejecución:
+      ---cero then false time: 476.526 → El useEffect se ejecuta nuevamente.
+      ---1er then false time: 476.526 → La petición completa correctamente, y el then se ejecuta.
+      ---2do finally false time: 476.526 → La promesa completa y el finally se ejecuta con ignore como false.
+        
+7) custom hook 
+  n: creo el hook en una carpeta de hooks:
+  u: meal-finder\src\hooks\useHttpData.ts
+  n: para usar este hook que sirva pa varios lo bueno es que las dos apis debuelven:
+    ▶️ categorias:https://www.themealdb.com/api/json/v1/1/list.php?c=list
+       Respuesta: 
+            {      
+              "meals": [
+                {
+                  "strCategory": "Beef"
+                },
+                {
+                  "strCategory": "Chicken"
+                },
+              ]
+            }
+    ▶️ filtro de una categoria:       https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood
+      Respuesta:
+              {
+                "meals": [
+                  {
+                    "strMeal": "Baked salmon with fennel & tomatoes",
+                    "strMealThumb": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+                    "idMeal": "52959"
+                  },
+                  {
+                    "strMeal": "Cajun spiced fish tacos",
+                    "strMealThumb": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+                    "idMeal": "52819"
+                  },
+                ]
+              }
+    n: como ambas devuelven sus respuestas dentro de meal por eso se puee colocar
+    en el axios.get<{ meals: T[] }>(url, { signal })
+
+  s:  
+    // // import { useEffect, useState } from 'react';
+    // // import { CategoriesResponse, Category } from '../types';
+    // // import axios from 'axios';
+    // // export default function useHttpData<T>(url: string) {
+    // //   const [data, setData] = useState<T[]>([]);
+    // //   const [loading, setLoading] = useState<boolean>(false);
+    // //   useEffect(() => {
+    // //     let ignore = false;
+    // //     const controller = new AbortController();
+    // //     const { signal } = controller;
+    // //     setLoading(true);
+    // //     console.log('---cero then', ignore, 'time:', document.timeline.currentTime);
+
+    // //     axios
+    // //       .get<{ meals: T[] }>(url, { signal })
+    // //       // .then((re) => { //----sin destructuracion
+    // //       .then(({ data }) => {
+    // //         console.log('---1er then', ignore, 'time:', document.timeline.currentTime);
+    // //         // setData(re.data.meals); //----sin destructuracion
+    // //         if (!ignore) {
+    // //           //----si tiene que ignorar entonces no vuelve a setear
+    // //           setData(data.meals);
+    // //         }
+    // //       })
+    // //       .finally(() => {
+    // //         console.log('---2do finnally', ignore, 'time:', document.timeline.currentTime);
+
+    // //         if (!ignore) {
+    // //           //----si tiene que ignorar entonces no vuelve a setear
+    // //           setLoading(false);
+    // //         }
+    // //       });
+
+    // //     return () => {
+    // //       console.log('---3er return ', ignore, 'time:', document.timeline.currentTime);
+
+    // //       ignore = true; //----cuando se sale o termina el proceso(la 1era vez) entonces pone en true pa que no vuelva a ejecutar el set de react
+    // //       controller.abort();
+    // //     };
+    // //   }, []);
+
+    // //   return { data, loading };
+    // // }
+    )
+    
+  7.1) ahora como ya utilice el meals: T[] ➡️ " axios.get<{ meals: T[] }>(url, { signal })"
+    ya no se necesita en el types
+
+      U:meal-finder\src\types\index.ts
+      s:  // export type CategoriesResponse = { //--ya no se necesitaria porque ya lo coloque en el axios.get<{meals: T[]}>(url, {signal})
+          //   meals: Category[];
+          // };
+
+  7.2) ahora para usar le customhook:
+    u: meal-finder\src\App.tsx
+    s:
+      // //   function App() {
+      // //   const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+      // //   const [selectedCategory, setSelectedCategory] = useState<Category>({ strCategory: 'Beef' });
+      // //   const { data, loading } = useHttpData<Category>(url);
+      // //   return (
+      // //     <Grid
+      // //       templateAreas={`"header header"
+      // //                   "nav main"`}
+      // //       gridTemplateRows={'60px 1fr '}
+      // //       gridTemplateColumns={{ sm: `0 1fr`, md: `250px 1fr` }}
+      // //       fontSize={14}
+      // //     >
+      )
+
+  7.3) para  el uso del hook para la url de meal 
+    n: creo el typo 
+    u:meal-finder\src\types\index.ts
+    s:
+      // // export type Meal = {
+      // //   //-----se le coloco el mismo nombre del objeto pero perfectamente se podria otro nombre
+      // //   strMeal: string;
+      // //   strMealThumb: string;
+      // //   idMeal: string;
+      // // };
+   
+    7.3.2) 
+      u:
+      s://.........
+        // // const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+        // // const defaultCategory: Category = { strCategory: 'Beef' }; //------categoria por defecto
+        //----creo una pequeña fucnion que al recibir la categoria por defecto la ponga en el url 
+        // // const makeMealUrl = (category: Category) =>
+        // //   `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category.strCategory}`;
+
+        // // function App() {
+        // //   const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
+        // //   const { data, loading } = useHttpData<Category>(url);
+        //--------ahora si agrego el uso del custom hook pero on la segunda url 
+        // //   const { data: dataMeal, loading: loadingMeal } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+        // //   console.log('data:', { dataMeal });
+        // //   return (
+        // //     <Grid)........
+
+8) ahora cargaremos las "meals" de cada categoria
+  u: meal-finder\src\App.tsx
+  s:
+    ...
+     <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>
+     ...
+  8.1) le vamos a agregar esso nuevos props al componente 
+    u: meal-finder\src\components\MainContent.tsx
+    s: 
+      // // import React from 'react';
+      // // import { Meal } from '../types';
+      // // import {
+      // //   Box,
+      // //   Button,
+      // //   ButtonGroup,
+      // //   Card,
+      // //   CardBody,
+      // //   CardFooter,
+      // //   Divider,
+      // //   Heading,
+      // //   Image,
+      // //   SimpleGrid,
+      // //   Stack,
+      // //   Text,
+      // // } from '@chakra-ui/react';
+
+      // // type Props = {
+      // //   loading: boolean;
+      // //   meals: Meal[];
+      // // };
+
+      // // function MainContent({ loading, meals }: Props) {
+      // //   console.log('meals:', meals, loading);
+      // //   return (
+      // //     <>
+      // //       <SimpleGrid columns={[1, 2, null, 3]} spacing="40px">
+      // //         {meals.map((meal) => (
+      // //           <Card maxW="sm" key={meal.idMeal} boxShadow="lg">
+      // //             <CardBody>
+      // //               <Image src={meal.strMealThumb} alt={meal.strMeal} borderRadius="lg" />
+      // //               <Stack mt="6" spacing="3">
+      // //                 <Heading size="md" color="blue.400">
+      // //                   <Text mt="4">{meal.strMeal}</Text>
+      // //                 </Heading>
+      // //                 <Text>
+      // //                   This sofa is perfect for modern tropical spaces, baroque inspired spaces, earthy
+      // //                   toned spaces and for people who love a chic design with a sprinkle of vintage
+      // //                   design.
+      // //                 </Text>
+      // //                 <Text color="blue.600" fontSize="2xl">
+      // //                   $450
+      // //                 </Text>
+      // //               </Stack>
+      // //             </CardBody>
+      // //             <CardFooter pt={0}>
+      // //               <ButtonGroup spacing="2">
+      // //                 <Button colorScheme="white" bgColor={'blue.400'}>
+      // //                   Ver Receta
+      // //                 </Button>
+      // //                 <Button variant="ghost" colorScheme="blue">
+      // //                   Add to cart
+      // //                 </Button>
+      // //               </ButtonGroup>
+      // //             </CardFooter>
+      // //           </Card>
+      // //         ))}
+      // //       </SimpleGrid>
+      // //     </>
+      // //   );
+      // // }
+
+      // // export default MainContent;
+
+  8.2) boxShadow, position absolute, relative, fixed y sticky, overflowY
+    u: meal-finder\src\App.tsx
+    s:
+      // // <GridItem
+      // //       overflowY="auto"
+      // //       pos="sticky"
+      // //       top="60px"
+      // //       left="0px"
+      // //       p="5"
+      // //       area={'nav'}
+      // //       height="calc(100vh - 60px)"
+      // //     >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+      
