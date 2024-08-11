@@ -515,6 +515,102 @@ que permite organizar elementos en filas y columnas,
       // //       height="calc(100vh - 60px)"
       // //     >
 
+9) creando componente  Card para no dejar todo en maincontent y su skeleton
+  n: voy a copiar lo que estave en mainconten,
+     y se lo pasare a el MealCard y al SkeletonCard
+  u: meal-finder\src\components\MainContent.tsx
+  n: asi que queda de la siguiente manera
+  s:
+      // // import React from 'react';
+      // // import { Meal } from '../types';
+      // // import MealCard from './MealCard';
+      // // import { SimpleGrid } from '@chakra-ui/react';
+      // // import SkeletonCard from './SkeletonCard';
+      // // type Props = {
+      // //   loading: boolean;
+      // //   meals: Meal[];
+      // // };
+      // // function MainContent({ loading, meals }: Props) {
+      // //   const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+      // //   return (
+      // //     <>
+      // //       <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+      // //         {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+      // //         {!loading && meals.map((meal) => <MealCard key={meal.idMeal} meal={meal} />)}
+      // //       </SimpleGrid>
+      // //     </>
+      // //   );
+      // // }
+      // // export default MainContent;
+  9.1) creo el componete MealCard
+    u: meal-finder\src\components\MealCard.tsx
+    s:
+      // // import {Button,ButtonGroup,Card,CardBody,CardFooter,Heading,Image,Stack,Text} from '@chakra-ui/react';
+      // // import { Meal } from '../types';
+      // // type Props = {
+      // //   meal: Meal;
+      // // };
+
+      // // function MealCard({ meal }: Props) {
+      // //   return (
+      // //     <Card maxW="sm" boxShadow="lg">
+      // //       <CardBody>
+      // //         <Image src={meal.strMealThumb} alt={meal.strMeal} borderRadius="lg" />
+      // //         <Stack mt="6" spacing="3">
+      // //           <Heading size="md" color="blue.400">
+      // //             <Text mt="4">{meal.strMeal}</Text>
+      // //           </Heading>
+      // //           <Text>
+      // //             This sofa is perfect for modern tropical spaces, baroque inspired spaces, earthy toned
+      // //             spaces and for people who love a chic design with a sprinkle of vintage design.
+      // //           </Text>
+      // //           <Text color="blue.600" fontSize="2xl">
+      // //             $450
+      // //           </Text>
+      // //         </Stack>
+      // //       </CardBody>
+      // //       <CardFooter pt={0}>
+      // //         <ButtonGroup spacing="2">
+      // //           <Button colorScheme="white" bgColor={'blue.400'}>
+      // //             Ver Receta
+      // //           </Button>
+      // //           <Button variant="ghost" colorScheme="blue">
+      // //             Add to cart
+      // //           </Button>
+      // //         </ButtonGroup>
+      // //       </CardFooter>
+      // //     </Card>
+      // //   );
+      // // }
+
+      // // export default MealCard;
+  9.2) creo el componete SkeletonCard
+    u: meal-finder\src\components\SkeletonCard.tsx
+    s:
+      // // import { Card, CardBody, SkeletonText } from '@chakra-ui/react';
+      // // function SkeletonCard() {
+      // //   return (
+      // //     <>
+      // //       <Card maxW="sm" boxShadow="lg">
+      // //         <CardBody>
+      // //           <SkeletonText mt="1" noOfLines={1} spacing="4" skeletonHeight="100" />
+      // //           <SkeletonText mt="4" noOfLines={2} spacing="4" skeletonHeight="4" />
+      // //         </CardBody>
+      // //       </Card>
+      // //     </>
+      // //   );
+      // // }
+      // // export default SkeletonCard;
+
+
+
+
+
+
+
+
+
+
 
 
 
