@@ -1,17 +1,9 @@
 import React from 'react';
 import { Meal } from '../types';
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  CardBody,
-  CardFooter,
-  Heading,
-  Image,
-  SimpleGrid,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+
+import MealCard from './MealCard';
+import { SimpleGrid } from '@chakra-ui/react';
+import SkeletonCard from './SkeletonCard';
 
 type Props = {
   loading: boolean;
@@ -19,39 +11,12 @@ type Props = {
 };
 
 function MainContent({ loading, meals }: Props) {
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <>
       <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
-        {meals.map((meal) => (
-          <Card maxW="sm" key={meal.idMeal} boxShadow="lg">
-            <CardBody>
-              <Image src={meal.strMealThumb} alt={meal.strMeal} borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md" color="blue.400">
-                  <Text mt="4">{meal.strMeal}</Text>
-                </Heading>
-                <Text>
-                  This sofa is perfect for modern tropical spaces, baroque inspired spaces, earthy
-                  toned spaces and for people who love a chic design with a sprinkle of vintage
-                  design.
-                </Text>
-                <Text color="blue.600" fontSize="2xl">
-                  $450
-                </Text>
-              </Stack>
-            </CardBody>
-            <CardFooter pt={0}>
-              <ButtonGroup spacing="2">
-                <Button colorScheme="white" bgColor={'blue.400'}>
-                  Ver Receta
-                </Button>
-                <Button variant="ghost" colorScheme="blue">
-                  Add to cart
-                </Button>
-              </ButtonGroup>
-            </CardFooter>
-          </Card>
-        ))}
+        {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+        {!loading && meals.map((meal) => <MealCard key={meal.idMeal} meal={meal} />)}
       </SimpleGrid>
     </>
   );
