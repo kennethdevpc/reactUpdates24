@@ -1,13 +1,11 @@
 import React from 'react';
 import { Meal } from '../types';
 import {
-  Box,
   Button,
   ButtonGroup,
   Card,
   CardBody,
   CardFooter,
-  Divider,
   Heading,
   Image,
   SimpleGrid,
@@ -21,10 +19,9 @@ type Props = {
 };
 
 function MainContent({ loading, meals }: Props) {
-  console.log('meals:', meals, loading);
   return (
     <>
-      <SimpleGrid columns={[1, 2, null, 3]} spacing="40px">
+      <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
         {meals.map((meal) => (
           <Card maxW="sm" key={meal.idMeal} boxShadow="lg">
             <CardBody>

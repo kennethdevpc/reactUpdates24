@@ -21,8 +21,6 @@ function App() {
   const { data, loading } = useHttpData<Category>(url);
   const { data: dataMeal, loading: loadingMeal } = useHttpData<Meal>(makeMealUrl(defaultCategory));
 
-  console.log('data:', { dataMeal });
-
   return (
     <Grid
       templateAreas={`"header header"
@@ -31,10 +29,18 @@ function App() {
       gridTemplateColumns={{ sm: `0 1fr`, md: `250px 1fr` }}
       fontSize={14}
     >
-      <GridItem pl="2" bg="orange.300" area={'header'}>
+      <GridItem pos="sticky" top={0} zIndex={1} pt="7px" bg="white" boxShadow="lg" area={'header'}>
         <Header></Header>
       </GridItem>
-      <GridItem p="5" area={'nav'} height="calc(100vh - 60px)">
+      <GridItem
+        overflowY="auto"
+        pos="sticky"
+        top="60px"
+        left="0px"
+        p="5"
+        area={'nav'}
+        height="calc(100vh - 60px)"
+      >
         <SideNav
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
