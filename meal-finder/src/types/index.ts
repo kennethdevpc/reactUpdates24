@@ -11,3 +11,7 @@ export type Meal = {
   strMealThumb: string;
   idMeal: string;
 };
+
+export type SearchForm = {
+  search: boolean;
+};
