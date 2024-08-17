@@ -1205,7 +1205,7 @@ Chakra UI -> especifica de react
           name="nombre"
           type="text"
           id="name"
-           value={user.lastname} //-----le paso el value inicial 
+           value={user.name} //-----le paso el value inicial 
           className="form-control"
         />
     30.2.2) ahora la forma en la cual se usa una funcion para todas
@@ -1227,7 +1227,7 @@ Chakra UI -> especifica de react
            value={user.lastname} //-----le paso el value inicial 
           className="form-control"
         />
-  30.3) React hook form 
+  30.3) 💥 React hook form 💥💥💥💥💥💥💥💥💥
     c: npm i react-hook-form@7.51.3
     u:react-form\src\components\FormReactHook.tsx
     s:
@@ -1288,6 +1288,8 @@ Chakra UI -> especifica de react
           >
             <div className="mb-3">
 
+      }
+
     30.3.4) validaciones con el "register"
      obtengo la funcionalidad "formState"
      *max,
@@ -1304,9 +1306,7 @@ Chakra UI -> especifica de react
         ..
         <input
           {...register('name', { //----agrego las validaciones
-            required: 'Este campo es requerido',
-            minLength: { value: 2, message: 'Mínimo 2 caracteres' },
-            maxLength: { value: 10, message: 'No más de 10 caracteres' },
+            
           })}
           type="text"
           id="name"
@@ -1340,52 +1340,76 @@ Chakra UI -> especifica de react
     30.3.5) colocando la funcion del handle submit en una cfuncion aparte
       s:
         //---el onsubmit solo se ejecuta si no hya errores  
-        //---osea el handleSubmit se ejecuta colo cuando esa bien todo 
+        //---osea el handleSubmit se ejecuta solo cuando esa bien todo 
         const onsubmit = (data: Form) => console.log("informacion Obtenida desde el 'register'", data);
         return (
           //----------pasandole el submit
-            <form onSubmit={handleSubmit(onsubmit)}>
-31) biblioteca para manejo de formularios muy pesados
-  biblioteca Sopara validacion por schema
+            <form onSubmit={handleSubmit(onsubmit)}>)
+
+31)ZOD biblioteca para manejo de formularios muy pesados
+  biblioteca ZOD para validacion por schema
   joi, yup y zod
   uzaremos ZOD:
-  c:
-    npm i zod@3.22.4
-  n: creo la carpeta y el archivo:
-  u: react-form\src\schemas\user.ts
-
-  s: 
-      import { z } from 'zod';
-      export const userSchema = z.object({
-        name: z
-          .string({ required_error: 'Nombre es requerido' })
-          .min(3, { message: 'longitud minima 3' })
-          .max(20),
-        lastname: z
-          .string({ required_error: 'Apellido es requerido' })
-          .min(3, { message: 'longitud minima 3' })
-          .max(20),
-        amount: z
-          .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' })
-          .min(1, { message: 'el campo es requerido' }),
-      });
-
-  31.2) ahora utilizo esto en el formulario
-    u: react-form\src\components\FormReactHook.tsx
+  31.0) instalacion de ZOD
+    c: npm i zod@3.22.4
+    n: creo la carpeta y el archivo:
+  31.1) Creacion del schema
+    u: react-form\src\schemas\user.ts
     s: 
+        import { z } from 'zod';
+        export const userSchema = z.object({
+          name: z
+            .string({ required_error: 'Nombre es requerido' })
+            .min(3, { message: 'longitud minima 3' })
+            .max(20),
+          lastname: z
+            .string({ required_error: 'Apellido es requerido' })
+            .min(3, { message: 'longitud minima 3' })
+            .max(20),
+          amount: z
+            .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' })
+            .min(1, { message: 'el campo es requerido' }),
+            //tipo funcion 
+          //age: z.string().refine(
+          //  (age) => {return Number(age) >= 18; },
+          //  { message: "You must be 18 years or older" },
+          // ),
+        });
+
+
+        31.1.2) mira algunas validaciones posbles en:
+          u:zod.txt
+
+  31.2) ahora utilizo esto en el formulario, metodo "parse"
+     y verifico primero por consola los datos (imprime los datos de error )
+     
+     n: utilizo el metodo de parse, sin embargo esa no es la oforma correcta 
+      ya que se debe utilizar uno resolver que es mejor ya que 
+      analiza el resultado en lugar de capturar excepciones.
+      puedes saber mas en: 
+      * u: teoria.txt punto 2
+
+     u: react-form\src\components\FormReactHook.tsx
+     s: 
       import { userSchema } from '../schemas/user'; //-----importo ese schema creado 
       function FormReactHook() {
         //----usando react hook se sigue utilizando ya que ZOD se usa con "react hook form"
+        
         type Form = { name: string; lastname: string; };
-        const { register, handleSubmit,formState: { errors },
+
+        const {
+           register,
+            handleSubmit,
+            formState: { errors },
         } = useForm<Form>();
 
         const onsubmit = (data: Form) => {
           try { //--------Uso un try catch para usar el codigo de ZOD
-            const x = userSchema.parse(data);  //----uso ese schema
+            const x = userSchema.parse(data);  //----uso ese schema con metodo Parse
             console.log('sin eerror', x);
 
           } catch (error) {
+            //--------aqui puedo setear un estado de errores pero no lo hice solo imprimir porque lo mejor es con el resolver
             //me salia este error 'error' is of type 'unknown'.ts(18046)
             //lo que entiendo es que se debe colocar como una instancia de Error
             //o fix the error, you need to explicitly type the error variable as Error so that TypeScript recognizes it as an error object.
@@ -1411,7 +1435,8 @@ Chakra UI -> especifica de react
                 className="form-control"
               />
         )
-  31.3) ahora si utilizando la biblioteca de resolver
+  31.3)metodo Resolver:  despues comprobar los errores,
+    de ahora si utilizando la biblioteca de resolver
     n: me permite que ese zog o esos errores del Zog puedan manejarse mejor
     u: https://github.com/react-hook-form/resolvers
 
@@ -1430,11 +1455,11 @@ Chakra UI -> especifica de react
             handleSubmit,
             formState: { errors },
           } = useForm<Form>({
-            resolver: zodResolver(userSchema),
+            resolver: zodResolver(userSchema),//-----le agrego el schema
           });
           
           console.log('.....', errors);
-
+          
           const onsubmit = (data: Form) => {
             console.log('data', data);
           };

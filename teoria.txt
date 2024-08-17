@@ -1,0 +1,148 @@
+
+
+
+1) ZOD:
+     https://zod.dev/?id=primitives
+    Estás utilizando zod para validar datos en un esquema. zod es una potente librería de validación en JavaScript y TypeScript, y ofrece varias funciones para definir reglas de validación. Aquí te detallo algunas de las validaciones más comunes que puedes usar:
+    min y max: Establecen la longitud mínima y máxima para cadenas o la cantidad mínima y máxima para números.
+
+    Ejemplo: z.string().min(5) o z.number().min(18)
+    regex: Valida una cadena usando una expresión regular.
+
+    Ejemplo: z.string().regex(/^\d+$/)
+    refine: Permite agregar una validación personalizada que no esté cubierta por las otras funciones. Puedes usarla para cualquier tipo de validación que necesite lógica adicional.
+
+    Ejemplo: z.string().refine(val => val.includes('@'), { message: "Debe contener '@'" })
+    email: Valida que una cadena sea un correo electrónico válido.
+
+    Ejemplo: z.string().email()
+    url: Valida que una cadena sea una URL válida.
+
+    Ejemplo: z.string().url()
+    uuid: Valida que una cadena sea un UUID válido.
+
+    Ejemplo: z.string().uuid()
+    optional: Indica que un campo es opcional.
+
+    Ejemplo: z.string().optional()
+    nullable: Indica que un campo puede ser nulo.
+
+    Ejemplo: z.string().nullable()
+    default: Define un valor por defecto si el campo no se proporciona.
+
+    Ejemplo: z.string().default("default value")
+    length: Establece la longitud exacta de una cadena.
+
+    Ejemplo: z.string().length(5)
+    array: Valida que un valor sea un arreglo y puede incluir validaciones sobre los elementos del arreglo.
+
+    Ejemplo: z.array(z.string())
+    literal: Valida que un valor coincida exactamente con un valor dado.
+
+    Ejemplo: z.literal("exactValue")
+    enum: Valida que un valor esté dentro de un conjunto específico de valores.
+
+    Ejemplo: z.enum(["value1", "value2", "value3"])
+    transform: Permite transformar un valor después de la validación.
+
+    Ejemplo: z.string().transform(val => val.trim())
+    union: Valida que un valor corresponda a una de varias validaciones posibles.
+
+    Ejemplo: z.union([z.string(), z.number()])
+
+2) parse y resolvers(safeParse)
+  En zod, tanto parse como safeParse (o "resolver" en algunos contextos)
+  se utilizan para validar datos contra un esquema definido, pero tienen 
+  diferencias clave en cómo manejan los errores de validación.
+  Parse:
+    Uso: parse es una función que valida los datos contra un esquema definido. 
+    Si los datos son válidos, los devuelve; si no, arroja una excepción (throw) 
+    con un error detallado.
+    -Es ideal para flujos donde quieres manejar los errores a través de un try/catch.
+
+  safeParse (o "resolver")
+    Uso: safeParse también valida los datos contra un esquema,
+    pero en lugar de lanzar una excepción en caso de error, 
+    devuelve un objeto con dos propiedades:
+      success: un booleano que indica si la validación fue exitosa.
+      data o error: dependiendo del resultado, contiene los datos validados o un objeto con los errores.
+
+    Ejemplo 1: Usando parse:{
+      // // import React from 'react';
+      // // import { useForm } from 'react-hook-form';
+      // // import { z } from 'zod';
+
+      // // const apellidoSchema = z.string().min(3, 'Apellido debe tener al menos 3 caracteres');
+
+      // // type FormValues = {
+      // //   apellido: string;
+      // // };
+
+      // // const FormParseExample: React.FC = () => {
+      // //   const { register, handleSubmit, setError } = useForm<FormValues>();
+
+      // //   const onSubmit = (data: FormValues) => {
+      // //     try {
+      // //       apellidoSchema.parse(data.apellido);
+      // //       console.log('Datos válidos:', data);
+      // //     } catch (e) {
+      // //       setError('apellido', { message: (e as any).errors[0].message });
+      // //     }
+      // //   };
+
+      // //   return (
+      // //     <form onSubmit={handleSubmit(onSubmit)}>
+      // //       <label>
+      // //         Apellido:
+      // //         <input {...register('apellido')} />
+      // //       </label>
+      // //       <button type="submit">Enviar</button>
+      // //     </form>
+      // //   );
+      // // };
+
+      // // export default FormParseExample;
+    }
+    Ejemplo 2: Usando zodResolver{
+        // // import React from 'react';
+        // // import { useForm } from 'react-hook-form';
+        // // import { z } from 'zod';
+        // // import { zodResolver } from '@hookform/resolvers/zod';
+
+        // // const apellidoSchema = z.object({
+        // //   apellido: z.string().min(3, 'Apellido debe tener al menos 3 caracteres'),
+        // // });
+
+        // // type FormValues = z.infer<typeof apellidoSchema>;
+
+        // // const FormResolverExample: React.FC = () => {
+        // //   const {
+        // //     register,
+        // //     handleSubmit,
+        // //     formState: { errors },
+        // //   } = useForm<FormValues>({
+        // //     resolver: zodResolver(apellidoSchema),
+        // //   });
+
+        // //   const onSubmit = (data: FormValues) => {
+        // //     console.log('Datos válidos:', data);
+        // //   };
+
+        // //   return (
+        // //     <form onSubmit={handleSubmit(onSubmit)}>
+        // //       <label>
+        // //         Apellido:
+        // //         <input {...register('apellido')} />
+        // //         {errors.apellido && <span>{errors.apellido.message}</span>}
+        // //       </label>
+        // //       <button type="submit">Enviar</button>
+        // //     </form>
+        // //   );
+        // // };
+
+        // // export default FormResolverExample;
+
+
+
+
+    }

@@ -1,0 +1,47 @@
+https://zod.dev/?id=primitives
+Estás utilizando zod para validar datos en un esquema. zod es una potente librería de validación en JavaScript y TypeScript, y ofrece varias funciones para definir reglas de validación. Aquí te detallo algunas de las validaciones más comunes que puedes usar:
+min y max: Establecen la longitud mínima y máxima para cadenas o la cantidad mínima y máxima para números.
+
+Ejemplo: z.string().min(5) o z.number().min(18)
+regex: Valida una cadena usando una expresión regular.
+
+Ejemplo: z.string().regex(/^\d+$/)
+refine: Permite agregar una validación personalizada que no esté cubierta por las otras funciones. Puedes usarla para cualquier tipo de validación que necesite lógica adicional.
+
+Ejemplo: z.string().refine(val => val.includes('@'), { message: "Debe contener '@'" })
+email: Valida que una cadena sea un correo electrónico válido.
+
+Ejemplo: z.string().email()
+url: Valida que una cadena sea una URL válida.
+
+Ejemplo: z.string().url()
+uuid: Valida que una cadena sea un UUID válido.
+
+Ejemplo: z.string().uuid()
+optional: Indica que un campo es opcional.
+
+Ejemplo: z.string().optional()
+nullable: Indica que un campo puede ser nulo.
+
+Ejemplo: z.string().nullable()
+default: Define un valor por defecto si el campo no se proporciona.
+
+Ejemplo: z.string().default("default value")
+length: Establece la longitud exacta de una cadena.
+
+Ejemplo: z.string().length(5)
+array: Valida que un valor sea un arreglo y puede incluir validaciones sobre los elementos del arreglo.
+
+Ejemplo: z.array(z.string())
+literal: Valida que un valor coincida exactamente con un valor dado.
+
+Ejemplo: z.literal("exactValue")
+enum: Valida que un valor esté dentro de un conjunto específico de valores.
+
+Ejemplo: z.enum(["value1", "value2", "value3"])
+transform: Permite transformar un valor después de la validación.
+
+Ejemplo: z.string().transform(val => val.trim())
+union: Valida que un valor corresponda a una de varias validaciones posibles.
+
+Ejemplo: z.union([z.string(), z.number()])
