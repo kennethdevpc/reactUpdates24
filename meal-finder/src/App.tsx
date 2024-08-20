@@ -6,8 +6,9 @@ import SideNav from './components/SideNav';
 
 import MainContent from './components/MainContent';
 import { set } from 'react-hook-form';
-import { Category, Meal } from './types';
+import { Category, Meal, SearchForm } from './types';
 import useHttpData from './hooks/useHttpData';
+import axios from 'axios';
 
 const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
 const defaultCategory: Category = { strCategory: 'Beef' };
@@ -17,9 +18,28 @@ const makeMealUrl = (category: Category) =>
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
-
   const { data, loading } = useHttpData<Category>(url);
-  const { data: dataMeal, loading: loadingMeal } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+  const {
+    data: dataMeal,
+    loading: loadingMeal,
+    setData: setMeals,
+    setLoading: setLoadingMeal,
+  } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+
+  const searchApi = (SearchForm: SearchForm) => {
+    const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`;
+    setLoadingMeal(true);
+    axios
+      .get<{ meals: Meal[] }>(url)
+      .then((r) => {
+        setMeals(r.data.meals);
+        console.log('r', r);
+      })
+      .finally(() => {
+        console.log('finnally');
+        setLoadingMeal(false);
+      });
+  };
 
   return (
     <Grid
@@ -30,7 +50,7 @@ function App() {
       fontSize={14}
     >
       <GridItem pos="sticky" top={0} zIndex={1} pt="7px" bg="white" boxShadow="lg" area={'header'}>
-        <Header></Header>
+        <Header onSubmit={searchApi}></Header>
       </GridItem>
       <GridItem
         overflowY="auto"
@@ -50,6 +70,10 @@ function App() {
       </GridItem>
       <GridItem p="4" bg="gray.300" area={'main'}>
         <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>
+
+        {/* {!loadingMeal && (
+          <MainContent meals={dataMealSearch} loading={loadingMealSearch}></MainContent>
+        )} */}
       </GridItem>
     </Grid>
   );

@@ -41,5 +41,5 @@ export default function useHttpData<T>(url: string) {
     };
   }, []);
 
-  return { data, loading };
+  return { data, loading, setData, setLoading };
 }

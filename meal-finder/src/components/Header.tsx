@@ -6,15 +6,11 @@ import { searchSchema } from '../schemas/search';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 type Props = {
-  // onSubmit: (data: SearchForm) => void;
+  onSubmit: (data: SearchForm) => void;
 };
 
 // function Header({ onSubmit }: Props) {
-function Header({}: Props) {
-  const onsubmit = (data: SearchForm) => {
-    console.log('data', data);
-  };
-
+function Header({ onSubmit }: Props) {
   const {
     register,
     formState: { errors },
@@ -23,11 +19,9 @@ function Header({}: Props) {
     resolver: zodResolver(searchSchema),
   }); //---se agrega el useForm para poder utilizarlo en el formulario
 
-  console.log('.....Erroress', errors);
-
   return (
     <Container mt="1" maxW="3xl">
-      <form onSubmit={handleSubmit(onsubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <InputGroup>
           <InputLeftElement pointerEvents="none">
             <CiSearch color="blue" size={50} /> {/*--se agrega un icono*/}
