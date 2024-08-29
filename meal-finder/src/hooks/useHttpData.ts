@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CategoriesResponse, Category } from '../types';
 import axios from 'axios';
 
-export default function useHttpData<T>(url: string) {
+export default function useHttpData<T>(url: string, urlSearch?: string) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -39,7 +39,7 @@ export default function useHttpData<T>(url: string) {
       ignore = true; //----cuando se sale o termina el proceso(la 1era vez) entonces pone en true pa que no vuelva a ejecutar el set de react
       controller.abort();
     };
-  }, []);
+  }, [urlSearch]);
 
   return { data, loading, setData, setLoading };
 }

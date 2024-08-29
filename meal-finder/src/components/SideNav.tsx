@@ -16,7 +16,7 @@ const selectedProps = {
   fontWeight: 'bold',
 };
 function SideNav({ categories, loading, selectedCategory: selected, setSelectedCategory }: Props) {
-  console.log(loading);
+  console.log('entroooo', categories);
   return loading ? (
     <SkeletonText mt="4" noOfLines={8} spacing="4" skeletonHeight="2" />
   ) : (
