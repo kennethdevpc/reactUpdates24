@@ -679,14 +679,204 @@ que permite organizar elementos en filas y columnas,
         // //   );
         // // }
         // // export default Header;
+11) ahora buscamos en la api con lo que se manda en el formulario
 
+    n: en el header donde se  en cuentra el buscador 
+    u: meal-finder\src\components\Header.tsx
+    s:
+      // // type Props = {
+      // //   onSubmit: (data: SearchForm) => void;
+      // // };
+      // // function Header({ onSubmit }: Props) {
+      // // ...
+      // // ..
+      // // return (
+      // //  <Container mt="1" maxW="3xl">
+      // //    <form onSubmit={handleSubmit(onSubmit)}> 
+      // // .........)}
 
-
+  11.1) ahora creo en el App la el llamado de ese dato que se inserta en el search 
     
     
+    u: meal-finder\src\App.tsx
+    s: 
+      ...
+        // // function App() {
+        // // ...
+        // // const {
+        // //   data: dataMeal,
+        // //   loading: loadingMeal,
+        // //   setData: setMeals, //--------saco del useHttpData esto para que cuando busque setee nuevamente la data a mostrar (data buscada)
+        // //   setLoading: setLoadingMeal, //--------saco del useHttpData esto para que cuando busque setee nuevamente el skeleton  a mostrar (data buscada)
+        // // } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+        // //....
+        // //    const searchApi = (SearchForm: SearchForm) => {
+        // //   const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`;
+        // //   setLoadingMeal(true);  //----------seteo el estado del skeleton 
+        // //   axios
+        // //     .get<{ meals: Meal[] }>(url)
+        // //     .then((r) => {
+        // //       setMeals(r.data.meals); //-----seteo la data a mostrar
+        // //       console.log('r', r);
+        // //     })
+        // //     .finally(() => {
+        // //       console.log('finnally');
+        // //       setLoadingMeal(false);
+        // //     });
+        // // };
+        // //...
+        // //    <Header onSubmit={searchApi}></Header>
+  11.2) no olvidar exportar el setData y setLoading de:
+    u: meal-finder\src\hooks\useHttpData.ts
+    s:
+      return { data, loading, setData, setLoading };
+
+ 
+    u: App-11b-SearchconCustomHook.tsx
+    s:
+    // // ...
+    // // function App() {
+    // //   ...
+    // //    const {
+    // //     data: dataMeal,
+    // //     loading: loadingMeal,
+    // //     // setData: setMeals, --------ya no uso esto
+    // //     // setLoading: setLoadingMeal,--------ya no uso esto
+    // //   } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+    // //     //-----------forma 2 de hacerl la busqueda con el uso del custom hook
+    // //     const [urlSearch, setUrlSearch] = useState<string>('');
+    // //     const { data: searchData, loading: searchLoading } = useHttpData<Meal>(urlSearch, urlSearch);
+    // //     const searchApi = (SearchForm: SearchForm) => {
+    // //       setUrlSearch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`);
+    // //       console.log('urlSearch', urlSearch);
+    // //       console.log('searchData', searchData);
+    // //     };
+    // //     //-----------fin forma 2 de hacerl la busqueda con el uso del custom hook
+    // //     return(
+    // //     ....
+    // //       {/* forma 2 de hacerlo con el custom hook */}
+    // //       {!searchData && <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>}
+    // //       {searchData && <MainContent loading={searchLoading} meals={searchData}></MainContent>}
+    // //       {/* fin  forma 2 de hacerlo con el custom hook */}
+    // //     )
+    
+    11.2b) ahora en el useHttpData solo agrego el state que me actualiza 
+     solo cuanndo cambia el dato de la palabra search:
+      u: meal-finder\src\hooks\useHttpData.ts
+      s:
+      // //  export default function useHttpData<T>(url: string, urlSearch?: string) {
+      // //   useEffect(() => {
+      // //   ....
+      // //   }, [urlSearch]); //-----agrego este estado que hace que se eejecute el usefect una vez cambie este
+      // //  }
+
+12) agregando modal (pop up)
+  voy y modifico el 
+  u: meal-finder\src\components\RecipeModal.tsx
+  n: uso el coponnete modal de chackra
+  s:
+      // // import {
+      // //   Button,
+      // //   Modal,
+      // //   ModalBody,
+      // //   ModalCloseButton,
+      // //   ModalContent,
+      // //   ModalFooter,
+      // //   ModalHeader,
+      // //   ModalOverlay,
+      // // } from '@chakra-ui/react';
+
+      // // type Props = {
+      // //   isOpen: boolean;
+      // //   onClose: () => void;
+      // // };
+
+      // // function RecipeModal({ isOpen, onClose }: Props) {
+      // //   return (
+      // //     <>
+      // //       <Modal isOpen={isOpen} onClose={onClose}>
+      // //         <ModalOverlay />
+      // //         <ModalContent>
+      // //           <ModalHeader>Modal Title</ModalHeader>
+      // //           <ModalCloseButton />
+      // //           <ModalBody>Holamundo</ModalBody>
+
+      // //           <ModalFooter>
+      // //             <Button colorScheme="blue" mr={3} onClick={onClose}>
+      // //               Close
+      // //             </Button>
+      // //             <Button variant="ghost">Secondary Action</Button>
+      // //           </ModalFooter>
+      // //         </ModalContent>
+      // //       </Modal>
+      // //     </>
+      // //   );
+      // // }
+
+      // // export default RecipeModal;
+ 12.2) voy al app principal para pasarle las poriedades de oOpen y Onclose a las cards:
+  u:     meal-finder\src\App.tsx
+
+  s:
+    // // ...
+    // // function App() {
+    // //   const { isOpen, onOpen, onClose } = useDisclosure();
+    // // ....
+    // // ...
+    // //   <GridItem p="4" bg="gray.300" area={'main'}>
+    // //           <MainContent openRecipe={onOpen} loading={loadingMeal} meals={dataMeal}></MainContent>
+    // //         </GridItem>
+    // //       </Grid>
+    // // //----queda por fuera ya que esto parece cmo pop up 
+    // //   <RecipeModal isOpen={isOpen} onClose={onClose} />
 
 
 
+  12.3) luego voy al maincontent que posee todas las cartas 
+   u: meal-finder\src\components\MainContent.tsx
+   s:
+      // // ...
+      // // type Props = {
+      // //   loading: boolean;
+      // //   meals: Meal[];
+      // //   openRecipe: (meal: Meal) => void;  //-----agregado
+      // // };
+
+      // // function MainContent({ loading, meals, openRecipe }: Props) {
+      // //   const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+      // //   return (
+      // //     <>
+      // //       <button style={{ cursor: 'pointer' }}>click opopen </button>
+      // //       <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+      // //         {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+      // // //--------le agrego  al MeaCArd el openRecipe pero le paso el argumento meal,
+      // // //--------no sabia que se le podia pasar el meal:Meal y que se pudiera         
+      // //         {!loading &&
+      // //           meals.map((meal) => (
+      // //             <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+      // //           ))}
+      // //       </SimpleGrid>
+      // //     </>
+      // //   );
+      // // }
+
+  12.4) ahora voy al MealCard
+    u: meal-finder\src\components\MealCard.tsx
+    s:
+      // // type Props = {
+      // //   meal: Meal;
+      // //   openRecipe: () => void; //----aqui lo pone como si no tuviera argumento 
+      // // };
+      // // function MealCard({ openRecipe, meal }: Props) {
+      // //   return (
+      // //       ....
+      // //       ...
+      // //       <Button onClick={openRecipe} colorScheme="white" bgColor={'blue.400'}>
+      // //             Ver Receta
+      // //           </Button>
+      // //       ...
+      // //   )
+      // // }
 
 
 

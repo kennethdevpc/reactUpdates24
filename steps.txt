@@ -1784,22 +1784,22 @@ Chakra UI -> especifica de react
           const url = 'https://jsonplaceholder.typicode.com/users';
           setLoading(true);
 
-       fetch(url)
-        .then((response) => {
-          if (!response.ok) { //----errores de consulta differentes a 200 , como 300 ,400 ,500, ya que el catch no lee eso
-            throw new Error(`${response.status}`);//---lanza un error para que pueda ser leido con el catch 
-          }
-          return response.json() as Promise<User[]>;
-        })
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) { //----errores de consulta differentes a 200 , como 300 ,400 ,500, ya que el catch no lee eso
+                throw new Error(`${response.status}`);//---lanza un error para que pueda ser leido con el catch 
+              }
+              return response.json() as Promise<User[]>;
+            })
             .then((data) => {
-              setUser(data);
-            })
+                  setUser(data);
+                })
             .catch((error: Error) => { //----aqui toma los errores del servidor pero si no se hace el "response.ok" no detectaria los 300 , 400 , 500 
-              setError(error.message); //----setea el mensaje 
-            })
+                  setError(error.message); //----setea el mensaje 
+                })
             .finally(() => {
-              setLoading(false);
-            });
+                  setLoading(false);
+                });
         }, []);
         if (error && !loading) {
           return <p>Ha ocurrido un Error: {error}</p>;
