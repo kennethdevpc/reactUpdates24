@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import Header from './components/Header';
@@ -10,18 +10,21 @@ import { Category, Meal, SearchForm } from './types';
 import useHttpData from './hooks/useHttpData';
 import axios from 'axios';
 import RecipeModal from './components/RecipeModal';
+import useFetch from './hooks/useFetch';
 
-const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+const baseUrl = 'https://www.themealdb.com/api/json/v1/1';
+const url = `${baseUrl}/list.php?c=list`;
 const defaultCategory: Category = { strCategory: 'Beef' };
 
-const makeMealUrl = (category: Category) =>
-  `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category.strCategory}`;
+const makeMealUrl = (category: Category) => `${baseUrl}/filter.php?c=${category.strCategory}`;
 
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
+
   const { data, loading } = useHttpData<Category>(url);
+
   const {
     data: dataMeal,
     loading: loadingMeal,
@@ -30,7 +33,7 @@ function App() {
   } = useHttpData<Meal>(makeMealUrl(defaultCategory));
 
   const searchApi = (SearchForm: SearchForm) => {
-    const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`;
+    const url = `${baseUrl}/search.php?s=${SearchForm.search}`;
     setLoadingMeal(true);
     axios
       .get<{ meals: Meal[] }>(url)
@@ -40,6 +43,14 @@ function App() {
       .finally(() => {
         setLoadingMeal(false);
       });
+  };
+
+  const { fetch } = useFetch<Meal>();
+  const searchMealDetails = (meal: Meal) => {
+    onOpen();
+    const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
+
+    fetch(url);
   };
 
   return (
@@ -79,7 +90,11 @@ function App() {
           ></SideNav>
         </GridItem>
         <GridItem p="4" bg="gray.300" area={'main'}>
-          <MainContent openRecipe={onOpen} loading={loadingMeal} meals={dataMeal}></MainContent>
+          <MainContent
+            openRecipe={searchMealDetails}
+            loading={loadingMeal}
+            meals={dataMeal}
+          ></MainContent>
         </GridItem>
       </Grid>
       <RecipeModal isOpen={isOpen} onClose={onClose} />
