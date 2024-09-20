@@ -15,3 +15,9 @@ export type Meal = {
 export type SearchForm = {
   search: boolean;
 };
+
+export type MealDetails = {
+  //el key es el nombre del objeto y el value es el tipo de dato
+  //pero el tipo de dato tambien podria ser otro tipo por ejemplo number
+  [key: string]: string;
+};

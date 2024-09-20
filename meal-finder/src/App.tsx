@@ -6,7 +6,7 @@ import SideNav from './components/SideNav';
 
 import MainContent from './components/MainContent';
 import { set } from 'react-hook-form';
-import { Category, Meal, SearchForm } from './types';
+import { Category, Meal, MealDetails, SearchForm } from './types';
 import useHttpData from './hooks/useHttpData';
 import axios from 'axios';
 import RecipeModal from './components/RecipeModal';
@@ -45,7 +45,7 @@ function App() {
       });
   };
 
-  const { fetch } = useFetch<Meal>();
+  const { fetch } = useFetch<MealDetails>();
   const searchMealDetails = (meal: Meal) => {
     onOpen();
     const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
