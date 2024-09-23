@@ -45,11 +45,10 @@ function App() {
       });
   };
 
-  const { fetch } = useFetch<MealDetails>();
+  const { fetch, loading: loadingMealDetail, data: mealDetailData } = useFetch<MealDetails>();
   const searchMealDetails = (meal: Meal) => {
     onOpen();
     const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
-
     fetch(url);
   };
 
@@ -97,7 +96,12 @@ function App() {
           ></MainContent>
         </GridItem>
       </Grid>
-      <RecipeModal isOpen={isOpen} onClose={onClose} />
+      <RecipeModal
+        data={mealDetailData}
+        isOpen={isOpen}
+        onClose={onClose}
+        loading={loadingMealDetail}
+      />
     </>
   );
 }

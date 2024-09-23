@@ -13,7 +13,7 @@ export default <T>() => {
         setData(response.data.meals[0]);
       })
       .finally(() => {
-        console.log('fin');
+        setLoading(false);
       });
   };
 
