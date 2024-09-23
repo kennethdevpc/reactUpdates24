@@ -19,6 +19,7 @@ function RecipeModalContent({ data }: Props) {
   const joinIngredients = (data: MealDetails) => {
     const ingredients = [];
     for (let i = 1; i <= 20; i++) {
+      //------> busco por el nombre de la key y si hay algo lo agrego al array
       if (data[`strIngredient${i}`]) {
         ingredients.push(`${data[`strIngredient${i}`]} - ${data[`strMeasure${i}`]}`);
       } else {
@@ -38,7 +39,7 @@ function RecipeModalContent({ data }: Props) {
           Ingredients
         </Heading>
         <OrderedList mb="4">
-          {joinIngredients(data).map((ingredient, index) => (
+          {joinIngredients(data).map((ingredient) => (
             <ListItem key={ingredient}>{ingredient}</ListItem>
           ))}
         </OrderedList>
