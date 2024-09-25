@@ -1,33 +1,35 @@
 React:
-1) confirguracion en vs
-	stttings: escribo format on save y selecciono:
-	texto: format a file on save. A f...
+1)  Configuración en VS Code
+  🟦 Settings: 
 
-  settings2: formatter
-  texto: define a deffault fomrmatter.. y selecciono prettier
+    -Format on Save: Activar.
+    -Default Formatter: Seleccionar Prettier.
+  🟦 Extensiones:
+    -Autorename Tag: Cambia etiquetas de apertura y cierre automáticamente.
+    -ES7+ React/Redux/React-Native snippets: Autocompletar export default.
+  🟦 Terminal:
 
-    //extensiones
-
-  -Autorename tag: para que al inicio y al final cambei la etiqueta
-  -ES7+ React/Redux/React-Native snippets: para poder que autocomplete el export default 
+  🟦 Ejecutando el archivo:
+    bash
+    Copiar código
+    3:35:39 p. m. [vite] hmr update /src/Titulo.tsx
+    HMR (Hot Module Reload): Detecta cambios en el DOM y actualiza.
   
+  🟦 Convenciones:
+    -Funciones: Usar PascalCase o UpperCamelCase para componentes.
+  
+  🟦 Selección de texto:
+    Presionar CTRL + D para seleccionar múltiples instancias de texto.
 
-  n: si voy a la terminal me voy a enonctrar corriendo el archivo:
-  3:35:39 p. m. [vite] hmr update /src/Titulo.tsx 
-  hmr=hot module reload (esto vite lo que hace es que detecta si hay un cambio en el dom y actualiza)
+2) Uso de Vite
+  🟦React: Monitorea cambios en el DOM y comunica con ReactDOM
 
-  n: las funciones tienen la convencion PascalCase o UpperCamelCase 
-  siempre las funciones seran en Maysuscula si son un componente
-
-  n: si queiro seleccionar avarios textos iguales presiono CTRL+ d y va colocando un cursor al final de cada palabra
-
-2)actualmente deberia utilizar Vite
-  2.1) REACT Se encarga de ver que elemnto cambio en el DOM y le avisa  AL ReactDOM para que el renderice el el elemento root dicha infomracion
 3) creando proyecto:
 	c: npm create vite@5.2.3
 	c: cd react-app
 	c: npm install
 	c: npm run dev
+
 4) me dirijo a 
 	u: react-app\src\App.tsx
 	s:
@@ -37,6 +39,7 @@ React:
       return <h1>Hola mundo</h1>;
     }
     export default App;
+    
 5) para pasarle variables:
   s:
     function App() {

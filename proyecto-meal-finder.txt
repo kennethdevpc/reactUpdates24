@@ -878,9 +878,239 @@ que permite organizar elementos en filas y columnas,
       // //   )
       // // }
 
+13) creacion de custom-hook para llamado de data unicamente
+  u: meal-finder\src\hooks\useFetch.ts
+  s:
+    // // import axios from 'axios';
+    // // import { useState } from 'react';
+    // // export default <T>() => {
+    // //   const [loading, setLoading] = useState<boolean>(false);
+    // //   const [data, setData] = useState<T>([]);
+    // //   const fetch = (url: string) => {
+    // //     setLoading(true);
+    // //     axios.get(url)
+    // //     .then((response) => {
+    // //       console.log(response.data);
+    // //        setData(response.data);
+    // //     })
+    // //     .finally(() => {
+    // //       setLoading(false);
+    // //     });
+    // //   };
+    // //   return { loading, data, fetch };
+    // // };
 
+  13.1) si queireo imprimir puedo:
+    u: meal-finder\src\App.tsx
+    s:
+      // // const { fetch } = useFetch();
 
+      // // useEffect(() => {
+      // //   console.log('fetch');
+      // //   fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=Arrabiata');
+      // // }, []);
+14) ahora con ese custom hook lo usare
+para llamar el detalle cuando de click en alguna card
+  u: meal-finder\src\App.tsx
+  s:
+  // // const { fetch } = useFetch<Meal>();
+  // //   const searchMealDetails = (meal: Meal) => {
+  // //   onOpen();
+  // //   const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
+  // //   fetch(url);
+  // //   };
+  // //   ...
+  // //   ..
+  // //   <MainContent
+  // //     openRecipe={searchMealDetails}  //-----le paso a este componente la funcion para cundo de click pueda mandarle el id al url y asi llenar el estado de la variable "detalles"
+  // //     loading={loadingMeal}
+  // //     meals={dataMeal}
+  // //   >
+  // //   </MainContent>
 
+   14.1) MainContent
+    u: meal-finder\src\components\MainContent.tsx
+    n: MainContent recibe la funcion y cuando se da click en el boton pues ahi es donde se manda el id
+    s:
+
+      // // function MainContent({ ....... openRecipe }: Props) {
+      // //  .....
+      // //   return (
+      // //     .....
+      // //       ....
+      // //       <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+      // //         .......
+      // //         {!loading &&
+      // //           meals.map((meal) => (
+      // //             //---------aqui recive el Meal
+      // //             <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+      // //           ))}
+      // //       </SimpleGrid>
+      // //     </>
+      // //   );
+      // // }
+    14.2) como el componete MeaCard tiene un boton al dar click en el boton se ejecuta la funcion 
+      u:
+      s:
+      // // ...
+      // // function MealCard({ openRecipe, meal }: Props) {
+      // //   return (
+      // //     .......//-------aqui al dar click va a openRecipe y como en 14.1) MainContent
+      // //             //------se crea una ejecucion pasandole la meal 
+      // //             //-----entonces ejecuta en el u: meal-finder\src\App.tsx la funcion 
+      // //             //------searchMealDetails
+      // //           <Button onClick={openRecipe} colorScheme="white" bgColor={'blue.400'}>
+      // //             Ver Receta
+      // //           </Button>
+      
+
+      
+15) objetos dinamicos para poder hacer que si tengo muchas variables, y para no darle el nombre de todos los typos o interfaces, 
+ entonces se opta por darle a cada propiedad del JSON UN DATO ESPECIFICO 
+  n: por ejemplo teno algo como esto osea que tengo que definir 
+    para cada variable un typo , pero somcomo se ve son de tipo "string"
+    
+    // // {
+    // // "meals": [
+    // //   {
+    // //     "idMeal": "52772",
+    // //     "strMeal": "Teriyaki Chicken Casserole",
+    // //     "strDrinkAlternate": null,
+    // //     "strCategory": "Chicken",
+    // //     "strArea": "Japanese",
+    // //     "strIngredient1": "soy sauce",
+    // //     "strIngredient2": "water",
+    // //     "strIngredient3": "brown sugar",
+    // //     "strIngredient4": "ground ginger",
+    // //     "strIngredient5": "minced garlic",
+    // //     "strIngredient6": "cornstarch",
+    // //     "strIngredient7": "chicken breasts",
+    // //     "strIngredient8": "stir-fry vegetables",
+    // //     "strIngredient9": "brown rice",
+    // //   }
+    // // ]
+    // // }
+  15.1) n: entonces para que yo no tenga que definir en el archivo typo:
+    u: meal-finder\src\types\index.ts , 
+    cada una de las variable para no dfinirlas se hace lo siguiente:
+
+    u: meal-finder\src\types\index.ts
+    s:
+    // // export type MealDetails = {
+    // //   //el key es el nombre del objeto y el value es el tipo de dato
+    // //   //pero el tipo de dato tambien podria ser otro tipo por ejemplo number
+    // //   [key: string]: string;
+    // // };
+  15.2) para usarlo entonces:
+    u:meal-finder\src\App.tsx
+    s:
+        // // const { fetch } = useFetch<MealDetails>();
+        // // const searchMealDetails = (meal: Meal) => {
+        // //   onOpen();
+        // //   const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
+        // //   fetch(url);
+        // // };
+        // // <GridItem p="4" bg="gray.300" area={'main'}>
+        // //   <MainContent
+        // //     openRecipe={searchMealDetails}
+        // //     loading={loadingMeal}
+        // //     meals={dataMeal}
+        // //   ></MainContent>
+        // // </GridItem>;
+
+16) el skeleton de el modal 
+  u: meal-finder\src\App.tsx
+  s:
+    // //  const { fetch, loading: loadingMealDetail, data: mealDetailData } = useFetch<MealDetails>();
+    // // ...
+    // //   <RecipeModal data={mealDetailData} isOpen={isOpen} onClose={onClose} loading={loadingMealDetail} />;
+    // //       
+
+|16.1) voy al componete modal y agrego el tipo 
+  u:meal-finder\src\components\RecipeModal.tsx
+  s:
+    // // type Props = {
+    // //   isOpen: boolean;
+    // //   onClose: () => void;
+    // //   loading: boolean;
+    // //   data: MealDetails | undefined;
+    // // };
+    // // ...
+    // // ..
+          {loading ? <RecipeModalSkeleton /> : data && <RecipeModalContent data={data} />}
+ 16.1.2) creo el RecipeModalSkeleton
+    u: meal-finder\src\components\RecipeModalSkeleton.tsx
+    s:
+      // // import { Container, SkeletonText } from '@chakra-ui/react';
+      // // import React from 'react';
+      // // type Props = {};
+      // // function RecipeModalSkeleton({}: Props) {
+      // //   return (
+      // //     <Container>
+      // //       <SkeletonText spacing="4" mt="4" mb={5} noOfLines={1} skeletonHeight={8}></SkeletonText>
+      // //       <SkeletonText spacing="4" mb={5} noOfLines={1} skeletonHeight={208}></SkeletonText>
+      // //       <SkeletonText spacing="4" mt="4" noOfLines={3} skeletonHeight={1}></SkeletonText>
+      // //     </Container>
+      // //   );
+      // // }
+      // // export default RecipeModalSkeleton;
+  16.1.3) creo el RecipeModalContent para 16.1)
+    u: meal-finder\src\components\RecipeModalContent.tsx
+    s:
+      // // import React from 'react';
+      // // import { MealDetails } from '../types';
+      // // import {
+      // //   Heading,
+      // //   Image,
+      // //   ListItem,
+      // //   ModalBody,
+      // //   ModalCloseButton,
+      // //   ModalHeader,
+      // //   OrderedList,
+      // //   Text,
+      // // } from '@chakra-ui/react';
+
+      // // type Props = {
+      // //   data: MealDetails;
+      // // };
+
+      // // function RecipeModalContent({ data }: Props) {
+      // //   const joinIngredients = (data: MealDetails) => {
+      // //     const ingredients = [];
+      // //     for (let i = 1; i <= 20; i++) {
+      // //       //------> busco por el nombre de la key y si hay algo lo agrego al array
+      // //       if (data[`strIngredient${i}`]) {
+      // //         ingredients.push(`${data[`strIngredient${i}`]} - ${data[`strMeasure${i}`]}`);
+      // //       } else {
+      // //         break;
+      // //       }
+      // //     }
+      // //     return ingredients;
+      // //   };
+
+      // //   return (
+      // //     <>
+      // //       <ModalHeader>{data.strMeal}</ModalHeader>
+      // //       <ModalCloseButton></ModalCloseButton>
+      // //       <ModalBody>
+      // //         <Image width={'100%'} src={data.strMealThumb} alt={data.strMeal} />
+      // //         <Heading size="md" mt="4" mb="4">
+      // //           Ingredients
+      // //         </Heading>
+      // //         <OrderedList mb="4">
+      // //           {joinIngredients(data).map((ingredient) => (
+      // //             <ListItem key={ingredient}>{ingredient}</ListItem>
+      // //           ))}
+      // //         </OrderedList>
+
+      // //         <Text whiteSpace="pre-line">{data.strInstructions}</Text>
+      // //       </ModalBody>
+      // //     </>
+      // //   );
+      // // }
+      // // export default RecipeModalContent;
+
+Fin del proyecto meal 
 
 
 

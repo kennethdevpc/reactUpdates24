@@ -146,3 +146,41 @@
 
 
     }
+3)objetos dinamicos:  u: proyecto-meal-finder.txt
+    en punto 15) objetos dinamicos: 
+     para poder hacer que si tengo muchas variables, y para no darle el nombre de todos los typos o interfaces, 
+ entonces se opta por darle a cada propiedad del JSON UN DATO ESPECIFICO 
+  n: por ejemplo teno algo como esto osea que tengo que definir 
+    para cada variable un typo , pero somcomo se ve son de tipo "string"
+    
+    // // {
+    // // "meals": [
+    // //   {
+    // //     "idMeal": "52772",
+    // //     "strMeal": "Teriyaki Chicken Casserole",
+    // //     "strDrinkAlternate": null,
+    // //     "strCategory": "Chicken",
+    // //     "strArea": "Japanese",
+    // //     "strIngredient1": "soy sauce",
+    // //     "strIngredient2": "water",
+    // //     "strIngredient3": "brown sugar",
+    // //     "strIngredient4": "ground ginger",
+    // //     "strIngredient5": "minced garlic",
+    // //     "strIngredient6": "cornstarch",
+    // //     "strIngredient7": "chicken breasts",
+    // //     "strIngredient8": "stir-fry vegetables",
+    // //     "strIngredient9": "brown rice",
+    // //   }
+    // // ]
+    // // }
+    n: entonces para que yo no tenga que definir en el archivo typo:
+    u: meal-finder\src\types\index.ts , 
+    cada una de las variable para no dfinirlas se hace lo siguiente:
+
+    u: meal-finder\src\types\index.ts
+    s:
+    // // export type MealDetails = {
+    // //   //el key es el nombre del objeto y el value es el tipo de dato
+    // //   //pero el tipo de dato tambien podria ser otro tipo por ejemplo number
+    // //   [key: string]: string;
+    // // };
