@@ -558,7 +558,7 @@ React:
 
   n: el botton es el mismo que se creo en 17 solo que se utiliza ys se le manda las funciones
   
-19) andole estilos 
+19) dandole estilos 
   19.1.1)
   linestyles: En estos estilos se cambia los nombres de los estilos con camelcase
   u:react-app\src\components\Button.tsx
