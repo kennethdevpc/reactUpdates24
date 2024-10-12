@@ -1171,7 +1171,7 @@ Chakra UI -> especifica de react
         console.log('el input', input.value);
     
     
-      30.1.2) para en las input que cada vez que hay un cambio 
+      30.1.2) para en las input que cada vez que hay un cambio OJo si no hay cambio no se puede leer el value
       en ese input se ejetute esa funcion (esto esta en js, toca averiguar como es en TS)
         s:
         function handleOnChange(e) {
@@ -1380,7 +1380,7 @@ Chakra UI -> especifica de react
         });
 
 
-        31.1.2) mira algunas validaciones posbles en:
+        31.1.2) mira algunas validaciones posibles en:
           u:zod.txt
 
   31.2) ahora utilizo esto en el formulario, metodo "parse"
