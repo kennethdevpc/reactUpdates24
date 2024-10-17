@@ -2240,109 +2240,110 @@ export default FormControlled;
 
   ## 31.1) Creación del esquema
 
-  - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
-    El archivo donde se define el esquema es
+      - **Un Esquema**: es una definición o modelo que establece reglas y estructuras que los datos deben seguir. En el contexto de la validación de formularios y manejo de datos, un esquema especifica las reglas y restricciones que un conjunto de datos debe cumplir.
+      - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
+        El archivo donde se define el esquema es
 
-  - #### u: `react-form\src\schemas\user.ts`
+      - #### u: `react-form\src\schemas\user.ts`
 
-    ```typescript
-    // Importa ZOD para crear esquemas
-    import { z } from 'zod';
+        ```typescript
+        // Importa ZOD para crear esquemas
+        import { z } from 'zod';
 
-    // Definición del esquema para un usuario
-    export const userSchema = z.object({
-      // Validación del campo 'name'
-      name: z
-        .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
-        .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
-        .max(20), //----máximo de 20 caracteres
+        // Definición del esquema para un usuario
+        export const userSchema = z.object({
+          // Validación del campo 'name'
+          name: z
+            .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
+            .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
+            .max(20), //----máximo de 20 caracteres
 
-      // Validación del campo 'lastname'
-      lastname: z
-        .string({ required_error: 'Apellido es requerido' })
-        .min(3, { message: 'longitud minima 3' })
-        .max(20),
+          // Validación del campo 'lastname'
+          lastname: z
+            .string({ required_error: 'Apellido es requerido' })
+            .min(3, { message: 'longitud minima 3' })
+            .max(20),
 
-      // Validación del campo 'amount' (debe ser un número)
-      amount: z
-        .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
-        .min(1, { message: 'el campo es requerido' }),
+          // Validación del campo 'amount' (debe ser un número)
+          amount: z
+            .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
+            .min(1, { message: 'el campo es requerido' }),
 
-      //----Validación de 'age' como ejemplo de una función personalizada
-      // age: z.string().refine(
-      //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
-      //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
-      // ),
-    });
-    ```
+          //----Validación de 'age' como ejemplo de una función personalizada
+          // age: z.string().refine(
+          //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
+          //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
+          // ),
+        });
+        ```
 
-  - ### 31.1.2) Algunas validaciones posibles en ZOD
+      - ### 31.1.2) Algunas validaciones posibles en ZOD
 
-    - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
+      - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
 
-    ```link
-      https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
-    ```
+      ```link
+        https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
+      ```
 
-    ```typescript
-    import { z } from 'zod';
+      ```typescript
+      import { z } from 'zod';
 
-    // Ejemplos de validaciones con ZOD
+      // Ejemplos de validaciones con ZOD
 
-    // Validación de cadenas de texto
-    const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
-    const emailSchema = z.string().email(); //----validación de email
+      // Validación de cadenas de texto
+      const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
+      const emailSchema = z.string().email(); //----validación de email
 
-    // Validación de números
-    const numberSchema = z.number().int().positive(); //----números enteros y positivos
-    const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
+      // Validación de números
+      const numberSchema = z.number().int().positive(); //----números enteros y positivos
+      const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
 
-    // Validación de fechas
-    const dateSchema = z
-      .date()
-      .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
+      // Validación de fechas
+      const dateSchema = z
+        .date()
+        .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
 
-    // Validación de booleanos
-    const booleanSchema = z.boolean();
+      // Validación de booleanos
+      const booleanSchema = z.boolean();
 
-    // Validación de arreglos
-    const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
-    const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
+      // Validación de arreglos
+      const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
+      const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
 
-    // Validación de enums
-    const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
+      // Validación de enums
+      const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
 
-    // Validación de objetos anidados
-    const addressSchema = z.object({
-      street: z.string(),
-      city: z.string(),
-      zipCode: z.string().length(5), //----código postal de longitud 5
-    });
-
-    // Validación de refinamiento
-    const passwordSchema = z
-      .string()
-      .min(8)
-      .refine((password) => /[A-Z]/.test(password), {
-        message: 'Debe tener al menos una letra mayúscula',
+      // Validación de objetos anidados
+      const addressSchema = z.object({
+        street: z.string(),
+        city: z.string(),
+        zipCode: z.string().length(5), //----código postal de longitud 5
       });
 
-    // Validación condicional con refinamiento
-    const conditionalSchema = z.union([
-      z.string().length(4), //----si es cadena, debe tener 4 caracteres
-      z.number().min(10), //----si es número, debe ser mayor a 10
-    ]);
+      // Validación de refinamiento
+      const passwordSchema = z
+        .string()
+        .min(8)
+        .refine((password) => /[A-Z]/.test(password), {
+          message: 'Debe tener al menos una letra mayúscula',
+        });
 
-    // Uso de 'refine' para validaciones personalizadas
-    const customSchema = z.string().refine((val) => val === 'valid', {
-      message: 'El valor debe ser "valid"',
-    });
+      // Validación condicional con refinamiento
+      const conditionalSchema = z.union([
+        z.string().length(4), //----si es cadena, debe tener 4 caracteres
+        z.number().min(10), //----si es número, debe ser mayor a 10
+      ]);
 
-    // Validación opcional
-    const optionalSchema = z.string().optional(); //----campo opcional
-    ```
+      // Uso de 'refine' para validaciones personalizadas
+      const customSchema = z.string().refine((val) => val === 'valid', {
+        message: 'El valor debe ser "valid"',
+      });
 
-  ### 31.2) Utilizando el esquema ZOD en el formulario, método `parse`
+      // Validación opcional
+      const optionalSchema = z.string().optional(); //----campo opcional
+      ```
+
+  ## 31.2) Utilizando el esquema ZOD en el formulario, método `parse`
 
   - Aquí se muestra cómo utilizar el esquema de validación creado con ZOD dentro de un formulario de React usando `react-hook-form`.
   - Inicialmente, se utiliza el método `parse` para validar los datos, pero se advierte que **no es la forma recomendada** para manejar errores en formularios.
@@ -2560,3 +2561,87 @@ export default FormControlled;
           }
         ]
       ```
+
+  ## 31.3) Método Resolver: Utilizando el resolver con Zod para manejar errores
+
+  - Ahora, se utiliza el método **resolver** en combinación con la biblioteca `@hookform/resolvers`, lo cual permite una mejor integración y manejo de los errores definidos en los esquemas de Zod.
+    Este enfoque elimina la necesidad de manejar manualmente los errores dentro de un `try-catch`, lo que simplifica el código y proporciona una manera más eficiente de trabajar con los formularios.
+
+  - Beneficios del Resolver:
+
+    - Con el zodResolver, los errores definidos en el esquema Zod son manejados automáticamente por react-hook-form, lo que proporciona una validación más eficiente.
+    - Evita el uso de estructuras try-catch para manejar errores y simplifica el código.
+    - Los errores se muestran directamente en los elementos de la UI asociados con cada campo del formulario.
+
+    - **Repositorio de resolvers:** [GitHub - react-hook-form/resolvers](https://github.com/react-hook-form/resolvers)
+    - **Instalación de la biblioteca:**
+
+      ```bash
+      npm install @hookform/resolvers@3.3.4
+      ```
+
+    - **Archivo:** `react-form/src/components/FormReactHookResolver.tsx`
+
+    ```typescript
+    import { useForm } from 'react-hook-form';
+    import { zodResolver } from '@hookform/resolvers/zod'; //---importo el resolver de Zod
+    import { userSchema } from '../schemas/user'; //---importo el mismo esquema
+    type Props = {};
+    const errorLetter = { color: 'black', fontWeight: 'bold' };
+    function FormReactHookResolver({}: Props) {
+      type Form = {
+        name: string;
+        lastName: string;
+        age: number;
+        email: string;
+        password: string;
+      };
+
+      const {
+        register,
+        handleSubmit,
+        formState: { errors },
+      } = useForm<Form>({
+        resolver: zodResolver(userSchema), //-----uso el resolver de Zod con el esquema
+      });
+
+      console.log('Errores validados por Zod:', errors);
+
+      const onsubmit = (data: Form) => {
+        console.log('Datos enviados:', data);
+      };
+
+      return (
+        <form
+          action=""
+          onSubmit={handleSubmit(onsubmit)}
+          style={{ display: 'flex', color: 'red', flexDirection: 'column', maxWidth: '300px' }}
+        >
+          <label htmlFor="">Name</label>
+          <input type="text" id="name" {...register('name')} />
+          {/* Muestra el error si existe */}
+          {errors.name && <span style={errorLetter}>{errors?.name?.message?.toString()}</span>}
+          <label htmlFor="">Last name</label>
+          <input type="text" id="lastName" {...register('lastName')} />
+          {errors.lastName && (
+            <span style={errorLetter}>{errors?.lastName?.message?.toString()}</span>
+          )}
+          <label htmlFor="">Age</label>
+          <input type="text" id="age" {...register('age')} />
+          {errors.age && <span style={errorLetter}>{errors?.age?.message?.toString()}</span>}
+          <label htmlFor="">Email</label>
+          <input type="text" id="email" {...register('email')} />
+          {errors.email && <span style={errorLetter}>{errors?.email?.message?.toString()}</span>}
+          <label htmlFor="">Password</label>
+          <input type="text" id="password" {...register('password')} />
+          {errors.password && (
+            <span style={errorLetter}>{errors?.password?.message?.toString()}</span>
+          )}
+          <br />
+          <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    export default FormReactHookResolver;
+    ```
