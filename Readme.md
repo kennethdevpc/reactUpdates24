@@ -3042,3 +3042,143 @@ En esta sección, se actualiza el componente `ContactForm` para manejar errores 
 
         export default Input;
         ```
+
+# 34) Resetear Formulario con React Hook Form
+
+### Descripción:
+
+Hace un instante mencionamos esta parte sin embargo vamos a entrar en detalle.
+
+El método `reset` de `react-hook-form` permite resetear un formulario a su estado inicial. Puedes resetear el formulario por completo o, si lo prefieres, asignar un valor específico a una propiedad individual.
+
+- #### Teoria:
+
+  `  reset():` Resetea todos los campos del formulario a su estado inicial o al estado por defecto definido.
+
+  `reset({ name: 'luna' }):` Puedes resetear un formulario con valores específicos, en este caso, el campo name se establece con el valor "luna".
+
+### Ubicación del componente:
+
+- **u:** `first-p/src/components/ContactForm.tsx`
+
+### Código del componente `ContactForm`:
+
+```typescript
+import { useForm, FormProvider } from 'react-hook-form';
+import Button from './Button'; // Asumiendo que ya tienes un componente Button
+
+type contact = {
+  name: string;
+  email: string;
+};
+
+function ContactForm() {
+  const methods = useForm<contact>(); // Se inicializa el hook useForm
+  const { handleSubmit, reset } = methods;
+
+  const onSubmit = (data: contact) => {
+    console.log('Form data:', data);
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input {...methods.register('name')} placeholder="Nombre" />
+        <input {...methods.register('email')} placeholder="Email" />
+
+        {/* ----------Reseteo total del formulario */}
+        <Button onClick={() => reset()} variant={'secondary'}>
+          Limpiar Todo
+        </Button>
+
+        {/* ----------Reseteo total del formulario usndo methods */}
+        <Button onClick={() => methods.reset()} variant={'secondary'}>
+          Limpiar
+        </Button>
+
+        {/* ----------Reseteo de un solo campo o con valores personalizados */}
+        <Button onClick={() => reset({ name: 'luna' })} variant={'secondary'}>
+          Limpiar con Nombre "Luna"
+        </Button>
+
+        <Button type="submit" variant={'primary'}>
+          Enviar
+        </Button>
+      </form>
+    </FormProvider>
+  );
+}
+
+export default ContactForm;
+```
+
+## 34.1) Especificar el Tipo de Botón (submit, button, reset)
+
+- ### Descripción:
+
+  Es importante asegurarse de que los botones tengan el tipo correcto especificado (`button`, `submit` o `reset`). En caso de que no se defina el tipo de botón, el navegador asigna el tipo `submit` por defecto, lo cual puede causar comportamientos no deseados en formularios con varios botones.
+
+  - #### Teoria:
+
+    - **Tipos de Botón (ButtonType):**
+
+      - `button:` Un botón regular que no envía el formulario cuando se hace clic.
+      - `submit:` El botón que envía el formulario.
+      - `reset: `Un botón que restablece los campos del formulario a su estado inicial.
+
+    - **Propiedades:**
+
+      - `type:` Este define el tipo de botón (si es un botón normal, un botón de envío o un botón para resetear). Se usa el tipo button como valor por defecto.
+      - `variant:` Define el estilo del botón, como primary, secondary, danger, etc. Esto se asigna dinámicamente a través de las clases CSS.
+      - `onClick:` Una función opcional para manejar eventos de clic en el botón.
+
+      - **En el caso de que se utilicen varios botones en el mismo formulario, es recomendable que:**
+
+      - El botón de enviar tenga el tipo submit explícitamente:
+
+      ```tsx
+      <Button type="submit" variant="primary">
+        Enviar
+      </Button>
+      ```
+
+      - Otros botones, como el de limpiar, deben tener el tipo button o reset explícito:
+
+      ```tsx
+      <Button type="button" variant="secondary" onClick={handleReset}>
+        Limpiar
+      </Button>
+      ```
+
+  ### Ubicación del Componente:
+
+  - **u:** `first-p/src/components/Button.tsx`
+
+  ### Código del Componente `Button`:
+
+  ```typescript
+  import React from 'react';
+
+  // Defino los tipos disponibles para el botón
+  type ButtonType = 'button' | 'submit' | 'reset'; // Tipos de botón: botón común, submit, reset
+  type Variant = 'primary' | 'secondary' | 'danger' | 'warning'; // Variantes de estilo para el botón
+
+  // Defino las propiedades (Props) que aceptará el componente Button
+  type Props = {
+    variant?: Variant; // Estilo del botón (opcional, por defecto 'primary')
+    children: React.ReactNode; // Contenido dentro del botón
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Función opcional para el evento onClick
+    type?: ButtonType; // Tipo del botón (opcional, por defecto 'button')
+  };
+
+  // Función del componente Button con tipo por defecto definido como 'button'
+  function Button({ children, variant = 'primary', onClick, type = 'button' }: Props) {
+    return (
+      <button type={type} onClick={onClick} className={`btn btn-${variant} m-3`}>
+        {children}
+      </button>
+    );
+  }
+
+  export default Button;
+  ```
