@@ -2240,108 +2240,108 @@ export default FormControlled;
 
   ## 31.1) Creación del esquema
 
-      - **Un Esquema**: es una definición o modelo que establece reglas y estructuras que los datos deben seguir. En el contexto de la validación de formularios y manejo de datos, un esquema especifica las reglas y restricciones que un conjunto de datos debe cumplir.
-      - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
-        El archivo donde se define el esquema es
+        - **Un Esquema**: es una definición o modelo que establece reglas y estructuras que los datos deben seguir. En el contexto de la validación de formularios y manejo de datos, un esquema especifica las reglas y restricciones que un conjunto de datos debe cumplir.
+        - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
+          El archivo donde se define el esquema es
 
-      - #### u: `react-form\src\schemas\user.ts`
+        - #### u: `react-form\src\schemas\user.ts`
 
-        ```typescript
-        // Importa ZOD para crear esquemas
-        import { z } from 'zod';
+          ```typescript
+          // Importa ZOD para crear esquemas
+          import { z } from 'zod';
 
-        // Definición del esquema para un usuario
-        export const userSchema = z.object({
-          // Validación del campo 'name'
-          name: z
-            .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
-            .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
-            .max(20), //----máximo de 20 caracteres
+          // Definición del esquema para un usuario
+          export const userSchema = z.object({
+            // Validación del campo 'name'
+            name: z
+              .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
+              .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
+              .max(20), //----máximo de 20 caracteres
 
-          // Validación del campo 'lastname'
-          lastname: z
-            .string({ required_error: 'Apellido es requerido' })
-            .min(3, { message: 'longitud minima 3' })
-            .max(20),
+            // Validación del campo 'lastname'
+            lastname: z
+              .string({ required_error: 'Apellido es requerido' })
+              .min(3, { message: 'longitud minima 3' })
+              .max(20),
 
-          // Validación del campo 'amount' (debe ser un número)
-          amount: z
-            .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
-            .min(1, { message: 'el campo es requerido' }),
+            // Validación del campo 'amount' (debe ser un número)
+            amount: z
+              .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
+              .min(1, { message: 'el campo es requerido' }),
 
-          //----Validación de 'age' como ejemplo de una función personalizada
-          // age: z.string().refine(
-          //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
-          //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
-          // ),
-        });
+            //----Validación de 'age' como ejemplo de una función personalizada
+            // age: z.string().refine(
+            //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
+            //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
+            // ),
+          });
+          ```
+
+        - ### 31.1.2) Algunas validaciones posibles en ZOD
+
+        - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
+
+        ```link
+          https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
         ```
 
-      - ### 31.1.2) Algunas validaciones posibles en ZOD
+        ```typescript
+        import { z } from 'zod';
 
-      - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
+        // Ejemplos de validaciones con ZOD
 
-      ```link
-        https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
-      ```
+        // Validación de cadenas de texto
+        const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
+        const emailSchema = z.string().email(); //----validación de email
 
-      ```typescript
-      import { z } from 'zod';
+        // Validación de números
+        const numberSchema = z.number().int().positive(); //----números enteros y positivos
+        const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
 
-      // Ejemplos de validaciones con ZOD
+        // Validación de fechas
+        const dateSchema = z
+          .date()
+          .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
 
-      // Validación de cadenas de texto
-      const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
-      const emailSchema = z.string().email(); //----validación de email
+        // Validación de booleanos
+        const booleanSchema = z.boolean();
 
-      // Validación de números
-      const numberSchema = z.number().int().positive(); //----números enteros y positivos
-      const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
+        // Validación de arreglos
+        const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
+        const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
 
-      // Validación de fechas
-      const dateSchema = z
-        .date()
-        .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
+        // Validación de enums
+        const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
 
-      // Validación de booleanos
-      const booleanSchema = z.boolean();
-
-      // Validación de arreglos
-      const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
-      const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
-
-      // Validación de enums
-      const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
-
-      // Validación de objetos anidados
-      const addressSchema = z.object({
-        street: z.string(),
-        city: z.string(),
-        zipCode: z.string().length(5), //----código postal de longitud 5
-      });
-
-      // Validación de refinamiento
-      const passwordSchema = z
-        .string()
-        .min(8)
-        .refine((password) => /[A-Z]/.test(password), {
-          message: 'Debe tener al menos una letra mayúscula',
+        // Validación de objetos anidados
+        const addressSchema = z.object({
+          street: z.string(),
+          city: z.string(),
+          zipCode: z.string().length(5), //----código postal de longitud 5
         });
 
-      // Validación condicional con refinamiento
-      const conditionalSchema = z.union([
-        z.string().length(4), //----si es cadena, debe tener 4 caracteres
-        z.number().min(10), //----si es número, debe ser mayor a 10
-      ]);
+        // Validación de refinamiento
+        const passwordSchema = z
+          .string()
+          .min(8)
+          .refine((password) => /[A-Z]/.test(password), {
+            message: 'Debe tener al menos una letra mayúscula',
+          });
 
-      // Uso de 'refine' para validaciones personalizadas
-      const customSchema = z.string().refine((val) => val === 'valid', {
-        message: 'El valor debe ser "valid"',
-      });
+        // Validación condicional con refinamiento
+        const conditionalSchema = z.union([
+          z.string().length(4), //----si es cadena, debe tener 4 caracteres
+          z.number().min(10), //----si es número, debe ser mayor a 10
+        ]);
 
-      // Validación opcional
-      const optionalSchema = z.string().optional(); //----campo opcional
-      ```
+        // Uso de 'refine' para validaciones personalizadas
+        const customSchema = z.string().refine((val) => val === 'valid', {
+          message: 'El valor debe ser "valid"',
+        });
+
+        // Validación opcional
+        const optionalSchema = z.string().optional(); //----campo opcional
+        ```
 
   ## 31.2) Utilizando el esquema ZOD en el formulario, método `parse`
 
@@ -2639,6 +2639,96 @@ export default FormControlled;
           )}
           <br />
           <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    export default FormReactHookResolver;
+    ```
+
+  ## 31.4) Evitando la duplicidad de tipos al usar Zod
+
+  - Para optimizar el código y evitar la duplicidad de tipos al trabajar con Zod, se puede utilizar `z.infer` para inferir el tipo directamente del esquema de Zod. Esto asegura que el tipo de datos utilizado en el formulario siempre esté alineado con las validaciones definidas en el esquema.
+  - De esta manera, cualquier cambio en el esquema se reflejará automáticamente en el tipo inferido, lo que facilita el mantenimiento del código.
+
+  - **Archivo:** `react-form/src/schemas/user.ts`
+
+  ```typescript
+  import { z } from 'zod';
+
+  export const userSchema = z.object({
+    name: z
+      .string({ required_error: 'Nombre es requerido' })
+      .min(3, { message: 'Longitud mínima 3' })
+      .max(20),
+    lastname: z
+      .string({ required_error: 'Apellido es requerido' })
+      .min(3, { message: 'Longitud mínima 3' })
+      .max(20),
+    amount: z
+      .number({ coerce: true, invalid_type_error: 'El campo debe ser numérico' })
+      .min(1, { message: 'El campo es requerido' }),
+  });
+
+  // Inferir el tipo directamente desde el esquema para evitar duplicidad
+  export type userForm = z.infer<typeof userSchema>;
+  ```
+
+  ### 31.4.2) Actualización del formulario para usar el tipo inferido
+
+  - En este paso, se actualiza el formulario para utilizar el tipo inferido `userForm` directamente en lugar de definir un tipo de formulario manualmente. Esto simplifica el código y asegura que el tipo esté siempre alineado con las validaciones definidas en el esquema de Zod.
+
+  - **Archivo:** `react-form/src/components/FormReactHookResolver.tsx`
+
+    ```typescript
+    import { zodResolver } from '@hookform/resolvers/zod';
+    import { userSchema, userForm } from '../schemas/user'; //---importo el esquema y el tipo inferido
+    import { useForm } from 'react-hook-form'; //---importo useForm de react-hook-form
+
+    function FormReactHookResolver() {
+      /* type Form = {  //-----lo utlizamos si no usamos el "type userForm" de el archivo "schemas/user.ts"
+      name: string;
+      lastName: string;
+      age: number;
+      email: string;
+      password: string;
+      }; */
+      //---uso el tipo inferido en useForm
+      const {
+        register,
+        handleSubmit,
+        formState: { errors },
+      } = useForm<userForm>({
+        resolver: zodResolver(userSchema), //---se agrega el esquema de Zod
+      });
+
+      //---cambio a usar el tipo inferido en onSubmit
+      const onsubmit = (data: userForm) => {
+        console.log('Datos enviados:', data); //---imprime los datos recibidos
+      };
+
+      return (
+        <form onSubmit={handleSubmit(onsubmit)}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">
+              Nombre
+            </label>
+            <input {...register('name')} type="text" id="name" className="form-control" />
+            {errors.name && <span>{errors?.name?.message}</span>}
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="lastname" className="form-label">
+              Apellido
+            </label>
+            <input {...register('lastname')} type="text" id="lastname" className="form-control" />
+            {errors.lastname && <span>{errors?.lastname?.message}</span>}
+          </div>
+
+          {/* Botón de envío */}
+          <button type="submit" className="btn btn-primary">
+            Enviar
+          </button>
         </form>
       );
     }

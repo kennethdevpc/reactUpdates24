@@ -1510,7 +1510,7 @@ Chakra UI -> especifica de react
             };
 
 32) si quiero reutilizar mi boton 
-  u: first-p\src\components\Input.tsx
+  u: first-p\src\components\Button.tsx
   s:
       import React from 'react';
       type variant = 'primary' | 'secondary' | 'danger' | 'warning';
