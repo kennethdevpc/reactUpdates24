@@ -2735,3 +2735,310 @@ export default FormControlled;
 
     export default FormReactHookResolver;
     ```
+
+# 32) Si quiero reutilizar mi botón
+
+- **Descripción:** A continuación se utiliza el tipo `variant`, que define un conjunto de valores fijos para los estilos del botón. Esto es comúnmente conocido como un `enum` en otros lenguajes, aunque en TypeScript se logra mediante la definición de tipos literales. Además, se incluye la capacidad de especificar el tipo de botón (`button`, `submit`, `reset`) y manejar eventos de clic.
+
+- **Ubicación del archivo:** `first-p\src\components\Input.tsx`
+
+```typescript
+import React from 'react';
+
+// Definición de tipos para los estilos del botón
+type variant = 'primary' | 'secondary' | 'danger' | 'warning';
+// Definición de tipos para los diferentes tipos de botones
+type buttonType = 'button' | 'submit' | 'reset';
+
+// Props del componente Button
+type Props = {
+  variant?: variant; // Tipo de botón, opcional con valor por defecto 'primary'
+  children: React.ReactNode; // Contenido que se mostrará dentro del botón
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // Manejo de eventos de clic, opcional
+  type?: buttonType; // Tipo de botón, opcional, por defecto 'button'
+};
+
+function Button({ children, variant = 'primary', onClick, type = 'button' }: Props) {
+  return (
+    <button type={type} onClick={onClick} className={`btn btn-${variant} m-3`}>
+      {children} // Contenido del botón
+    </button>
+  );
+}
+
+export default Button;
+```
+
+- ## 32.2) Componente ContactForm
+
+  - **Descripción:** Este componente `ContactForm` es responsable de manejar la entrada de datos de contacto y proporciona botones para enviar y **`limpiar`** el formulario. Utiliza la biblioteca `react-hook-form` junto con Zod para la validación de los datos del formulario.
+  - **Uso de methods.reset():** resetea el formulario
+  - **Ubicación del archivo:** `first-p\src\components\ContactForm.tsx`
+
+  ```typescript
+  import React from 'react';
+  import { useForm, FormProvider } from 'react-hook-form'; // Importación de react-hook-form
+  import { zodResolver } from '@hookform/resolvers/zod'; // Importación de Zod para resolver la validación
+  import { contactSchema } from '../schemas/contact'; // Importación del esquema de validación
+  import Button from './Button'; // Importación del componente Button
+
+  // Definición del tipo de contacto
+  type contact = {
+    // Agrega las propiedades necesarias para el contacto aquí
+    name: string;
+    email: string;
+    message: string;
+  };
+
+  // Props del componente ContactForm
+  type Props = {
+    onSubmit: (contact: contact) => void; // Función de callback para manejar el envío del formulario
+  };
+
+  function ContactForm({ onSubmit }: Props) {
+    // Uso de useForm para manejar el estado del formulario y la validación
+    const methods = useForm<contact>({ resolver: zodResolver(contactSchema) });
+    const { handleSubmit } = methods; // Desestructuración de handleSubmit del objeto methods
+
+    return (
+      <FormProvider {...methods}>
+        {' '}
+        // Proveedor de contexto para métodos del formulario
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {' '}
+          // Manejo del envío del formulario
+          <Button type={'submit'} variant={'primary'}>
+            Enviar
+          </Button>
+          <Button onClick={() => methods.reset()} variant={'secondary'}>
+            Limpiar
+          </Button>
+        </form>
+      </FormProvider>
+    );
+  }
+
+  export default ContactForm;
+  ```
+
+  ## 33.3) Llamando al Componente `ContactForm`
+
+  El siguiente código implementa un componente llamado `CMS` que permite gestionar contactos. Dentro de este componente, se utiliza `ContactForm` para agregar nuevos contactos a una lista y `ContactTable` (aunque no está implementado en este fragmento) para visualizar los contactos.
+
+  - #### **u:** `first-p\src\components\CMS.tsx`
+
+  ### Código
+
+  ```typescript
+  import { useState } from 'react';
+  import ContactForm from './ContactForm'; // Importamos el formulario de contacto
+  import ContactTable from './ContactTable'; // Importamos la tabla de contactos
+  import { contact } from '../schemas/contact'; // Importamos el tipo de contacto
+
+  function CMS() {
+    // Estado que almacena la lista de contactos
+    const [contacts, setContacts] = useState<contact[]>([]);
+
+    // Función para agregar un nuevo contacto a la lista
+    const addContact = (contact: contact) => {
+      // Al agregar, se asigna un ID aleatorio y se añade al inicio de la lista
+      setContacts([{ ...contact, id: Math.random().toString() }, ...contacts]);
+    };
+
+    // Función para eliminar un contacto de la lista
+    const deleteContact = (id: string) => {
+      // Filtramos los contactos para eliminar el que coincide con el ID
+      setContacts(contacts.filter((e) => e.id !== id));
+    };
+
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            <ContactForm onSubmit={addContact} /> {/* Llamada al componente ContactForm */}
+          </div>
+        </div>
+        {/* Aquí podrías incluir la tabla de contactos utilizando el componente ContactTable */}
+        {/* <ContactTable contacts={contacts} onDelete={deleteContact} /> */}
+      </div>
+    );
+  }
+
+  export default CMS;
+  ```
+
+# 33) Actualizamos el `ContactForm` para Recibir Datos
+
+En esta sección, se actualiza el componente `ContactForm` para manejar errores de validación, pasando dichos errores al campo de entrada (`Input`). Esto permite que los errores se muestren de manera más clara en la interfaz de usuario.
+
+- #### Código Actualizado
+
+  ```typescript
+  import { useForm, FormProvider } from 'react-hook-form';
+  import { zodResolver } from '@hookform/resolvers/zod';
+  import { contactSchema } from '../schemas/contact'; // Importa el esquema de validación
+  import Input from './Input'; // Importa el componente de entrada
+
+  type Props = {
+    onSubmit: (contact: contact) => void; // Tipo de las props
+  };
+
+  function ContactForm({ onSubmit }: Props) {
+    const methods = useForm<contact>({ resolver: zodResolver(contactSchema) }); // Uso de react-hook-form con Zod para validaciones
+    const {
+      handleSubmit,
+      formState: { errors }, // Extraemos los errores del estado del formulario
+    } = methods;
+
+    return (
+      <FormProvider {...methods}>
+        {' '}
+        {/* Proveedor de contexto para react-hook-form */}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Pasamos el error al componente de Input */}
+          <Input name="name" errors={errors}>
+            Nombre
+          </Input>
+          {/* Aquí se pueden agregar más campos de entrada, como "lastname", pasando también sus respectivos errores */}
+          <Input name="lastname" errors={errors}>
+            Apellido
+          </Input>
+          {/* Botón de enviar */}
+          <Button type="submit" variant="primary">
+            Enviar
+          </Button>
+          <Button onClick={() => methods.reset()} variant="secondary">
+            Limpiar
+          </Button>
+        </form>
+      </FormProvider>
+    );
+  }
+
+  export default ContactForm;
+  ```
+
+  ## 33.1) Creación del Componente `Input` y forma de mostrar los errores ya que es un componente reusable
+
+  - ### FORMA1
+
+    En esta sección, se crea el componente `Input`, el cual está diseñado para manejar la entrada de datos del formulario y mostrar errores de validación relacionados. El componente recibe las propiedades necesarias para su funcionamiento, incluyendo el nombre del campo, el contenido que se mostrará, y los errores de validación.
+
+    - **TEORIA**
+
+      - **Errores con React-hook:** En react-hook-form, el objeto errors que se encuentra dentro de formState es un objeto que contiene todos los errores de validación actuales de los campos del formulario. Este objeto tiene una estructura donde `cada clave` es el `nombre del campo` y el `valor` es un objeto con detalles del error que ocurrió para ese campo (si es que hubo un error).
+      - **FieldErrors<contact> :** es el tipo que indica cómo será la estructura del objeto errors en función de las reglas de validación del esquema que definiste (en este caso, el esquema de contact).
+        Este tipo se importa desde react-hook-form y define un mapeo entre los nombres de los campos y los posibles errores que podrían ocurrir en esos campos.
+
+      - Si en este ejemplo el campo name tiene un error de validación, el objeto errors podría verse así:
+
+        ```tsx
+          {
+            name: {
+              type: "required", // El tipo de validación que falló (en este caso, requerido)
+              message: "El campo nombre es obligatorio", // El mensaje que defines en el esquema o configuración de validación
+            },
+            // Si no hay errores en otros campos, no aparecerán aquí
+          }
+        ```
+
+      - El tipo `FieldErrors<contact>` generaría un tipo que podría tener esta estructura:
+
+        ```Tsx
+        type FieldErrors<contact> = {
+          name?: {
+            type: string; // El tipo de error (como "required", "min", etc.)
+            message: string; // El mensaje de error
+          };
+          email?: {
+            type: string;
+            message: string;
+          };
+        };
+        ```
+
+    - ## continuo con la construccion de el componete input##
+
+      - **Archivo**: `first-p/src/components/Input copy.tsx`
+
+        ### Código del Componente `Input`
+
+        ```typescript
+        import React from 'react';
+        import { FieldErrors } from 'react-hook-form';
+        import { contact } from '../schemas/contact'; // Asegúrate de importar el tipo de contacto
+
+        type Props = {
+          name: string; // Nombre del campo de entrada
+          children: React.ReactNode; // Contenido del label o texto
+          errors: FieldErrors<contact>; // Tipo para manejar errores de validación
+        };
+
+        function Input({ name, children, errors }: Props) {
+          // Desestructuración de props
+          return (
+            <div className="mb-3">
+              <label htmlFor={name} className="form-label">
+                {children} {/* Muestra el texto proporcionado como children */}
+              </label>
+              <input
+                {...register(name)} // Registra el input con el nombre correspondiente
+                type="text" // Tipo de entrada, puede ajustarse según sea necesario
+                id={name} // Establece el id del input para accesibilidad
+                className={`form-control ${errors[name] ? 'is-invalid' : ''}`} // Aplica clase de error si existe
+              />
+              {/* Muestra el mensaje de error correspondiente si existe */}
+              {errors[name]?.message && <p className="text-danger">{errors[name].message}</p>}
+            </div>
+          );
+        }
+
+        export default Input;
+        ```
+
+  - ### FORMA - 2: Uso de `getFieldState` para manejar errores en el Input
+
+    - ### Descripción:
+
+      En esta forma, utilizamos la funcionalidad `getFieldState` proporcionada por `react-hook-form` para obtener el estado específico de un campo del formulario, como los errores de validación, en lugar de acceder directamente al objeto `errors`. Esto nos permite controlar de manera más precisa la validación de cada campo individual dentro de los formularios.
+
+      ### Ubicación del componente:
+
+      - **u:** `first-p\src\components\Input.tsx`
+
+      - ### Código del componente `Input`:
+
+        ```typescript
+        import { useFormContext } from 'react-hook-form';
+
+        type Props = {
+          name: string;
+          children: React.ReactNode;
+        };
+
+        function Input({ name, children }: Props) {
+          // Importamos el "formState" y la función "getFieldState" desde `useFormContext`
+          const { register, formState, getFieldState } = useFormContext();
+
+          // Obtenemos el error del atributo "name" que se pasa como prop
+          const { error } = getFieldState(name, formState);
+
+          return (
+            <div className="mb-3">
+              <label htmlFor={name} className="form-label">
+                {children}
+              </label>
+              <input
+                {...register(name)} // Registramos el input en el formulario
+                type="text"
+                id={name}
+                className={`form-control ${error ? 'is-invalid' : ''}`} // Aplicamos la clase de error si existe
+              />
+              {/* Mostramos el mensaje de error si existe */}
+              {error?.message && <p className="text-danger">{error.message}</p>}
+            </div>
+          );
+        }
+
+        export default Input;
+        ```

@@ -1533,7 +1533,7 @@ Chakra UI -> especifica de react
     import Input from './Input';
 
     <Input {...register('name')} />
-33) pasando el error al campo inPut, 
+33) pasando el error al campo inPut,  
   FORMA1
     u:first-p\src\components\ContactForm.tsx
     s:  
