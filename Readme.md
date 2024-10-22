@@ -3385,3 +3385,61 @@ En este contexto, es importante diferenciar entre **funciones puras** y **funcio
           setUser(['hola', 'mundo']);
         }, []); //--- Al agregar el array vacío, se ejecuta solo una vez al montar el componente
         ```
+
+      - #### 3.2) Ejecución de `useEffect` cuando cambia un estado
+
+      - ## Descripción
+
+        El hook `useEffect` se ejecuta una vez al montar el componente y, posteriormente, se ejecutará cada vez que cambie alguna de las dependencias especificadas. Esto es útil para realizar acciones que dependen de cambios en el estado o en las propiedades.
+
+        - ### Ejemplo de ejecución sin dependencias de estado:
+
+          ```tsx
+          const [user, setUser] = useState<string>();
+
+          useEffect(() => {
+            console.log('Ejecutando hook---', user);
+          }, []); //----- Si no se coloca nada, solo se ejecuta una vez
+
+          return ( //------- Por más que haga clic en setUser, aquí no ejecutará nuevamente el useEffect
+            <button onClick={() => setUser('--nuevo estado del user--')}>Cambiar el estado</button>
+            hola mundo
+          );
+          ```
+
+          Retorno por consola
+
+          ```consola
+            App.tsx:9 Ejecutando hook--- undefined
+            App.tsx:9 Ejecutando hook--- undefined
+          ```
+
+        - ### Ejemplo de ejecución con dependencias de estado:
+
+          ```tsx
+          const [user, setUser] = useState<string>();
+
+          useEffect(() => {
+            console.log('Ejecutando hook---', user);
+          }, [user]); //----- Al agregar 'user' como dependencia, se ejecutará cada vez que 'user' cambie
+
+          return (
+            <h1>
+              <button onClick={() => setUser('--nuevo estado del user--')}>
+                Cambiar el estado
+              </button>{' '}
+              hola mundo
+            </h1>
+          );
+          ```
+
+          Retorno por consola
+
+          ```consola
+            App.tsx:9 Ejecutando hook--- undefined
+            App.tsx:9 Ejecutando hook--- undefined
+            App.tsx:9 Ejecutando hook--- --nuevo estado del user--
+
+          ```
+
+          - **Comentario**: En este segundo ejemplo, useEffect se ejecuta inicialmente una vez y luego cada vez que se actualiza el estado user. Al hacer clic en el botón, se cambia el estado y se muestra el nuevo valor en la consola.
