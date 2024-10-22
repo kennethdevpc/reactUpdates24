@@ -2926,6 +2926,73 @@ En esta sección, se actualiza el componente `ContactForm` para manejar errores 
 
     - **TEORIA**
 
+      - **Función genérica en TypeScript (ejemplo simple):** Primero, recordemos que los tipos genéricos son una forma de escribir `funciones o componentes` que funcionan con `cualquier tipo de dato`, mientras aún mantenemos las validaciones de tipo de TypeScript. Es algo que JavaScript no hace directamente porque no tiene tipado estático, pero TypeScript lo agrega como una ventaja
+
+        - ejemplo: en javascript normalmente se ejecutaria uuna funcion como esta
+
+          ```js
+          function getFirstElement(arr) {
+            return arr[0];
+          }
+
+          console.log(getFirstElement([1, 2, 3])); // Devuelve 1
+          console.log(getFirstElement(['a', 'b', 'c'])); // Devuelve 'a'
+          ```
+
+        - En TypeScript
+
+          ```ts
+          function getFirstElement<T>(arr: T[]): T {
+            return arr[0];
+          }
+
+          console.log(getFirstElement([1, 2, 3])); // T será número, devuelve 1
+          console.log(getFirstElement(['a', 'b', 'c'])); // T será string, devuelve 'a'
+          ```
+
+          - **< T >:** Es el tipo genérico, que se adapta al tipo del array que se le pase.
+          - **T[]:** Significa que el array contiene elementos del tipo T.
+          - **: T:** Esto indica que la función devuelve un valor de tipo T. en caso que no devolviera nada se colocaria `void`
+
+          - **Relación con el tipo `FieldErrors<contact>`:** _(Es un **tipo** genérico **proporcionado por react-hook-form** que describe los errores asociados con los campos de un formulario.)_
+            Ahora que entiendes los genéricos con funciones, puedes ver cómo esto se relaciona con el tipo `FieldErrors<contact>`
+
+          - _En lugar_ de ser una función que _acepta cualquier tipo_, aquí es un **tipo** que puede contener **errores** para cualquier **tipo de objeto (en este caso, contact).**
+          - En este caso, el `tipo genérico < T >` es reemplazado por tu propio tipo `contact`, que representa la estructura de los datos del formulario. Esto significa que los errores estarán relacionados con las propiedades del tipo `contact`.
+
+            - Supongamos que tienes el siguiente tipo para los datos del formulario:
+
+              ```ts
+              type contact = {
+                name: string;
+                email: string;
+              };
+              ```
+
+              - cuando usamos `FieldErrors<contact>`, estamos diciendo que el objeto errors tendrá las mismas propiedades que el tipo contact
+              - si la Definición del _tipo_ FieldErrors es:
+
+              ```ts
+              type FieldErrors<T> = {
+                [K in keyof T]?: {
+                  message: string;
+                };
+              };
+              ```
+
+              - Cuando usas `FieldErrors<contact>`, estás creando un tipo que se ve así:
+
+              ```ts
+              const errors: FieldErrors<contact> = {
+                name: {
+                  message: 'Name is required',
+                },
+                email: {
+                  message: 'Email is invalid',
+                },
+              };
+              ```
+
       - **Errores con React-hook:** En react-hook-form, el objeto errors que se encuentra dentro de formState es un objeto que contiene todos los errores de validación actuales de los campos del formulario. Este objeto tiene una estructura donde `cada clave` es el `nombre del campo` y el `valor` es un objeto con detalles del error que ocurrió para ese campo (si es que hubo un error).
       - **FieldErrors<contact> :** es el tipo que indica cómo será la estructura del objeto errors en función de las reglas de validación del esquema que definiste (en este caso, el esquema de contact).
         Este tipo se importa desde react-hook-form y define un mapeo entre los nombres de los campos y los posibles errores que podrían ocurrir en esos campos.
@@ -2957,7 +3024,7 @@ En esta sección, se actualiza el componente `ContactForm` para manejar errores 
         };
         ```
 
-    - ## continuo con la construccion de el componete input##
+    - ## continuo con la construccion de el componete input
 
       - **Archivo**: `first-p/src/components/Input copy.tsx`
 
@@ -3145,7 +3212,7 @@ export default ContactForm;
       - Otros botones, como el de limpiar, deben tener el tipo button o reset explícito:
 
       ```tsx
-      <Button type="button" variant="secondary" onClick={handleReset}>
+      <Button type="button" variant="secondary" onClick={() => methods.reset()}>
         Limpiar
       </Button>
       ```
@@ -3182,3 +3249,139 @@ export default ContactForm;
 
   export default Button;
   ```
+
+# 35) Efectos en React
+
+### Descripción y teoría
+
+En React, los **efectos** son un concepto central cuando queremos manejar interacciones con el mundo exterior, como API calls, suscripciones o modificaciones del DOM que no se pueden hacer durante el renderizado. React ofrece el hook `useEffect` para este propósito, permitiendo a los componentes ejecutar lógica adicional después del renderizado.
+
+En este contexto, es importante diferenciar entre **funciones puras** y **funciones impuras**:
+
+- **Función pura:** Siempre devuelve el mismo resultado cuando recibe las mismas entradas, y no tiene efectos secundarios. Por ejemplo, un componente de React que simplemente devuelve JSX basado en `props`.
+- **Función impura (efecto):** Es aquella que interactúa con elementos externos como APIs, la consola, o el local storage. Las funciones impuras generan efectos secundarios que pueden alterar el comportamiento de la aplicación más allá de su ciclo de renderizado normal.
+
+  - Llamadas a una API REST.
+  - Registro de logs en la consola.
+  - Interacción con `localStorage` u otras APIs del navegador.
+
+  ## `useEffect` en React
+
+  El hook `useEffect` permite manejar efectos en los componentes funcionales. Aquí te describo sus características principales:
+
+  - **Se ejecuta después de que el componente se renderiza en el DOM.** Esto significa que React primero construye y actualiza el DOM, y luego ejecuta los efectos.
+  - **Función de limpieza:** El `useEffect` puede retornar una función que actúa como limpieza de efectos anteriores. Esta función de limpieza se ejecuta cuando:
+
+    - Las dependencias cambian.
+    - El componente se desmonta del DOM.
+
+  - **Sistema de dependencias:** El hook recibe un array opcional de dependencias. Estas dependencias controlan cuándo se ejecuta el efecto.
+
+    - Se ejecuta por primera vez tras el primer renderizado del componente.
+    - Se ejecuta de nuevo cada vez que alguna de las dependencias cambia.
+    - Se ejecuta para limpiar cuando React va a desmontar el componente.
+
+      ### Ejemplo de dependencia vacía:
+
+      Si no proporcionamos dependencias, el efecto se ejecutará con cada renderizado. Si pasamos un array vacío `[]`, solo se ejecutará una vez, cuando el componente se monte:
+
+      ```tsx
+      useEffect(() => {
+        // Lógica del efecto
+      }, []); // Dependencia vacía
+      ```
+
+  - **No se puede usar async/await directamente en useEffect:** Dado que el useEffect no espera una función asíncrona, debes envolver la lógica asíncrona dentro de la función o crear una función asíncrona dentro del efecto.
+
+    - Ejemplo de uso con función asíncrona:
+
+      ```tsx
+      useEffect(() => {
+        const fetchData = async () => {
+          const data = await getDataFromAPI();
+          console.log(data);
+        };
+
+        fetchData();
+      }, []); // Dependencia vacía
+      ```
+
+  - ## 35.1) Ejecución de `useEffect` en React
+
+    - #### Descripción
+
+      El hook `useEffect` en React se utiliza para manejar efectos secundarios que deben ejecutarse en diferentes puntos del ciclo de vida del componente. Este hook puede configurarse para ejecutarse después del primer renderizado, cuando se desmonta un componente, o en función de dependencias específicas.
+
+      ### 1) Ejecución de `useEffect` después del primer renderizado
+
+      Cuando no se especifica un array de dependencias, el `useEffect` se ejecuta después de cada renderizado, incluyendo el inicial. Esto es útil cuando queremos ejecutar una acción cada vez que el componente se renderiza.
+
+      ```tsx
+      useEffect(() => {
+        console.log('useEffect ejecutado', document.title);
+        document.title = 'Cambié el título';
+      });
+      //---Comentario: En este caso, useEffect se ejecuta después de que el componente se monta y actualiza el título de la página.
+      ```
+
+      ### 2) Ejecución durante el desmontaje del componente
+
+      Puedes retornar una función dentro de useEffect que se ejecutará justo antes de que el componente se desmonte. Esto es ideal para limpiar recursos, como suscripciones o temporizadores.
+
+      ```tsx
+      Copiar código
+      useEffect(() => {
+
+        return () => {
+          console.log('Se ejecuta durante el desmontaje del componente');
+        };
+      });
+
+      //-----Comentario: Aquí el useEffect retorna una función que se ejecuta cuando el componente se desmonta, limpiando cualquier posible efecto.
+      ```
+
+      ### 3) Manejo de dependencias en useEffect
+
+      El uso de dependencias controla cuándo se ejecuta el efecto. Si se cambian los valores de las dependencias, el efecto se vuelve a ejecutar. Debes tener cuidado de no generar bucles infinitos al modificar el estado dentro de un useEffect sin dependencias, ya que esto puede causar que el componente se re-renderice constantemente.
+
+      - #### Ejemplo con bucle infinito:
+
+      ```tsx
+      const [user, setUser] = useState<string[]>([]);
+
+      useEffect(() => {
+        // El uso de setUser dentro del hook causará un bucle infinito
+        setUser(['hola', 'mundo']); //--- Error: se renderiza y vuelve a ejecutar el efecto
+      });
+
+      return <h1>Hola mundo</h1>;
+
+      //-----Comentario: Aquí, el useEffect provoca un bucle infinito porque cada vez que el estado user cambia, se vuelve a ejecutar el efecto, lo que a su vez vuelve a cambiar el estado y genera otro renderizado.
+      ```
+
+      - #### Solución con dependencias:
+        Para evitar este problema, se deben definir dependencias que controlen cuándo debe ejecutarse el efecto:
+
+      ```tsx
+      useEffect(() => {
+        setUser(['hola', 'mundo']);
+      }, []); // Al pasar un array vacío, el efecto solo se ejecutará una vez.
+      //-----Comentario: Al pasar un array vacío [], el efecto solo se ejecuta una vez, después del primer renderizado, evitando el bucle infinito.
+      ```
+
+      - #### 3.1) Ejecución de `useEffect` una sola vez
+
+        - #### Descripción
+
+        El hook `useEffect` puede configurarse para que se ejecute solo una vez, lo que es útil para inicializar datos o realizar acciones que solo deben ocurrir en el montaje del componente. Esto se logra pasando un array vacío como segundo argumento.
+
+        - ### Ejemplo de `useEffect` ejecutándose una sola vez:
+
+        ```tsx
+        const [user, setUser] = useState<string[]>([]);
+
+        useEffect(() => {
+          console.log('Ejecutando solo una vez');
+          setUser(['hola', 'mundo']);
+        }, []); //--- Al agregar el array vacío, se ejecuta solo una vez al montar el componente
+        ```
