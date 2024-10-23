@@ -4059,3 +4059,302 @@ export default function useFetchData<T>(url: string) {
 
   export default App;
   ```
+
+# 41) Agregando Elementos con "Optimistic UI"
+
+### Introducción
+
+En este punto, modificamos el custom hook para permitir agregar elementos a los datos con una estrategia conocida como "Optimistic UI". Esta estrategia mejora la experiencia del usuario al actualizar el estado localmente antes de realizar la llamada a la API.
+
+### Teoría: Estrategia "Optimistic UI"
+
+- **Convencional**:
+  1. Quiero agregar un elemento.
+  2. Llamo a la API para agregar el elemento.
+  3. Actualizo el estado con la respuesta de la API.
+- **Optimistic UI**:
+  1. Quiero agregar un elemento.
+  2. Actualizo inmediatamente el estado (sin esperar la respuesta de la API).
+  3. Llamo a la API para guardar los cambios.
+  4. Si hay un error, revierto el cambio local; si no, dejo los datos como están.
+
+Esta estrategia proporciona una interfaz más fluida, ya que el usuario no percibe demoras en la actualización de la interfaz mientras se espera la respuesta de la API.
+
+### Cambios en este Punto
+
+- **Agregar Elementos**: Se añade la función `addData` que sigue la estrategia "Optimistic UI". Primero, actualizamos el estado local con el nuevo elemento, y luego hacemos la llamada a la API para guardar los datos. Si ocurre un error, revertimos el estado al valor anterior.
+- **Provisional ID**: Se asigna un ID provisional al nuevo elemento antes de recibir la confirmación de la API.
+
+### Implementación
+
+Aquí está el código del hook `useHttpData` con la funcionalidad de agregar elementos:
+
+```typescript
+import { useEffect, useState } from 'react';
+
+export default function useHttpData<T>(url: string) {
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    async function hook() {
+      setLoading(true);
+      try {
+        const response = await fetch(url, { signal });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: T[] = await response.json();
+        setData(data);
+        setError(undefined);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    hook();
+    return () => controller.abort();
+  }, [url]);
+
+  // Función para agregar elementos usando la estrategia Optimistic UI
+  const addData = async (element: T) => {
+    const initialData = [...data]; // Guardamos los datos iniciales
+    setData([{ id: 0, ...element }, ...data]); // Agregamos el nuevo elemento con un ID provisional
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(element),
+      });
+
+      if (!response.ok) {
+        setData(initialData); // Si hay un error, revertimos al estado original
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const saveData = await response.json();
+
+      // Si la API devuelve el objeto completo con el ID, actualizamos el estado con los nuevos datos
+      setData([saveData, ...initialData]);
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  };
+
+  return { data, loading, error, addData };
+}
+```
+
+# 42) Borrando Elementos
+
+### Introducción
+
+En este punto, hemos añadido la funcionalidad para borrar elementos de la lista de datos. Sin embargo, surgió un problema: el tipo `T` no reconocía el campo `id` que estaba presente en el tipo `User`. Para solucionarlo, se extendió `T` con una interfaz `ID`.
+
+### Problema Detectado
+
+El tipo genérico `T` no reconocía el campo `id` a pesar de que `User` tenía este campo. Esto generaba un error al intentar acceder a `id` en la función de borrado. La solución fue crear una interfaz `ID` que contiene el campo `id` y extender `T` desde esta interfaz.
+
+- Aquí tienes un ejemplo sencillo en TypeScript sobre cómo extender una interfaz:
+
+  ```ts
+  // Definimos una interfaz base
+  interface Persona {
+    nombre: string;
+    edad: number;
+  }
+
+  // Extendemos la interfaz Persona
+  interface Empleado extends Persona {
+    salario: number;
+  }
+
+  // Ahora podemos crear un objeto de tipo Empleado que tiene todas las propiedades de Persona y la nueva propiedad 'salario'
+  const empleado: Empleado = {
+    nombre: 'Juan',
+    edad: 30,
+    salario: 50000,
+  };
+
+  console.log(empleado);
+  ```
+
+### Implementación
+
+Aquí está el código actualizado del hook `useHttpData` con la funcionalidad de borrar elementos:
+
+```typescript
+import { useEffect, useState } from 'react';
+
+// Interfaz que asegura que el tipo T siempre tenga un campo 'id'
+interface ID {
+  id: number | string;
+}
+
+export default function useHttpData<T extends ID>(url: string) {
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    async function hook() {
+      setLoading(true);
+      try {
+        const response = await fetch(url, { signal });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: T[] = await response.json();
+        setData(data);
+        setError(undefined);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    hook();
+    return () => controller.abort();
+  }, [url]);
+
+  // Función para borrar un elemento
+  const deleteData = async (id: number) => {
+    const initialData = [...data]; // Guardamos los datos iniciales por si hay que revertir
+    setData(data.filter((element) => element.id !== id)); // Filtramos el elemento por su ID
+
+    try {
+      const response = await fetch(`${url}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        setData(initialData); // Si hay un error, revertimos al estado original
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  };
+
+  return { data, loading, error, addData, deleteData };
+}
+```
+
+# 43) Actualizando elementos
+
+- #### Archivo: `effectos/src/hooks/useHttpData.ts`
+
+### Código:
+
+```typescript
+const updateData = async (updatedElement: T) => {
+  const initialData = [...data];
+  setData(data.map((el) => (el.id === updatedElement.id ? updatedElement : el)));
+  try {
+    const response = await fetch(`${url}/${updatedElement.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedElement),
+    });
+    if (!response.ok) {
+      setData(initialData);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    setError((error as Error).message);
+  }
+};
+```
+
+- ## 43.2) Llamando la función `updateData` en el componente App
+
+  #### Archivo: `effectos/src/App.tsx`
+
+  ### Código:
+
+  ```typescript
+  const { updateData: updateUser } = useHttpData<User>(url);
+
+  return <button onClick={() => updateUser({ id: 1, name: 'chanchoooo' })}>update 11</button>;
+  ```
+
+# 44) Uso de AXIOS en vez de `fetch.then` y `fetch` con `async/await`
+
+## Archivo:
+
+`proyecto-meal-finder.txt`
+
+### 3) Uso de AXIOS
+
+#### Introducción:
+
+AXIOS es una biblioteca para hacer solicitudes HTTP. A diferencia de `fetch`, AXIOS ofrece una API más sencilla y maneja automáticamente la conversión de respuestas a JSON. A continuación, se presentan ejemplos de cómo usar AXIOS en lugar de `fetch`.
+
+### Ejemplo con `fetch.then`:
+
+```javascript
+fetch('https://api.example.com/data')
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((error) => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+```
+
+#### Ejemplo con fetch y async/await:
+
+```js
+async function fetchData() {
+  try {
+    const response = await fetch('https://api.example.com/data');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+  }
+}
+```
+
+#### Ejemplo con AXIOS:
+
+```js
+import axios from 'axios';
+
+async function fetchData() {
+  try {
+    const response = await axios.get('https://api.example.com/data');
+    console.log(response.data);
+  } catch (error) {
+    console.error('There was a problem with the AXIOS operation:', error);
+  }
+}
+```
+
+#### Ventajas de usar AXIOS:
+
+Simplificación de código: Menos líneas de código para manejar respuestas y errores.
+Transformación automática de datos: AXIOS convierte automáticamente la respuesta a JSON.
+Intercepción de solicitudes y respuestas: Permite modificar o manejar errores de manera centralizada.
