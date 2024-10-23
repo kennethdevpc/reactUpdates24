@@ -3443,3 +3443,619 @@ En este contexto, es importante diferenciar entre **funciones puras** y **funcio
           ```
 
           - **Comentario**: En este segundo ejemplo, useEffect se ejecuta inicialmente una vez y luego cada vez que se actualiza el estado user. Al hacer clic en el botón, se cambia el estado y se muestra el nuevo valor en la consola.
+
+# 36) Promesas (continua en el .38)
+
+## Descripción
+
+Las promesas en JavaScript permiten manejar operaciones asincrónicas. Estas representan un valor que puede estar disponible ahora, en el futuro o nunca. Se utiliza comúnmente en llamadas a APIs, como la función `fetch`, la cual devuelve una promesa que resuelve con la respuesta de la solicitud.
+
+En este ejemplo, trabajamos con la API de JSONPlaceholder para obtener una lista de usuarios. El uso de promesas permite recibir y procesar datos asincrónicamente.
+
+#### url: https://jsonplaceholder.typicode.com/users
+
+### Teoría relevante
+
+- **`fetch()`**: es una función nativa que realiza solicitudes HTTP y devuelve una promesa.
+- **Deserialización de JSON**: el método `.json()` de la respuesta convierte los datos JSON en un objeto JavaScript.
+- **Uso de tipos en TypeScript**: al convertir los datos de una API a un tipo específico, evitamos que TypeScript los trate como `any`, mejorando la seguridad y claridad del código.
+
+### Código de ejemplo con la API de JSONPlaceholder
+
+```tsx
+import { useEffect, useState } from 'react';
+import './App.css';
+
+// Tipo para definir la estructura de un usuario
+type User = {
+  id: number;
+  name: string;
+};
+
+function App() {
+  const [user, setUser] = useState<User[]>([]); // Estado inicial como un array vacío de usuarios
+
+  useEffect(() => {
+    const url = 'https://jsonplaceholder.typicode.com/users';
+
+    // Realizando la solicitud a la API
+    fetch(url)
+      .then((response) => response.json() as Promise<User[]>) // Convertimos la respuesta a un array de 'User'
+      .then((data) => {
+        // Establecemos los datos en el estado
+        setUser(data);
+      });
+  }, []); // El array vacío como dependencia garantiza que se ejecute solo una vez al montar el componente
+
+  return (
+    <>
+      {user.map((user) => (
+        <div key={user.id}>
+          <h1>{user.name}</h1> {/* Mostrando el nombre del usuario */}
+        </div>
+      ))}
+    </>
+  );
+}
+
+export default App;
+```
+
+- ### 36.2 Estado de Cargando
+
+  #### Descripción y Teoría:
+
+  Cuando hacemos una solicitud a una API, generalmente queremos mostrar un mensaje o indicador de que los datos están en proceso de carga. Para manejar este estado, podemos agregar un estado adicional en nuestro componente que indique si estamos "cargando" los datos (`loading`). Una vez que los datos hayan sido recuperados (o si ocurre un error), desactivamos el estado de carga.
+
+  #### Código:
+
+  ```tsx
+  import { useEffect, useState } from 'react';
+  import './App.css';
+
+  type User = {
+    id: number;
+    name: string;
+  };
+
+  function App() {
+    const [user, setUser] = useState<User[]>([]);
+    const [loading, setLoading] = useState<boolean>(false); // Estado de cargando
+
+    useEffect(() => {
+      const url = 'https://jsonplaceholder.typicode.com/users';
+      setLoading(true); // Estado cargando activado antes de la solicitud
+
+      fetch(url)
+        .then((response) => response.json() as Promise<User[]>) // Convertimos la respuesta a un array de User
+        .then((data) => {
+          setUser(data); // Actualizamos el estado con los datos recibidos
+        })
+        .finally(() => {
+          setLoading(false); // Desactivamos el estado de cargando cuando la operación termina
+        });
+    }, []); // Solo se ejecuta una vez, después del primer renderizado
+
+    if (loading) {
+      // Si estamos cargando, mostramos un mensaje
+      return <p>Loading...</p>;
+    }
+
+    return (
+      <>
+        {user.map((user) => (
+          <div key={user.id}>
+            <h1>{user.name}</h1>
+          </div>
+        ))}
+      </>
+    );
+  }
+
+  export default App;
+  ```
+
+- ### 36.3 Estado de Error
+
+  #### Descripción y Teoría:
+
+  Cuando hacemos solicitudes a una API, pueden surgir errores de diferentes tipos, como respuestas con códigos 4xx o 5xx, o incluso problemas de conexión. Es importante manejar estos errores para informar al usuario de lo que está ocurriendo y para evitar que la aplicación falle sin mostrar mensajes adecuados.
+
+  - ¿Por qué no se maneja todo en el catch?
+
+    - El problema es que fetch `no lanza automáticamente un error cuando recibe una respuesta HTTP con un status como 404 o 500`. Simplemente devuelve la respuesta con el código de estado, y `no considera estos códigos como errores fatales`. Por eso, necesitamos comprobar manualmente con response.ok si el código es exitoso o no.
+    - Si no hacemos esta verificación, el `catch` solo capturaría `errores de red`, como una `desconexión de internet`, pero `no detectaría errores` de código `de estado HTTP`, lo que podría dejar fallos sin manejar correctamente.
+
+      - Ejemplo sin response.ok:
+        ```ts
+        Copiar código
+        fetch(url)
+          .then((response) => response.json())
+          .catch((error) => {
+            console.error('Error de red o imprevisto:', error);
+          });
+        Este código no capturaría un error 404 o 500, ya que fetch lo consideraría una respuesta válida (aunque no exitosa).
+        ```
+      - Ejemplo con manejo adecuado de errores HTTP:
+
+        ```ts
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`${response.status}`); // Manejamos los errores de status HTTP
+            }
+            return response.json();
+          })
+          .catch((error) => {
+            console.error('Error capturado:', error.message); // Capturamos tanto errores de red como HTTP
+          });
+        ```
+
+    #### Continuando con el ejercicio, el codigo quedaria:
+
+    ```tsx
+    import { useEffect, useState } from 'react';
+    import './App.css';
+
+    type User = {
+      id: number;
+      name: string;
+    };
+
+    function App() {
+      const [user, setUser] = useState<User[]>([]);
+      const [loading, setLoading] = useState<boolean>(false); // Estado de cargando
+      const [error, setError] = useState<string>(); // Estado de error
+
+      useEffect(() => {
+        const url = 'https://jsonplaceholder.typicode.com/users';
+        setLoading(true);
+
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              // Detectamos errores de status HTTP no exitosos
+              throw new Error(`${response.status}`); // Lanzamos un error con el código de estado HTTP
+            }
+            return response.json() as Promise<User[]>; // Convertimos la respuesta a JSON
+          })
+          .then((data) => {
+            setUser(data); // Actualizamos el estado de usuarios
+          })
+          .catch((error: Error) => {
+            // Manejamos errores capturados, ya sean de red o de status HTTP
+            setError(error.message); // Guardamos el mensaje de error
+          })
+          .finally(() => {
+            setLoading(false); // Desactivamos el estado de cargando
+          });
+      }, []);
+
+      if (error && !loading) {
+        // Si hay un error y ya no estamos cargando, mostramos el mensaje de error
+        return <p>Ha ocurrido un Error: {error}</p>;
+      }
+
+      return (
+        <>
+          {user.map((user) => (
+            <div key={user.id}>
+              <h1>{user.name}</h1>
+            </div>
+          ))}
+        </>
+      );
+    }
+
+    export default App;
+    ```
+
+# 37) Custom Hooks en React
+
+## Descripción y Teoría
+
+En React, los **Custom Hooks** son funciones que permiten encapsular y reutilizar lógica relacionada con el estado y los efectos. Se suelen utilizar para manejar lógica compleja que puede ser repetitiva entre varios componentes, como la obtención de datos de una API o el manejo de formularios.
+
+Por convención, los custom hooks siempre deben comenzar con la palabra `use`. Esto es necesario para que React pueda identificar correctamente el hook y gestionar el ciclo de vida de los estados y efectos asociados.
+
+En este ejemplo, vamos a crear un custom hook llamado `useUsers` que encapsula la lógica de llamada a una API, manejo de errores y estado de carga.
+
+## Implementación
+
+Archivo: `effectos\src\hooks\useUsers1.ts`
+
+```typescript
+import { useEffect, useState } from 'react';
+
+type User = {
+  // Al verificar la API veo que tiene estos campos en el objeto, por ahora solo quiero estos 2 campos
+  id: number;
+  name: string;
+};
+
+export default function useUsers() {
+  const [user, setUser] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    const url = 'https://jsonplaceholder.typicode.com/users';
+    setLoading(true); // Cuando se inicia la petición, cambiamos el estado a "cargando"
+
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          // Si la respuesta no es exitosa, lanzamos un error con el código de estado
+          throw new Error(`${response.status}`);
+        }
+        return response.json() as Promise<User[]>;
+        // Convertimos la respuesta a un tipo específico (User[]), evitando el uso de `any`
+      })
+      .then((data) => {
+        // Aquí deserializamos el JSON y actualizamos el estado con los usuarios obtenidos
+        setUser(data);
+      })
+      .catch((error: Error) => {
+        // Capturamos cualquier error, ya sea de red o de status HTTP no exitoso
+        setError(error.message);
+      })
+      .finally(() => {
+        // Al final de la petición, sea exitosa o no, cambiamos el estado de "cargando" a false
+        setLoading(false);
+      });
+  }, []); // Solo se ejecuta una vez, cuando se monta el componente
+
+  // Retornamos el estado actual de "user", "loading" y "error" para ser usado en un componente
+  return { user, loading, error };
+}
+```
+
+- ## 37.2. Uso del Custom Hook en `App.tsx`
+
+  - #### Descripción
+
+    Después de crear nuestro **custom hook** `useUsers`, vamos a utilizarlo en el componente principal `App.tsx`. El hook nos proporcionará los datos de los usuarios, así como los estados de carga y de error, para poder manejarlos fácilmente en el componente.
+
+    ## Implementación
+
+    Archivo: `effectos\src\App.tsx`
+
+    ```typescript
+    import useUsers from './hooks/useUsers'; // Importamos el custom hook
+
+    function App() {
+      // Utilizamos el custom hook y desestructuramos los valores que retorna
+      const { user, loading, error } = useUsers();
+
+      // Si el estado de "loading" es true, mostramos un mensaje de cargando
+      if (loading) {
+        return <p>Loading...</p>;
+      }
+
+      // Si ocurre un error y no está cargando, mostramos el mensaje de error
+      if (error && !loading) {
+        return <p>Ha ocurrido un error: {error}</p>;
+      }
+
+      // Si no hay error y no está cargando, mostramos la lista de usuarios
+      return (
+        <>
+          {user.map((user) => (
+            <div key={user.id}>
+              <h1>{user.name}</h1>
+            </div>
+          ))}
+        </>
+      );
+    }
+
+    export default App;
+    ```
+
+# 38. Uso de `async/await` sin `.then`
+
+## Descripción
+
+En esta sección, mostramos cómo refactorizar el código anterior que utilizaba `.then()` para manejar promesas, sustituyéndolo por la sintaxis de `async/await` en un custom hook llamado `useUsers`. Esto mejora la legibilidad y facilita el manejo de errores y otros flujos asíncronos.
+
+## Implementación
+
+Archivo: `effectos\src\hooks\useUsers2.ts`
+
+```typescript
+import { useEffect, useState } from 'react';
+
+type User = {
+  id: number;
+  name: string;
+};
+
+export default function useUsers() {
+  const [user, setUser] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    async function hook() {
+      const url = 'https://jsonplaceholder.typicode.com/users';
+      setLoading(true); // Iniciamos la carga
+
+      try {
+        const response = await fetch(url); // 1. Hacemos la solicitud con `await`
+        if (!response.ok) {
+          // 2. Si el status de la respuesta no es exitoso, lanzamos un error
+          throw new Error(`${response.status}`);
+        }
+        const data: User[] = await response.json(); // 3. Esperamos el cuerpo de la respuesta y lo tipamos
+        setUser(data); // 4. Actualizamos el estado con los datos obtenidos
+      } catch (error) {
+        setError((error as Error).message); // 5. Capturamos y manejamos los errores
+      } finally {
+        setLoading(false); // 6. Finalizamos la carga
+      }
+    }
+
+    hook(); // Ejecutamos la función asíncrona al cargar el componente
+  }, []); // Se ejecuta solo una vez al montar el componente
+
+  return { user, loading, error }; // Retornamos los valores necesarios
+}
+```
+
+## comparacion
+
+# Comparativa de Manejo de Promesas: `fetch` con `.then()` vs. `async/await`
+
+| **Uso de `.then()`**                       | **Uso de `async/await`**                    |
+| ------------------------------------------ | ------------------------------------------- |
+| ```typescript                              | ```typescript                               |
+| fetch(url)                                 | const response = await fetch(url);          |
+| .then((response) => {                      |                                             |
+| if (!response.ok) {                        | if (!response.ok) {                         |
+| throw new Error(`${response.status}`);     | throw new Error(`${response.status}`);      |
+| }                                          | }                                           |
+| return response.json() as Promise<User[]>; | const data: User[] = await response.json(); |
+| })                                         |                                             |
+| .then((data) => {                          | setUser(data);                              |
+| setUser(data);                             | }                                           |
+| })                                         |                                             |
+| .catch((error: Error) => {                 | }                                           |
+| setError(error.message);                   | catch (error) {                             |
+| })                                         | setError((error as Error).message);         |
+| .finally(() => {                           | }                                           |
+| setLoading(false);                         | finally {                                   |
+| });                                        | setLoading(false);                          |
+| ```                                        | }                                           |
+|                                            | ```                                         |
+
+- ### `.then()` con Promesas
+
+  - Cuando usas `.then()` y `catch()`, cada uno de estos métodos acepta una función como argumento. Por eso, cuando llamas a `finally`, estás pasando una función anónima (callback) que se ejecutará cuando la promesa se resuelva o sea rechazada, independientemente del resultado. Por eso, necesitas usar `() =>` (una función de flecha) para definir la función a ejecutar:
+
+  ```javascript
+  fetch(url)
+    .then((response) => {
+      // manejo de respuesta
+    })
+    .catch((error) => {
+      // manejo de errores
+    })
+    .finally(() => {
+      // este código se ejecuta al final, sin importar el resultado
+      setLoading(false);
+    });
+  ```
+
+- ### async/await
+
+  - En el contexto de `async/await`, el código dentro de finally se ejecuta directamente como parte de un bloque `try/catch/finally`. Aquí, no necesitas definir una `función anónima` porque ya estás dentro de un contexto que permite ejecutar el código directamente. `Por eso, simplemente colocas el código que quieres` que se ejecute al final dentro del bloque finally:
+    ```js
+    try {
+      const response = await fetch(url);
+      // manejo de respuesta
+    } catch (error) {
+      // manejo de errores
+    } finally {
+      // este código se ejecuta al final, sin importar el resultado
+      setLoading(false);
+    }
+    ```
+  - **En el enfoque de promesas (`.then()`):** necesitas pasar funciones `(callbacks) a .then(), .catch(), y .finally()`, por lo que usas` () =>` para definir qué hacer.
+  - **En el enfoque de `async/await:`** el bloque finally forma parte del bloque `try/catch`, y se ejecuta el código directamente sin necesidad de definir una función anónima.
+
+## Descripción
+
+Este cuadro muestra dos enfoques para manejar solicitudes asíncronas utilizando la API `fetch`. En la columna izquierda, se presenta la forma tradicional usando `.then()`, y en la columna derecha, se muestra la misma funcionalidad utilizando `async/await`.
+
+### Ventajas del Uso de `async/await`
+
+- **Legibilidad**: El flujo es más lineal y fácil de entender.
+- **Manejo de Errores**: Es más fácil capturar errores con `try/catch`.
+- **Código más limpio**: Se evitan las anidaciones de promesas, lo que mejora la mantenibilidad del código.
+  `
+
+# 39) Cancelación de Hooks con `AbortController`
+
+### Introducción
+
+En el punto 35 se habló de la cancelación de hooks en las dependencias. Ahora, podemos usar una función llamada `AbortController` que nos permite cancelar hooks cuando se necesite.
+
+### Explicación y conceptos iniciales
+
+1. **AbortController**: Se crea una instancia de `AbortController`, que permite cancelar una solicitud.
+2. **Signal**: Se extrae la señal del controlador, que se pasará a la solicitud `fetch`.
+3. **Fetch con Signal**: Al hacer la solicitud `fetch`, se incluye el objeto `signal` en las opciones.
+4. **Manejo de Errores**: Si la respuesta no es exitosa, se lanza un error.
+5. **Limpiar Errores**: Se restablece el estado de error a `undefined` cuando la solicitud es exitosa.
+6. **Abortar Peticiones**: Al desmontar el componente, se llama a `controller.abort()` para cancelar la solicitud en curso.
+
+### Implementación
+
+Aquí se muestra cómo se puede implementar `AbortController` en un hook personalizado para realizar solicitudes HTTP:
+
+```typescript
+import { useEffect, useState } from 'react';
+
+type User = {
+  id: number;
+  name: string;
+};
+
+export default function useUsers() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    // ===================== Cambios en este punto =====================
+    const controller = new AbortController(); // Creamos un controlador de abortos
+    const { signal } = controller; // Obtenemos la señal del controlador
+    // ===================== Fin de los cambios =====================
+    async function hook() {
+      const url = 'https://jsonplaceholder.typicode.com/users';
+      setLoading(true);
+      try {
+        // ===================== Cambios en este punto =====================
+        const response = await fetch(url, { signal }); // Pasamos la señal al fetch
+        // ===================== Fin de los cambios =====================
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`); // Manejo de errores HTTP
+        }
+        const data: User[] = await response.json(); // Convertimos la respuesta a JSON
+        setUsers(data); // Guardamos los usuarios
+        // ===================== Cambios en este punto =====================
+        setError(undefined); // Limpiamos cualquier error anterior
+        // ===================== Fin de los cambios =====================
+      } catch (error) {
+        setError((error as Error).message); // Guardamos el mensaje de error
+      } finally {
+        setLoading(false); // Finalizamos el estado de carga
+      }
+    }
+
+    hook(); // Ejecutamos la función hook
+    // ===================== Cambios en este punto =====================
+    return () => controller.abort(); // Cancela la petición si el componente se desmonta
+    // ===================== Fin de los cambios =====================
+  }, []); // Si no se coloca nada, solo se ejecuta una vez
+
+  return { users, loading, error }; // Retornamos el estado y los usuarios
+}
+```
+
+# 40) Custom Hook Acotado para Llamadas a Datos
+
+### Introducción
+
+Este hook personalizado, `useFetchData`, permite realizar solicitudes HTTP a cualquier URL y manejar el estado de los datos, la carga y los errores. Es un hook acotado, lo que significa que puede ser reutilizado para diferentes tipos de datos mediante el uso de genéricos.
+
+### Explicación del Código
+
+1. **Generics**: El uso de `<T>` permite que el hook sea flexible y pueda manejar diferentes tipos de datos.
+2. **AbortController**: Se utiliza para cancelar solicitudes si el componente que utiliza el hook se desmonta.
+3. **Fetch**: Se hace la solicitud a la URL proporcionada y se maneja la respuesta como se explicó anteriormente.
+4. **Manejo de Errores**: Se captura cualquier error que ocurra durante la solicitud y se establece en el estado correspondiente.
+
+### Implementación
+
+Aquí está el código para el custom hook `useFetchData`:
+
+```typescript
+import { useEffect, useState } from 'react';
+// ===================== Cambios en este punto =====================
+export default function useFetchData<T>(url: string) {
+  const [data, setData] = useState<T[]>([]); // Estado para los datos
+  // ===================== Fin de los cambios =====================
+
+  const [loading, setLoading] = useState<boolean>(false); // Estado para la carga
+  const [error, setError] = useState<string>(); // Estado para los errores
+
+  useEffect(() => {
+    const controller = new AbortController(); // Creamos un controlador de abortos
+    const { signal } = controller; // Obtenemos la señal del controlador
+
+    async function hook() {
+      setLoading(true); // Indicamos que la carga ha comenzado
+      try {
+        const response = await fetch(url, { signal }); // Pasamos la señal al fetch //-------Esto es un objeto que se le pasa a la peticion fetch tal como se le pasan por ejemplo un POST, GET, etc
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`); // Manejo de errores HTTP
+        }
+        // ===================== Cambios en este punto =====================
+        const data: T[] = await response.json(); // Convertimos la respuesta a JSON
+        // ===================== Fin de los cambios =====================
+        setData(data); // Guardamos los datos
+        setError(undefined); // Limpiamos cualquier error anterior
+      } catch (error) {
+        setError((error as Error).message); // Guardamos el mensaje de error
+      } finally {
+        setLoading(false); // Finalizamos el estado de carga
+      }
+    }
+
+    hook(); // Ejecutamos la función hook
+    // ===================== Cambios en este punto =====================
+    return () => controller.abort(); // Cancela la petición si el componente se desmonta
+    // ===================== Fin de los cambios =====================
+  }, [url]); // Ahora el hook se ejecutará nuevamente si cambia la URL
+
+  return { data, loading, error }; // Retornamos el estado y los datos
+}
+```
+
+- ## 40.1) Implementación del Hook Acotado en el Componente Principal
+
+  ### Introducción
+
+  En este punto, implementamos el custom hook `useFetchData` dentro del componente `App.tsx`. Se pasa la URL de la API y el tipo `User` para realizar la solicitud de datos y manejar la respuesta.
+
+  ### Explicación del Código
+
+  1. **Tipo de Datos `User`**: Definimos un tipo para los usuarios que queremos obtener de la API. En este caso, solo nos interesa el `id` y el `name`.
+  2. **Custom Hook**: Se llama al hook `useFetchData` pasando el tipo `User` para que el hook sepa qué tipo de datos debe esperar de la API.
+  3. **Desestructuración de `useFetchData`**: Obtenemos los datos (renombrados como `users`), el estado de carga (`loading`) y los errores (`error`) directamente desde el hook.
+
+  ### Implementación
+
+  Aquí está el código del componente `App.tsx`:
+
+  ```typescript
+  import './App.css';
+  import useFetchData from './hooks/useFetchData';
+
+  type User = {
+    //-----uso aquí mi tipo
+    id: number;
+    name: string;
+  };
+
+  function App() {
+    //-----El código es reutilizable para diferentes tipos de datos cambiando el tipo genérico <T>.
+    // ===================== Enfoque en este punto =====================
+    const url = 'https://jsonplaceholder.typicode.com/users'; // URL de la API
+    const { data: users, loading, error } = useFetchData<User>(url); //----le paso el url y el tipo
+    // ===================== fin Enfoque en este punto =====================
+
+    if (loading) {
+      return <p>Loading...</p>; // Muestra mensaje de carga
+    }
+
+    if (error) {
+      return <p>Error: {error}</p>; // Muestra mensaje de error si ocurre
+    }
+
+    return (
+      <div className="App">
+        <h1>Lista de Usuarios</h1>
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>{user.name}</li> // Muestra la lista de usuarios
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  export default App;
+  ```
