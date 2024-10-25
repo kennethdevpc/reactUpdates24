@@ -2240,108 +2240,109 @@ export default FormControlled;
 
   ## 31.1) Creación del esquema
 
-        - **Un Esquema**: es una definición o modelo que establece reglas y estructuras que los datos deben seguir. En el contexto de la validación de formularios y manejo de datos, un esquema especifica las reglas y restricciones que un conjunto de datos debe cumplir.
-        - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
-          El archivo donde se define el esquema es
+  - **Un Esquema**: es una definición o modelo que establece reglas y estructuras que los datos deben seguir. En el contexto de la validación de formularios y manejo de datos, un esquema especifica las reglas y restricciones que un conjunto de datos debe cumplir.
 
-        - #### u: `react-form\src\schemas\user.ts`
+    - Para definir un esquema de validación con ZOD, puedes seguir este ejemplo.
+      El archivo donde se define el esquema es
 
-          ```typescript
-          // Importa ZOD para crear esquemas
-          import { z } from 'zod';
-
-          // Definición del esquema para un usuario
-          export const userSchema = z.object({
-            // Validación del campo 'name'
-            name: z
-              .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
-              .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
-              .max(20), //----máximo de 20 caracteres
-
-            // Validación del campo 'lastname'
-            lastname: z
-              .string({ required_error: 'Apellido es requerido' })
-              .min(3, { message: 'longitud minima 3' })
-              .max(20),
-
-            // Validación del campo 'amount' (debe ser un número)
-            amount: z
-              .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
-              .min(1, { message: 'el campo es requerido' }),
-
-            //----Validación de 'age' como ejemplo de una función personalizada
-            // age: z.string().refine(
-            //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
-            //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
-            // ),
-          });
-          ```
-
-        - ### 31.1.2) Algunas validaciones posibles en ZOD
-
-        - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
-
-        ```link
-          https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
-        ```
+      - #### u: `react-form\src\schemas\user.ts`
 
         ```typescript
+        // Importa ZOD para crear esquemas
         import { z } from 'zod';
 
-        // Ejemplos de validaciones con ZOD
+        // Definición del esquema para un usuario
+        export const userSchema = z.object({
+          // Validación del campo 'name'
+          name: z
+            .string({ required_error: 'Nombre es requerido' }) //----mensaje de error personalizado cuando el campo es requerido
+            .min(3, { message: 'longitud minima 3' }) //----mínimo de 3 caracteres
+            .max(20), //----máximo de 20 caracteres
 
-        // Validación de cadenas de texto
-        const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
-        const emailSchema = z.string().email(); //----validación de email
+          // Validación del campo 'lastname'
+          lastname: z
+            .string({ required_error: 'Apellido es requerido' })
+            .min(3, { message: 'longitud minima 3' })
+            .max(20),
 
-        // Validación de números
-        const numberSchema = z.number().int().positive(); //----números enteros y positivos
-        const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
+          // Validación del campo 'amount' (debe ser un número)
+          amount: z
+            .number({ coerce: true, invalid_type_error: 'el campo debe ser numerico' }) //----coerce convierte valores a número
+            .min(1, { message: 'el campo es requerido' }),
 
-        // Validación de fechas
-        const dateSchema = z
-          .date()
-          .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
-
-        // Validación de booleanos
-        const booleanSchema = z.boolean();
-
-        // Validación de arreglos
-        const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
-        const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
-
-        // Validación de enums
-        const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
-
-        // Validación de objetos anidados
-        const addressSchema = z.object({
-          street: z.string(),
-          city: z.string(),
-          zipCode: z.string().length(5), //----código postal de longitud 5
+          //----Validación de 'age' como ejemplo de una función personalizada
+          // age: z.string().refine(
+          //   (age) => { return Number(age) >= 18; }, //----comprueba si la edad es mayor o igual a 18
+          //   { message: "You must be 18 years or older" }, //----mensaje de error personalizado
+          // ),
         });
-
-        // Validación de refinamiento
-        const passwordSchema = z
-          .string()
-          .min(8)
-          .refine((password) => /[A-Z]/.test(password), {
-            message: 'Debe tener al menos una letra mayúscula',
-          });
-
-        // Validación condicional con refinamiento
-        const conditionalSchema = z.union([
-          z.string().length(4), //----si es cadena, debe tener 4 caracteres
-          z.number().min(10), //----si es número, debe ser mayor a 10
-        ]);
-
-        // Uso de 'refine' para validaciones personalizadas
-        const customSchema = z.string().refine((val) => val === 'valid', {
-          message: 'El valor debe ser "valid"',
-        });
-
-        // Validación opcional
-        const optionalSchema = z.string().optional(); //----campo opcional
         ```
+
+      - ### 31.1.2) Algunas validaciones posibles en ZOD
+
+      - Aquí se muestran algunos ejemplos de validaciones posibles que puedes usar con ZOD. Las validaciones van desde tipos básicos hasta más complejas como arreglos, enums, refinamientos y cadenas personalizadas.
+
+      ```link
+        https://github.com/kennethdevpc/reactUpdates24/blob/master/zod.txt
+      ```
+
+      ```typescript
+      import { z } from 'zod';
+
+      // Ejemplos de validaciones con ZOD
+
+      // Validación de cadenas de texto
+      const stringSchema = z.string().min(2).max(100); //----cadenas entre 2 y 100 caracteres
+      const emailSchema = z.string().email(); //----validación de email
+
+      // Validación de números
+      const numberSchema = z.number().int().positive(); //----números enteros y positivos
+      const ageSchema = z.number().min(18, { message: 'Debes ser mayor de 18 años' }); //----número mínimo con mensaje personalizado
+
+      // Validación de fechas
+      const dateSchema = z
+        .date()
+        .min(new Date('2020-01-01'), { message: 'La fecha debe ser posterior a 2020' });
+
+      // Validación de booleanos
+      const booleanSchema = z.boolean();
+
+      // Validación de arreglos
+      const arraySchema = z.array(z.string()).nonempty(); //----arreglo de cadenas no vacío
+      const arrayNumberSchema = z.array(z.number()).length(5); //----arreglo de 5 números
+
+      // Validación de enums
+      const roleSchema = z.enum(['admin', 'user', 'guest']); //----solo acepta valores del enum
+
+      // Validación de objetos anidados
+      const addressSchema = z.object({
+        street: z.string(),
+        city: z.string(),
+        zipCode: z.string().length(5), //----código postal de longitud 5
+      });
+
+      // Validación de refinamiento
+      const passwordSchema = z
+        .string()
+        .min(8)
+        .refine((password) => /[A-Z]/.test(password), {
+          message: 'Debe tener al menos una letra mayúscula',
+        });
+
+      // Validación condicional con refinamiento
+      const conditionalSchema = z.union([
+        z.string().length(4), //----si es cadena, debe tener 4 caracteres
+        z.number().min(10), //----si es número, debe ser mayor a 10
+      ]);
+
+      // Uso de 'refine' para validaciones personalizadas
+      const customSchema = z.string().refine((val) => val === 'valid', {
+        message: 'El valor debe ser "valid"',
+      });
+
+      // Validación opcional
+      const optionalSchema = z.string().optional(); //----campo opcional
+      ```
 
   ## 31.2) Utilizando el esquema ZOD en el formulario, método `parse`
 
@@ -3889,9 +3890,15 @@ En el punto 35 se habló de la cancelación de hooks en las dependencias. Ahora,
 5. **Limpiar Errores**: Se restablece el estado de error a `undefined` cuando la solicitud es exitosa.
 6. **Abortar Peticiones**: Al desmontar el componente, se llama a `controller.abort()` para cancelar la solicitud en curso.
 
+- `Signal En useEffect:`se utiliza el signal para cancelar la solicitud cuando el componente se desmonta o cambia el url, protegiendo contra intentos de actualizar el estado en un componente no montado.
+  - Función hook() en useEffect:
+    - `Propósito:` Esta función se encarga de obtener datos cuando se monta el componente o cuando cambia el valor de url. Dado que la solicitud de datos puede ser cancelada si el componente se desmonta antes de que la solicitud se complete, se utiliza un `AbortController` para `asegurarse de que no se intente actualizar el estado (setData)`
+- `Signal En addData:` no se usa signal porque la función se dispara manualmente por una acción del usuario y no suele ser necesario cancelarla, ya que no está vinculada al ciclo de vida del componente como en el caso de useEffect
+
 ### Implementación
 
-Aquí se muestra cómo se puede implementar `AbortController` en un hook personalizado para realizar solicitudes HTTP:
+- #### u: effectos/src/hooks/useUsers2.ts
+  Aquí se muestra cómo se puede implementar `AbortController` en un hook personalizado para realizar solicitudes HTTP:
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -3958,7 +3965,8 @@ Este hook personalizado, `useFetchData`, permite realizar solicitudes HTTP a cua
 
 ### Implementación
 
-Aquí está el código para el custom hook `useFetchData`:
+- #### u: effectos\src\hooks\useFetchData.ts
+  Aquí está el código para el custom hook `useFetchData`:
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -4018,7 +4026,8 @@ export default function useFetchData<T>(url: string) {
 
   ### Implementación
 
-  Aquí está el código del componente `App.tsx`:
+  - #### u: effectos\src\App.tsx
+    Aquí está el código del componente `App.tsx`:
 
   ```typescript
   import './App.css';
@@ -4087,7 +4096,8 @@ Esta estrategia proporciona una interfaz más fluida, ya que el usuario no perci
 
 ### Implementación
 
-Aquí está el código del hook `useHttpData` con la funcionalidad de agregar elementos:
+- #### effectos\src\hooks\useHttpData.ts
+  Aquí está el código del hook `useHttpData` con la funcionalidad de agregar elementos:
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -4189,7 +4199,8 @@ El tipo genérico `T` no reconocía el campo `id` a pesar de que `User` tenía e
 
 ### Implementación
 
-Aquí está el código actualizado del hook `useHttpData` con la funcionalidad de borrar elementos:
+- #### effectos\src\hooks\useHttpData.ts
+  Aquí está el código actualizado del hook `useHttpData` con la funcionalidad de borrar elementos:
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -4358,3 +4369,348 @@ async function fetchData() {
 Simplificación de código: Menos líneas de código para manejar respuestas y errores.
 Transformación automática de datos: AXIOS convierte automáticamente la respuesta a JSON.
 Intercepción de solicitudes y respuestas: Permite modificar o manejar errores de manera centralizada.
+
+---
+
+# Teoría React
+
+## 1. Actualización de estado
+
+React lo primero que hace es verificar la información que se actualizará.
+Ejemplo: `setCount(count + 1);` Luego actualiza los estados en su totalidad, pero lo hace **cuando se renderiza**. Por eso, cuando imprimo inmediatamente:
+
+```javascript
+const [count, setCount] = useState(0);
+const handleClick = () => {
+  setCount(count + 1);
+  console.log('count:', count); // "count: 0"
+};
+
+//---- En el segundo render, sí podría aparecer: // "count: 1"
+```
+
+## 2. Hooks
+
+En el nivel más alto (es decir, no anidado), se deben colocar los hooks y nunca anidados dentro de un `if, for, while,` ya que así React no puede hacer seguimiento de los estados.
+
+- `useState:` detecta el estado.
+- `useRef: `si hay un cambio en un elemento con ese useRef, toma ese valor.
+
+## 3. Estado de memoria
+
+En React, no es recomendable tener variables que queden en memoria. Ejemplo:
+
+- #### u: `react-app2/src/App.tsx`
+
+```js
+import { useState } from 'react';
+let variableFuera = 0; //---- variable que quedará en memoria
+function App() {
+  const handleClick = () => {
+    variableFuera = variableFuera + 1; //---- aumentándole valor a variable
+  };
+}
+```
+
+- **Problema:**
+  Si vuelvo a usar este componente, o quiero volver a usarlo, entonces esa variable también quedará con el dato anterior, o sea, no quedará separada. Por eso es mejor usarlo como hook.
+
+## 4. Detalles del useState para modificar arrays y objetos, mutables e inmutables
+
+Algo muy importante es que React, en su useState, no va a modificar un estado si lo que se hace es pasarle el mismo estado inicial pero modificado.
+
+```js
+function App() {
+  const [products, setProducts] = useState([
+    { name: 'shoes', price: 20 },
+    { name: 'shirts', price: 30 },
+  ]);
+  const handleClick = () => {
+    products.push({ name: 'pants', price: 40 }); //---- aquí le pasa el mismo "products"
+    setProducts(products); // pero ahora lo modificado, entonces React no vuelve a renderizar, y solo cuando vuelva a renderizar mostrará ese valor
+  };
+  return (
+    <>
+      {products.map((product) => (
+        <h1>{product.name}</h1> //------ solo renderiza shoes y shirts así presione el botón
+      ))}
+      <button onClick={handleClick}>Enviar</button>
+    </>
+  );
+}
+```
+
+- #### **Estado de arrays**
+
+  Para arreglar esto, la forma es pasarle un nuevo array. Podría tomar el array anterior y colocarlo en una nueva variable:
+
+  - Formas alternativas
+
+    - // Forma 1
+
+    ```js
+    const handleClick = () => {
+      products.push({ name: 'pants', price: 40 });
+      // 🖐️ let newProducts = products;  //------ OJO aquí no crea un nuevo array, NO HACERLO ASÍ
+      let newProducts = [...products]; //------ aquí creo un nuevo array
+      setProducts(newProducts);
+    };
+    ```
+
+    - Forma 2:
+
+    ```js
+    javascript
+    Copiar código
+    const handleClick = () => {
+        let newProducts = [...products, { name: 'pants', price: 40 }];
+        setProducts(newProducts);
+    };
+    ```
+
+    - Forma 3:
+
+    ```js
+    javascript
+    Copiar código
+    const handleClick = () => {
+        let newProducts = products.concat({ name: 'pants', price: 40 });
+        setProducts(newProducts);
+    };
+    ```
+
+    - Forma 4:
+
+    ```js
+    javascript
+    Copiar código
+    const handleClick = () => {
+        setProducts((previEstadoDeProducts) => [...previEstadoDeProducts, { name: 'pants', price: 40 }]);
+    };
+    ```
+
+- #### Ejemplo para objetos
+
+  ```js
+  const [user, setUser] = useState({ name: 'Carlos', lastName: 'Pérez' });
+  const handleClick = () => {
+    setUser({ ...user, name: 'JuanCambiado' }); //----- cambiando el estado del objeto
+  };
+  ```
+
+## 5. Para poner un estado de array en vacío
+
+- Ejemplo:
+  ```javascript
+  Copiar código
+  const empty = () => {
+      setProducts([]);
+  };
+  ```
+
+## 6. Comportamiento en formularios, refresca automáticamente
+
+- ejemplo
+
+  ```javascript
+  event.preventDefault(); // esto l
+  ```
+
+## 7. Agregando una propiedad a un tipo (interface)
+
+- Si por ejemplo quiero agregar a una interface otro campo, puedo agregarlo con "&". Ejemplo:
+
+  ```javascript
+  type Props = {
+    name: string,
+    children: React.ReactNode,
+  } & { id: string };
+
+  // en el ejercicio
+  // first-p/src/schemas/contact.ts
+  export type contact = z.infer<typeof contactSchema> & { id: string };
+  ```
+
+## 8. Valor por defecto en las propiedades cuando se le pasa a componentes (parecido a Enum)
+
+```js
+// first-p/src/components/Button.tsx
+//--- estos son los valores que tendrá como aceptables
+type variant = 'primary' | 'secondary' | 'danger' | 'warning';
+
+type Props = {
+  variant?: variant, //---- se crea esa interface
+  children: React.ReactNode,
+};
+
+//---------- variant se le pasa aquí en las props y tendrá como defecto "primary"
+function Button({ children, variant = 'primary' }: Props) {
+  return (
+    <button type="submit" className={`btn btn-${variant} m-3`}>
+      {children}
+    </button>
+  );
+}
+```
+
+## 9. Agregando un enum en la validación (datos por defecto)
+
+- ```js
+  // first-p/src/schemas/contact.ts
+  export const contactSchema = z.object({
+    type: z.enum(['Familiar', 'Trabajo', 'Amigo', 'Otros']),
+  });
+  ```
+  Si quiero hacer que esos datos queden en una constante, entonces:
+- ejemplo
+
+  ```javascript
+  Copiar código
+  const contactTypeOptions = [
+      'Familiar',
+      'Trabajo',
+      'Amigo',
+      'Otros'
+  ] as const; //--- se le indica que será una constante, y es así como Zod permite
+
+  export const contactSchema = z.object({
+      ...
+      type: z.enum(contactTypeOptions), //--- aquí entonces se pasa la variable
+  });
+
+
+  ```
+
+  - #### Error
+
+  ```rust
+    The type 'readonly ["Familiar", "Trabajo", "Amigo", "Otros"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+
+  ```
+
+  - Esto significa que en el Select: `first-p/src/components/Select.tsx` podría que al ser un `string[]` es mutable.
+
+    - al llamar al select se le pasa las opciones
+
+    ```ts
+    <Select
+      options={contactTypeOptions}
+      defaultMessage={'--selecciona el typo--'}
+      label={'Tipo '}
+      name={'type'}
+    ></Select>
+    ```
+
+    - el error se produce porque:
+    - #### u: `first-p\src\components\Select.`
+
+    ```ts
+    type Props = {
+      options: string[]; //--- esto es mutable entonces
+      // como es un enum "readonly"
+      // debo indicarle que este string es "readonly"
+      defaultMessage: string;
+      label: string;
+      name: string;
+    };
+
+    function Select({ options, defaultMessage, label, name }: Props) {
+      //---resto d e codigo}
+    }
+    ```
+
+  - #### Solución:
+
+  ```ts
+  type Props = {
+    options: readonly string[]; //----aqui se coloca Readonly
+    defaultMessage: string;
+    label: string;
+    name: string;
+  };
+  // ---Solución:
+  function Select({ options, defaultMessage, label, name }: Props) {
+    //---resto d e codigo}
+  }
+  ```
+
+## 10. Exportar formas
+
+- **forma1**
+  - **Exporta:**`export function CardBody(props: CardBodyProps) {}`
+  - **Importa:** `  import { CardBody } from './components/Card';`
+- **forma2**
+
+  - **Exporta:**`export default Card;`
+  - **Importa:**` import Card from './components/Card';`
+
+- **Importando de las dos maneras:**
+  `import Card, { CardBody } from './components/Card';`
+
+## 11. Teclados o comandos visuales
+
+- `CTRL + D:` Seleccionar varios textos iguales.
+- `CTRL + Espacio: `Muestra opciones.
+- `CTRL + ALT + R:` Permite sacar las opciones de snippets (abreviatura para crear código de React).
+- `Shift + CTRL + P: `Busca Wrap y permite envolver con una etiqueta.
+
+## 12. Trucos de HTML: EMET de Visual Studio Code me ayuda
+
+- Para crear un formulario:
+
+  ```plaintext
+  form>div.mb-3\*2>label.form-label+input#name.form-control
+
+  ```
+
+  #### Resultado:
+
+  - ejemplo:
+
+  ```html
+  <form action="">
+    <div className="mb-3">
+      <label htmlFor="" className="form-label"></label>
+      <input type="text" id="name" className="form-control" />
+    </div>
+    <div className="mb-3">
+      <label htmlFor="" className="form-label"></label>
+      <input type="text" id="name" className="form-control" />
+    </div>
+  </form>
+  ```
+
+  - Para crear un botón:
+
+    ```plaintext
+
+      button.btn.btn-primary
+    ```
+
+## 13. Snippets
+
+`**tsrfce:**` Crea un componente funcional de React.
+
+- `**Interfaces**`
+  Contiene el nombre y el tipo de las propiedades que se le pasan a una función o las variables para saber qué tipo son. Las interfaces se pueden definir:
+
+- **Forma 1:**
+
+```javascript
+Copiar código
+type Props = {};
+```
+
+- **Forma 2:**
+
+```javascript
+Copiar código
+interface Props = {};
+```
+
+## 14. Eventos
+
+- **onClick:** Este es el mismo onClick de HTML.
+  ```html
+  <li onClick={() => console.log}
+  ```
