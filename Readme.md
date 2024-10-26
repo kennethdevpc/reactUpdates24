@@ -3330,9 +3330,7 @@ En este contexto, es importante diferenciar entre **funciones puras** y **funcio
       Puedes retornar una función dentro de useEffect que se ejecutará justo antes de que el componente se desmonte. Esto es ideal para limpiar recursos, como suscripciones o temporizadores.
 
       ```tsx
-      Copiar código
       useEffect(() => {
-
         return () => {
           console.log('Se ejecuta durante el desmontaje del componente');
         };
@@ -3568,8 +3566,9 @@ export default App;
     - Si no hacemos esta verificación, el `catch` solo capturaría `errores de red`, como una `desconexión de internet`, pero `no detectaría errores` de código `de estado HTTP`, lo que podría dejar fallos sin manejar correctamente.
 
       - Ejemplo sin response.ok:
+
         ```ts
-        Copiar código
+
         fetch(url)
           .then((response) => response.json())
           .catch((error) => {
@@ -3577,6 +3576,7 @@ export default App;
           });
         Este código no capturaría un error 404 o 500, ya que fetch lo consideraría una respuesta válida (aunque no exitosa).
         ```
+
       - Ejemplo con manejo adecuado de errores HTTP:
 
         ```ts
@@ -4460,32 +4460,35 @@ function App() {
     - Forma 2:
 
     ```js
-    javascript
-    Copiar código
+    javascript;
+
     const handleClick = () => {
-        let newProducts = [...products, { name: 'pants', price: 40 }];
-        setProducts(newProducts);
+      let newProducts = [...products, { name: 'pants', price: 40 }];
+      setProducts(newProducts);
     };
     ```
 
     - Forma 3:
 
     ```js
-    javascript
-    Copiar código
+    javascript;
+
     const handleClick = () => {
-        let newProducts = products.concat({ name: 'pants', price: 40 });
-        setProducts(newProducts);
+      let newProducts = products.concat({ name: 'pants', price: 40 });
+      setProducts(newProducts);
     };
     ```
 
     - Forma 4:
 
     ```js
-    javascript
-    Copiar código
+    javascript;
+
     const handleClick = () => {
-        setProducts((previEstadoDeProducts) => [...previEstadoDeProducts, { name: 'pants', price: 40 }]);
+      setProducts((previEstadoDeProducts) => [
+        ...previEstadoDeProducts,
+        { name: 'pants', price: 40 },
+      ]);
     };
     ```
 
@@ -4501,10 +4504,10 @@ function App() {
 ## 5. Para poner un estado de array en vacío
 
 - Ejemplo:
+
   ```javascript
-  Copiar código
   const empty = () => {
-      setProducts([]);
+    setProducts([]);
   };
   ```
 
@@ -4565,7 +4568,7 @@ function Button({ children, variant = 'primary' }: Props) {
 - ejemplo
 
   ```javascript
-  Copiar código
+
   const contactTypeOptions = [
       'Familiar',
       'Trabajo',
@@ -4697,20 +4700,392 @@ function Button({ children, variant = 'primary' }: Props) {
 - **Forma 1:**
 
 ```javascript
-Copiar código
 type Props = {};
 ```
 
 - **Forma 2:**
 
 ```javascript
-Copiar código
+
 interface Props = {};
 ```
 
 ## 14. Eventos
 
 - **onClick:** Este es el mismo onClick de HTML.
+
   ```html
-  <li onClick={() => console.log}
+  <li onClick={() => console.log('evento', elemento)} key={elemento} className="list-group-item"
+  value={elemento} >
   ```
+
+  - 16.2 Identificar Tipo de Evento
+
+    - Si no conoces el tipo de evento, puedes situarte sobre la variable y el IDE indicará su tipo.
+    - Ejemplo:
+      ```jsx
+      onClick={(e) => handleClick()}
+      //----Al posicionarte sobre e, verás algo como React.MouseEvent<HTMLLIElement, MouseEvent>.
+      ```
+
+  - **onChange:**Se utiliza principalmente en formularios. Se activa cuando el valor de un elemento de formulario cambia. Por ejemplo, en un campo de entrada:
+
+  ```jsx
+  <input type="text" onChange={handleInputChange} />
+  ```
+
+  - **onSubmit:** Este evento se utiliza en formularios y se activa cuando se envía un formulario. Es importante prevenir el comportamiento predeterminado del formulario para evitar la recarga de la página. Aquí tienes un ejemplo:
+
+  ```jsx
+  <form onSubmit={handleSubmit}>
+    <input type="text" />
+    <button type="submit">Submit</button>
+  </form>
+  ```
+
+## 15 contexto en React
+
+Es una herramienta útil para compartir datos `(como el tema de la aplicación o el estado de autenticación)` entre componentes sin tener que pasar las `props `manualmente en cada nivel.
+
+- Ejemplo de Flujo de Contexto en React
+  Supongamos que tenemos una aplicación donde queremos compartir un tema `("dark" o "light")` entre varios componentes. Vamos a definir un contexto para este tema y lo vamos a consumir en un componente anidado.
+- Paso 1: Crear el contexto
+
+  ```jsx
+  import React, { createContext, useContext, useState } from 'react';
+  const ThemeContext = createContext('light');
+  //------ Paso 2: Definir el proveedor de contexto
+  const ThemeProvider = ({ children }) => {
+    const [theme, setTheme] = useState('dark');
+
+    return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
+  };
+  ```
+
+- Paso 3: Consumir el contexto en un componente
+
+  ```jsx
+  const DisplayTheme = () => {
+    const { theme, setTheme } = useContext(ThemeContext);
+
+    return (
+      <div>
+        El tema actual es: {theme}
+        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Cambiar tema</button>
+      </div>
+    );
+  };
+  ```
+
+- Componente principal donde usamos el ThemeProvider
+
+  ```jsx
+  const App = () => (
+    <ThemeProvider>
+      <DisplayTheme />
+    </ThemeProvider>
+  );
+
+  export default App;
+  ```
+
+## 17. Uso de Variables en Atributos HTML de React
+
+- Uso de Llaves
+  Para utilizar variables en los atributos de HTML, usa llaves `{}.`
+  ```jsx
+  className={`list-group-item ${elemento === '1' ? 'active' :
+  ```
+
+## 18. Símbolos Usados en React
+
+- Optional Chaining (?.)
+
+  Permite acceder a propiedades de objetos anidados de manera segura. Si la propiedad no existe, devuelve undefined en lugar de lanzar un error, evita que el código se rompa si la variable no está definida.
+
+  ```javascript
+  const usuario = { perfil: { nombre: 'Carlos' } };
+  console.log(usuario.perfil?.nombre); // Carlos
+  console.log(usuario.perfil?.edad); // undefined (sin error)
+  ```
+
+- Null Propagation (??) o - Nullish Coalescing (??)
+
+  Se usa para devolver un valor alternativo cuando el valor original es null o undefined.
+
+  ```javascript
+  const valor = null ?? 'Valor predeterminado';
+  console.log(valor); // Valor predeterminado
+  ```
+
+  Retorna el valor de la `derecha` solo si el valor de la izquierda es `null o undefined`. A diferencia de` ||`, que considera `0`, `''`, y false como falsy, `??` solo considera `null y undefined`.
+
+  ```javascript
+  const nombre = '';
+  const saludo = nombre ?? 'Anónimo';
+  console.log(saludo); // '' porque nombre NO es null ni undefined
+  //----ejemplo2
+  const cantidad = 0;
+  const resultado = cantidad ?? 10;
+  console.log(resultado); // Imprime 0, ya que `??` solo reemplaza null o undefined
+  ```
+
+- Logical OR (||)
+
+  Retorna el **primer** valor `truthy`**o** el **último** valor `si ninguno` es truthy. Puede usarse como valor predeterminado.
+
+  - por ejemplo:
+    `null, undefined` , `""`o `0 `es considerado un valor `"falsy"` Esto significa que, cuando se usa en una evaluación con el operador ||, se tratará como si fuera false. Aquí tienes algunos ejemplos que muestran cómo se comporta 0 con el operador ||:
+
+  ```javascript
+  const nombre = '' || 'Anónimo';
+  console.log(nombre); // 'Anónimo' porque '' es falsy
+  //-----------ejmplo2
+  const puntaje = 0;
+  const puntajeFinal = puntaje || 100;
+  console.log(puntajeFinal); //----Imprime 100, ya que `puntaje` es falsy
+
+  //--------------ejempo3
+  const nombreUsuario = usuarioNombre || 'Anónimo';
+  console.log(nombreUsuario); // Si `usuarioNombre` es falsy, imprimirá "Anónimo"
+  ```
+
+- Spread Operator (...)
+
+  Expande elementos de un `array, objeto o string`. En React, se usa para pasar `props` y actualizar el estado de forma inmutable.
+
+  ```javascript
+  const array1 = [1, 2, 3];
+  const array2 = [...array1, 4, 5];
+  console.log(array2); // [1, 2, 3, 4, 5]
+
+  const objeto1 = { a: 1, b: 2 };
+  const objeto2 = { ...objeto1, b: 3 };
+  console.log(objeto2); // { a: 1, b: 3 }
+  ```
+
+- Rest Parameters (...)
+
+  Similar al operador spread, pero utilizado para `agrupar argumentos en una función` o en desestructuración.
+
+  ```javascript
+  function sumar(...numeros) {
+    return numeros.reduce((a, b) => a + b, 0);
+  }
+  console.log(sumar(1, 2, 3, 4)); // 10
+  ```
+
+- Ternary Operator (? :)
+
+  Simplifica expresiones condicionales. Muy común en JSX para renderizado condicional.
+
+  ```javascript
+  const esVisible = true;
+  return <div>{esVisible ? 'Visible' : 'Oculto'}</div>;
+  ```
+
+- Short-circuit Evaluation (&&)
+
+  Ejecuta el segundo operando solo si el primero es truthy. Útil para renderizado condicional sin ternarios.
+
+  ```javascript
+  const mensaje = 'Hola';
+  return <div>{mensaje && <p>{mensaje}</p>}</div>; // Renderiza <p>Hola</p>
+  ```
+
+- Exclamación Doble (!!)
+
+  Convierte valores a booleanos. Útil para verificar la existencia de un valor.
+
+  ```javascript
+  const existe = !!variable;
+  console.log(existe); // true si variable tiene algún valor
+  ```
+
+- Object Destructuring ({ })
+
+  Extrae propiedades de objetos en variables individuales.
+
+  ```javascript
+  const { nombre, edad } = { nombre: 'Carlos', edad: 30 };
+  console.log(nombre); // Carlos
+  ```
+
+- Array Destructuring ([ ])
+
+  Extrae elementos de un array en variables individuales.
+
+  ```javascript
+  const [primero, segundo] = [1, 2, 3];
+  console.log(primero, segundo); // 1, 2
+  ```
+
+## 19. Convenciones en React
+
+La función que recibe un evento se llama `onSelect()`.
+La función que manda el evento se llama `handleSelect`.
+
+```jsx
+<List data={list} onSelect={handleSelect} />
+```
+
+## 20. React: Conceptos Clave
+
+#### 20.1 State y Props
+
+- **State:** Puede mutar.
+- **Props:** Son inmutables.
+
+#### 20.2 Truthy y Falsy
+
+- **&&** se usa para mostrar valores según la condición de la izquierda.
+- Ejemplos:
+
+  ```jsx
+  {
+    123 && 'numeros ';
+  } // Imprime 'numeros'
+  {
+    '' && 'string vacio';
+  } // No imprime nada
+  {
+    0 && 'soy cero';
+  } // No imprime 'soy cero'
+  {
+    list2.length !== 0 && 'si hay algo en la lista';
+  }
+  ```
+
+## 22. Infraestructura en React
+
+Guardar componentes como `index.tsx` permite importarlos sin especificar el nombre del archivo.
+
+```jsx
+import Button from './components/Button';
+```
+
+`
+
+## 23. Componentes React
+
+`<React.StrictMode>`
+
+- Detecta posibles errores y verifica que el componente sea puro.
+  - **Función pura:** Siempre retorna el mismo valor.
+  - **Función impura:** Puede devolver valores diferentes.
+- Detecta funcionalidades deprecadas.
+
+## 24. HTML en React
+
+#### Atributo `for`
+
+En React, usa htmlFor en lugar de for.
+
+```jsx
+<label htmlFor="exampleInputEmail1" className="form-label">
+```
+
+## 25. Métodos en JavaScript
+
+#### slice
+
+Crea un nuevo array con elementos seleccionados.
+
+```js
+const arr = [1, 2, 3, 4, 5];
+const newArr = arr.slice(1, 3); // [2, 3]
+```
+
+#### join
+
+Une todos los elementos de un array en un solo string.
+
+```js
+const array = ['1', '2', '3', 'Carlos'];
+console.log(array.join(' ')); // "1 2 3 Carlos"
+```
+
+#### Date
+
+Obtener el tiempo actual:
+
+```js
+new Date().getTime();
+```
+
+## 26. Desestructuración en JavaScript
+
+### 26.1 Desestructuración Anidada
+
+Extraer propiedades de objetos anidados:
+
+```js
+const {
+  address: { city, country },
+} = person;
+```
+
+### 26.2 Cambiar Nombre al Desestructurar
+
+Cambiar el nombre de las variables al desestructurar.
+
+```js
+const { data: users, addData: addUser } = useHttpData < User > url;
+```
+
+## 27. Recorrer Objetos por Clave
+
+Para recorrer un objeto e imprimir cada clave:
+
+```jsx
+{
+  Object.entries(errors).map(([fieldName, error]) => <p key={fieldName}>{error.message}</p>);
+}
+```
+
+## 28. Comandos de Instalación
+
+**--save:** Instala la dependencia para nuevos proyectos.
+
+## 29. Conceptos de UI
+
+#### Términos Clave
+
+- `header:` Cabecera de la página.
+- `sideNav:` Barra de navegación lateral.
+- `skeleton:` Estado de carga.
+- `layout:` Disposición de todos los elementos visuales.
+
+## 30. HTML en React
+
+#### 30.1 Calculando Medidas en CSS
+
+Calcular la altura total de la pantalla:
+
+```jsx
+height = 'calc(100vh - 60px)';
+```
+
+#### 30.2 Agregar Lógica a Atributos
+
+Usar lógica en atributos HTML en React:
+
+```jsx
+
+<Link {...(selected.strCategory === category.strCategory && selectedProps)}>
+```
+
+#### 30.3 Posiciones en CSS
+
+- **Relative:** Elementos internos pueden ser absolute.
+- **Fixed:** Elemento fijo en pantalla.
+- **Sticky:** Elemento se fija cuando alcanza el top.
+
+```jsx
+
+pos="sticky" top="60px"
+```
+
+#### 30.4 Overflow en Eje Y
+
+- **overflowY="auto"** permite scroll en el eje vertical.
