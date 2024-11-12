@@ -4974,6 +4974,77 @@ import Button from './components/Button';
   - **Función pura:** Siempre retorna el mismo valor.
   - **Función impura:** Puede devolver valores diferentes.
 - Detecta funcionalidades deprecadas.
+- ### strickmode
+
+  - lo que yo entiendo es que se ejecuta dos veces con el `strickmode` una vez con el abort y otra vez sin el abort, osea verificando el asincronismo puede ser que se ejecute `primero el aborto `y que no se finalice la peticion con `axios`, y **otra que puede pasar** es que se ejecute `completamente` la peticion de `axios` y `luego el aborto`
+
+  ## Contexto:
+
+  En React, cuando se ejecuta en modo estricto (`StrictMode`), el ciclo de vida del componente se simula ejecutándose dos veces en el entorno de desarrollo para identificar posibles efectos secundarios y asegurar que el código maneje correctamente las dependencias y el estado. Esto puede influir en cómo las peticiones asincrónicas, como las realizadas con `axios`, interactúan con la limpieza (`cleanup`) del efecto.
+
+  ## ¿Qué ocurre en `StrictMode`?
+
+  Cuando un componente utiliza un `useEffect` para realizar una petición HTTP, el comportamiento observado en `StrictMode` puede incluir los siguientes escenarios:
+
+  1. **Primera Ejecución con Limpieza (Abort):**
+
+  - React ejecuta el `useEffect` por primera vez.
+  - Si el componente se desmonta o React realiza una simulación, se ejecuta la función de limpieza (`cleanup`), cancelando la petición con `controller.abort()`.
+  - En este caso, la promesa de `axios` no se resuelve completamente porque la petición fue abortada.
+
+  2. **Segunda Ejecución Completa:**
+
+  - React vuelve a ejecutar el `useEffect` tras la simulación.
+  - Esta vez, la petición `axios` se completa correctamente y resuelve la promesa, permitiendo que el bloque `then` se ejecute.
+
+  ### Flujo Detallado:
+
+  1. **Primera Ejecución con Abort:**
+
+
+      - El `useEffect` lanza una petición `axios`.
+      - Antes de que la petición se complete, React ejecuta la limpieza mediante `controller.abort()`.
+      - Debido a la cancelación, la promesa no se resuelve completamente, y solo el bloque `finally` se ejecuta.
+
+  2. **Segunda Ejecución Exitosa:**
+
+
+      - React reinicia el ciclo del `useEffect`.
+      - En esta ejecución, la petición se completa sin interrupciones.
+      - El bloque `then` se ejecuta, actualizando el estado del componente con los datos obtenidos.
+
+  ### ¿Por qué ocurre esto?
+
+  El `StrictMode` de React está diseñado para simular montajes y desmontajes rápidos en desarrollo, con el objetivo de identificar posibles problemas en los efectos secundarios. Este comportamiento es exclusivo del entorno de desarrollo y no ocurre en producción.
+
+  ### Ejemplo de Código:
+
+  ```tsx
+  useEffect(() => {
+    let ignore = false; // Bandera para evitar actualizaciones tras el desmontaje
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    axios
+      .get<CategoriesResponse>(url, { signal })
+      .then(({ data }) => {
+        if (!ignore) {
+          setData(data.meals);
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignore = true; // Evita actualizaciones tras el desmontaje
+      controller.abort(); // Cancela la petición al limpiar el efecto
+    };
+  }, []);
+  ```
 
 ## 24. HTML en React
 
