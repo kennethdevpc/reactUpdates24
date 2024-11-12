@@ -606,3 +606,227 @@ function SideNav({ categories, loading, selectedCategory: selected, setSelectedC
 
 export default SideNav;
 ```
+
+# 7) Custom Hook para Manejo de Datos de API
+
+Este hook está diseñado para manejar peticiones HTTP reutilizables, pensado para obtener datos de APIs con respuestas similares. Especificaciones como la gestión de estados (`loading`, `data`, `error`) y el uso de `AbortController` para cancelar peticiones están incluidas.
+
+- #### Descripción:
+
+  Para usar este hook que sirva para varios casos, es importante notar que las dos APIs devuelven resultados en el mismo formato.
+
+  - como ambas devuelven sus respuestas dentro de meal por eso se puee colocar
+    en el
+    ```ts
+    axios.get<{ meals: T[] }>(url, { signal });
+    ```
+
+  #### API1 de Categorías:
+
+  `https://www.themealdb.com/api/json/v1/1/list.php?c=list`
+
+  **Respuesta esperada:**
+
+  ```json
+  {
+    "meals": [
+      {
+        "strCategory": "Beef"
+      },
+      {
+        "strCategory": "Chicken"
+      }
+    ]
+  }
+  ```
+
+  #### API2 filtro de una categoria:
+
+  [https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood](`https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood`)
+
+  **Respuesta esperada:**
+
+  ```json
+  {
+    "meals": [
+      {
+        "strMeal": "Baked salmon with fennel & tomatoes",
+        "strMealThumb": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+        "idMeal": "52959"
+      },
+      {
+        "strMeal": "Cajun spiced fish tacos",
+        "strMealThumb": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+        "idMeal": "52819"
+      }
+    ]
+  }
+  ```
+
+## Hook Personalizado: `useHttpData`
+
+#### Ubicación del archivo:
+
+`meal-finder\src\hooks\useHttpData.ts`
+
+#### Descripción:
+
+Este hook personalizado se utiliza para manejar peticiones HTTP en múltiples casos y trabaja con estructuras de respuesta consistentes. Implementa un manejo adecuado de asincronía y limpieza utilizando `AbortController`.
+
+## Código:
+
+```typescript
+import { useEffect, useState } from 'react';
+import { CategoriesResponse, Category } from '../types';
+import axios from 'axios';
+
+export default function useHttpData<T>(url: string) {
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    let ignore = false;
+    const controller = new AbortController();
+    const { signal } = controller;
+    setLoading(true);
+
+    console.log('---cero then', ignore, 'time:', document.timeline.currentTime);
+
+    axios
+      .get<{ meals: T[] }>(url, { signal })
+      // .then((re) => { //----sin destructuración
+      .then(({ data }) => {
+        console.log('---1er then', ignore, 'time:', document.timeline.currentTime);
+        // setData(re.data.meals); //----sin destructuración
+        if (!ignore) {
+          //----si tiene que ignorar entonces no vuelve a setear
+          setData(data.meals);
+        }
+      })
+      .finally(() => {
+        console.log('---2do finally', ignore, 'time:', document.timeline.currentTime);
+
+        if (!ignore) {
+          //----si tiene que ignorar entonces no vuelve a setear
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      console.log('---3er return ', ignore, 'time:', document.timeline.currentTime);
+
+      ignore = true; //----cuando se sale o termina el proceso (la 1era vez) entonces pone en true para que no vuelva a ejecutar el set de React
+      controller.abort();
+    };
+  }, []);
+
+  return { data, loading };
+}
+```
+
+## 7.1) Eliminación de Tipo `CategoriesResponse`
+
+#### Ubicación del archivo:
+
+`meal-finder\src\types\index.ts`
+
+#### Descripción:
+
+El tipo `CategoriesResponse` ya no es necesario porque su estructura (`meals: T[]`) ahora se define directamente en la llamada de Axios: `axios.get<{ meals: T[] }>(url, { signal })`.
+
+#### Código:
+
+```typescript
+// export type CategoriesResponse = {
+//   meals: Category[];
+// };
+//--- Ya no se necesita porque ya se define en axios.get<{meals: T[]}>(url, {signal})
+```
+
+## 7.2) Uso del Custom Hook en `App.tsx`
+
+#### Ubicación del archivo:
+
+`meal-finder\src\App.tsx`
+
+#### Descripción:
+
+Aquí se utiliza el custom hook `useHttpData` para obtener los datos de la API y manejar el estado de carga. El hook se usa pasando la URL de la API como parámetro, y luego se extraen `data` y `loading` del hook.
+
+#### Código:
+
+```typescript
+function App() {
+  const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+  const [selectedCategory, setSelectedCategory] = useState<Category>({ strCategory: 'Beef' });
+  const { data, loading } = useHttpData<Category>(url);
+  return (
+    <Grid
+      templateAreas={`"header header"
+                   "nav main"`}
+      gridTemplateRows={'60px 1fr '}
+      gridTemplateColumns={{ sm: `0 1fr`, md: `250px 1fr` }}
+      fontSize={14}
+    >
+      ...
+    </Grid>
+  );
+}
+```
+
+#### hasta aqui se podria tener el mismo funcionamiento pero con el **_custom hook_**
+
+---
+
+## 7.3) LLamando la daa de la [API2 de Meals](https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood)Creación del tipo `Meal` para la URL de la API de Meals
+
+#### Ubicación del archivo:
+
+`meal-finder\src\types\index.ts`
+
+#### Descripción:
+
+Aquí se crea el tipo `Meal`, el cual se utiliza para definir la estructura de los datos que se obtendrán de la API de Meals. Aunque se utiliza el nombre `Meal`, se podría usar otro nombre dependiendo de las necesidades del proyecto.
+
+#### Código:
+
+```typescript
+export type Meal = {
+  //-----se le coloco el mismo nombre del objeto pero perfectamente se podria otro nombre
+  strMeal: string;
+  strMealThumb: string;
+  idMeal: string;
+};
+```
+
+#### 7.3.2) Uso de la URL dinámica con el Custom Hook para la API de Meals
+
+### Descripción:
+
+Se crea una función pequeña `makeMealUrl` que toma una categoría y la agrega dinámicamente al URL para hacer una solicitud a la API. Esta función se usa para actualizar la URL de la API según la categoría seleccionada y se pasa al custom hook `useHttpData`.
+
+#### Ubicación del archivo:
+
+`meal-finder\src\types\index.ts`
+
+### Código:
+
+```typescript
+const url = 'https://www.themealdb.com/api/json/v1/1/list.php?c=list';
+const defaultCategory: Category = { strCategory: 'Beef' }; // Categoría por defecto
+
+// Función para crear la URL dinámica con la categoría seleccionada
+const makeMealUrl = (category: Category) =>
+  `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category.strCategory}`;
+
+function App() {
+  const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
+  const { data, loading } = useHttpData<Category>(url);
+  // Usando el custom hook con la URL dinámica para obtener los datos de las comidas
+  const { data: dataMeal, loading: loadingMeal } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+
+  console.log('data:', { dataMeal });
+
+  return <Grid>{/* Más contenido */}</Grid>;
+}
+```

@@ -431,7 +431,10 @@ chackra:
   u: meal-finder\src\App.tsx
   s:
     ...
-     <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>
+     <MainContent
+#### Ubicación del archivo:
+
+`meal-finder\src\types\index.ts`ntent loading={loadingMeal} meals={dataMeal}></MainContent>
      ...
   8.1) le vamos a agregar esso nuevos props al componente 
     u: meal-finder\src\components\MainContent.tsx
