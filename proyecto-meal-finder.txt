@@ -16,10 +16,8 @@ chackra:
   creare un componente modal con un nombre diferente
 
   meal-finder/src/components/RecipeModal.tsx
-2) creo el Grilla: Una grilla (o grid en inglés) es un sistema de diseño 
-que permite organizar elementos en filas y columnas,
- creando una estructura visualmente coherente y 
- ordenada para una página web
+2) creo el Grilla: Una grilla (o grid en inglés) es un sistema de diseño que permite organizar elementos en filas y columnas,
+ creando una estructura visualmente coherente y  ordenada para una página web 
   u: meal-finder\src\App-sinCustomhook.tsx
   meal-finder\src\App-sinhook.tsx
   s:
