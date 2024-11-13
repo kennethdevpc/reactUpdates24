@@ -516,6 +516,8 @@ chackra:
       // //       height="calc(100vh - 60px)"
       // //     >
 
+
+      
 9) creando componente  Card para no dejar todo en maincontent y su skeleton
   n: voy a copiar lo que estave en mainconten,
      y se lo pasare a el MealCard y al SkeletonCard

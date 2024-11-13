@@ -5001,17 +5001,15 @@ import Button from './components/Button';
 
   1. **Primera Ejecución con Abort:**
 
-
-      - El `useEffect` lanza una petición `axios`.
-      - Antes de que la petición se complete, React ejecuta la limpieza mediante `controller.abort()`.
-      - Debido a la cancelación, la promesa no se resuelve completamente, y solo el bloque `finally` se ejecuta.
+     - El `useEffect` lanza una petición `axios`.
+     - Antes de que la petición se complete, React ejecuta la limpieza mediante `controller.abort()`.
+     - Debido a la cancelación, la promesa no se resuelve completamente, y solo el bloque `finally` se ejecuta.
 
   2. **Segunda Ejecución Exitosa:**
 
-
-      - React reinicia el ciclo del `useEffect`.
-      - En esta ejecución, la petición se completa sin interrupciones.
-      - El bloque `then` se ejecuta, actualizando el estado del componente con los datos obtenidos.
+     - React reinicia el ciclo del `useEffect`.
+     - En esta ejecución, la petición se completa sin interrupciones.
+     - El bloque `then` se ejecuta, actualizando el estado del componente con los datos obtenidos.
 
   ### ¿Por qué ocurre esto?
 
@@ -5151,6 +5149,7 @@ Usar lógica en atributos HTML en React:
 - **Relative:** Elementos internos pueden ser absolute.
 - **Fixed:** Elemento fijo en pantalla.
 - **Sticky:** Elemento se fija cuando alcanza el top.
+- **zIndex=1** lo que hace es que en el eje Z osea que quede en una posicion o atras o adelante el 1 es adelane el 0 es atras
 
 ```jsx
 

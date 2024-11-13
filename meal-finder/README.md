@@ -830,3 +830,421 @@ function App() {
   return <Grid>{/* Más contenido */}</Grid>;
 }
 ```
+
+# 8) Carga de las "meals" de cada categoría, usamos la data del punto 7)
+
+### Ubicación del archivo:
+
+`meal-finder\src\App.tsx`
+
+### Descripción:
+
+Se pasa la información de las comidas (`meals`) obtenidas mediante el custom hook al componente `MainContent`. Este componente maneja el estado de carga (`loadingMeal`) y los datos (`dataMeal`) para mostrarlos en la interfaz.
+
+### Código:
+
+```typescript
+...
+<MainContent loading={loadingMeal} meals={dataMeal}></MainContent>
+...
+```
+
+## 8.1) Agregar nuevos props al componente `MainContent`
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\MainContent.tsx`
+
+### Descripción:
+
+Se añaden los nuevos props `loading` y `meals` al componente `MainContent` para manejar el estado de carga y renderizar las comidas obtenidas. El componente utiliza el diseño proporcionado por `Chakra UI` para mostrar las comidas en un diseño en cuadrícula con tarjetas.
+
+### Código:
+
+```typescript
+import React from 'react';
+import { Meal } from '../types';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  Divider,
+  Heading,
+  Image,
+  SimpleGrid,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
+
+type Props = {
+  loading: boolean;
+  meals: Meal[];
+};
+
+function MainContent({ loading, meals }: Props) {
+  console.log('meals:', meals, loading);
+  return (
+    <>
+      <SimpleGrid columns={[1, 2, null, 3]} spacing="40px">
+        {meals.map((meal) => (
+          <Card maxW="sm" key={meal.idMeal} boxShadow="lg">
+            <CardBody>
+              <Image src={meal.strMealThumb} alt={meal.strMeal} borderRadius="lg" />
+              <Stack mt="6" spacing="3">
+                <Heading size="md" color="blue.400">
+                  <Text mt="4">{meal.strMeal}</Text>
+                </Heading>
+                <Text>
+                  This sofa is perfect for modern tropical spaces, baroque-inspired spaces, earthy
+                  toned spaces, and for people who love a chic design with a sprinkle of vintage
+                  design.
+                </Text>
+                <Text color="blue.600" fontSize="2xl">
+                  $450
+                </Text>
+              </Stack>
+            </CardBody>
+            <CardFooter pt={0}>
+              <ButtonGroup spacing="2">
+                <Button colorScheme="white" bgColor={'blue.400'}>
+                  Ver Receta
+                </Button>
+                <Button variant="ghost" colorScheme="blue">
+                  Add to cart
+                </Button>
+              </ButtonGroup>
+            </CardFooter>
+          </Card>
+        ))}
+      </SimpleGrid>
+    </>
+  );
+}
+
+export default MainContent;
+```
+
+## 8.2) Uso de `boxShadow`, `position`, `overflowY` y estilos relacionados en el componente `GridItem`
+
+### Ubicación del archivo:
+
+`meal-finder\src\App.tsx`
+
+### Descripción:
+
+Se aplican estilos avanzados de diseño y posicionamiento al componente `GridItem`, incluyendo `overflowY`, `position` (`sticky`), y ajustes de dimensiones. Esto asegura que el contenido dentro del `GridItem` permanezca fijo en su posición mientras permite el desplazamiento vertical.
+
+#### 30.3 Posiciones en CSS
+
+- **Relative:** Elementos internos pueden ser absolute.
+- **Fixed:** Elemento fijo en pantalla.
+- **Sticky:** Elemento se fija cuando alcanza el top.
+
+### Código:
+
+```typescript
+//----para el header
+<GridItem
+          pos="sticky"
+          top={0}
+          zIndex={1}
+          pt="7px"
+          bg="white"
+          boxShadow="lg"
+          area={'header'}
+        >
+          <Header onSubmit={searchApi}></Header>
+        </GridItem>
+//----para el sidenav
+
+<GridItem
+  overflowY="auto"      // Permite desplazamiento vertical si el contenido excede la altura disponible.
+  pos="sticky"          // Hace que el elemento permanezca fijo en su posición relativa al contenedor.
+  top="60px"            // Define el desplazamiento desde el borde superior del contenedor.
+  left="0px"            // Define el desplazamiento desde el borde izquierdo del contenedor.
+  p="5"                 // Aplica padding al contenido del `GridItem`.
+  area={'nav'}          // Especifica la área del grid donde se posicionará este elemento.
+  height="calc(100vh - 60px)" // Ajusta la altura para que ocupe todo el espacio restante menos el header.
+>
+```
+
+# 9) Creación de los Componentes `MealCard` y `SkeletonCard`
+
+### Descripción:
+
+Para mejorar la organización y modularidad del código, se ha extraído la lógica de presentación de cada comida y el esqueleto de carga en componentes separados llamados `MealCard` y `SkeletonCard`, respectivamente. Esto permite mantener el componente `MainContent` más limpio y enfocarse solo en la lógica de renderización.
+
+### Ubicación del archivo:
+
+` meal-finder\src\components\MainContent.tsx`
+
+### Código de `MainContent.tsx`:
+
+```typescript
+import React from 'react';
+import { Meal } from '../types';
+import MealCard from './MealCard';
+import { SimpleGrid } from '@chakra-ui/react';
+import SkeletonCard from './SkeletonCard';
+
+type Props = {
+  loading: boolean;
+  meals: Meal[];
+};
+
+function MainContent({ loading, meals }: Props) {
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  return (
+    <>
+      <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+        {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+        {!loading && meals.map((meal) => <MealCard key={meal.idMeal} meal={meal} />)}
+      </SimpleGrid>
+    </>
+  );
+}
+
+export default MainContent;
+```
+
+## 9.1) Creación del Componente `MealCard`
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\MealCard.tsx`
+
+### Descripción:
+
+El componente `MealCard` es responsable de mostrar los detalles de una comida. Este componente recibe una prop `meal` que contiene la información de la comida, como el nombre y la imagen, y la presenta en una tarjeta con botones de acción.
+
+### Código del Componente `MealCard`:
+
+```typescript
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  Heading,
+  Image,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
+import { Meal } from '../types';
+
+type Props = {
+  meal: Meal;
+};
+
+function MealCard({ meal }: Props) {
+  return (
+    <Card maxW="sm" boxShadow="lg">
+      <CardBody>
+        <Image src={meal.strMealThumb} alt={meal.strMeal} borderRadius="lg" />
+        <Stack mt="6" spacing="3">
+          <Heading size="md" color="blue.400">
+            <Text mt="4">{meal.strMeal}</Text>
+          </Heading>
+          <Text>
+            This sofa is perfect for modern tropical spaces, baroque inspired spaces, earthy toned
+            spaces and for people who love a chic design with a sprinkle of vintage design.
+          </Text>
+          <Text color="blue.600" fontSize="2xl">
+            $450
+          </Text>
+        </Stack>
+      </CardBody>
+      <CardFooter pt={0}>
+        <ButtonGroup spacing="2">
+          <Button colorScheme="white" bgColor={'blue.400'}>
+            Ver Receta
+          </Button>
+          <Button variant="ghost" colorScheme="blue">
+            Add to cart
+          </Button>
+        </ButtonGroup>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export default MealCard;
+```
+
+## 9.2) Creación del Componente `SkeletonCard`
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\SkeletonCard.tsx`
+
+### Descripción:
+
+El componente `SkeletonCard` se utiliza para mostrar un esqueleto de carga mientras los datos de las comidas están siendo cargados. Este esqueleto actúa como un marcador de posición antes de que los datos reales sean renderizados.
+
+### Código del Componente `SkeletonCard`:
+
+```typescript
+import { Card, CardBody, SkeletonText } from '@chakra-ui/react';
+
+function SkeletonCard() {
+  return (
+    <>
+      <Card maxW="sm" boxShadow="lg">
+        <CardBody>
+          <SkeletonText mt="1" noOfLines={1} spacing="4" skeletonHeight="100" />
+          <SkeletonText mt="4" noOfLines={2} spacing="4" skeletonHeight="4" />
+        </CardBody>
+      </Card>
+    </>
+  );
+}
+
+export default SkeletonCard;
+```
+
+# 10) Creación de la Barra de Búsqueda
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\Header-sinschema.tsx`
+
+#### Descripción:
+
+Este componente `Header` incluye una barra de búsqueda que permite a los usuarios buscar comidas mediante palabras clave, como "chicken" o "beans". Utiliza el componente `Input` de Chakra UI y un ícono de búsqueda de `react-icons` para proporcionar una interfaz de usuario intuitiva.
+
+#### Código del Componente `Header`:
+
+```typescript
+import { InputGroup, InputLeftElement, Stack, Input, Container } from '@chakra-ui/react';
+import { CiSearch } from 'react-icons/ci';
+
+type Props = {};
+
+function Header({}: Props) {
+  return (
+    <Container mt="1" maxW="3xl">
+      <Stack spacing={1} pl={10} pr={10}>
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <CiSearch color="blue" size={50} />
+          </InputLeftElement>
+          <Input type="tel" placeholder="Intenta con 'chicken' o 'beans'" />
+        </InputGroup>
+      </Stack>
+    </Container>
+  );
+}
+
+export default Header;
+```
+
+## 10.1) luego podemos hacer la validaciones con reack form
+
+### Ubicación del archivo:
+
+`u: meal-finder\src\types\index.ts`
+
+- creo el typo de la respuesta que tendre del formulario
+  ```ts
+  export type SearchForm = {
+    search: boolean;
+  };
+  ```
+
+### 10.1.2) Implementación del Componente `Header` con Validación de Búsqueda y el uso de `React Hook Form`
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\Header.tsx`
+
+### Descripción:
+
+Este componente `Header` incluye una barra de búsqueda con un formulario que valida la entrada del usuario antes de enviarla. Se utiliza la librería `react-hook-form` para gestionar el formulario y las validaciones de los campos.
+
+### Código del Componente `Header`:
+
+```typescript
+import { InputGroup, InputLeftElement, Stack, Input, Container, Button } from '@chakra-ui/react';
+import { useForm } from 'react-hook-form';
+import { CiSearch } from 'react-icons/ci';
+import { SearchForm } from '../types';
+
+type Props = {
+  onSubmit: (data: SearchForm) => void;
+};
+
+function Header({ onSubmit }: Props) {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<SearchForm>(); //---se agrega el useForm para poder utilizarlo en el formulario
+
+  return (
+    <Container mt="1" maxW="3xl">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <CiSearch color="blue" size={50} /> {/*--se agrega un icono*/}
+          </InputLeftElement>
+          <Input
+            mr={5}
+            //-----cambia el color del borde
+
+            focusBorderColor={errors.search ? 'red.500' : 'blue.500'}
+            //---se agrega para que se muestre el borde rojo si es invalido la informacion "isInvalid" si es  TRUE  entonces pone en rojo, "errors.search " no es boolean con lo cual se ussa "!!" por si existe entonces pondria "TRUE"  si no existe pondria "false"
+
+            isInvalid={!!errors.search}
+            //---se agrega el register para que se pueda registrar el campo al "useForm"
+
+            {...register('search', {
+              required: 'Este campo es requerido',
+              minLength: { value: 2, message: 'Mínimo 2 caracteres' },
+            })}
+            type="tel"
+            placeholder="Intenta con 'chicken' o 'beans'"
+          />
+          <Button color="white" type="submit" bgColor="blue.400">
+            Buscar
+          </Button>
+          {errors.search && <span>{errors?.search?.message}</span>}
+        </InputGroup>
+      </form>
+    </Container>
+  );
+}
+
+export default Header;
+```
+
+# 11) Búsqueda en la API con los datos del formulario
+
+### Ubicación del archivo:
+
+`meal-finder\src\components\Header.tsx`
+
+### Descripción:
+
+Aquí se implementa la funcionalidad para realizar la búsqueda en la API usando los datos del formulario. El formulario de búsqueda en el componente `Header` captura el término de búsqueda y lo envía para buscar en la API de comidas.
+
+### Código actualizado del componente `Header`:
+
+```typescript
+type Props = {
+  onSubmit: (data: SearchForm) => void;
+};
+
+function Header({ onSubmit }: Props) {
+  // ...
+  return (
+    <Container mt="1" maxW="3xl">
+      <form onSubmit={handleSubmit(onSubmit)}>{/* Aquí está el formulario con el input */}</form>
+    </Container>
+  );
+}
+```
