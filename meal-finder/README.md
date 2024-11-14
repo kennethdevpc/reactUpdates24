@@ -1248,3 +1248,216 @@ function Header({ onSubmit }: Props) {
   );
 }
 ```
+
+## 11.1) Llamado de los datos del formulario de búsqueda en `App`
+
+### Ubicación del archivo:
+
+`meal-finder\src\App.tsx`
+
+### Descripción:
+
+En este paso, se integra la lógica para realizar una búsqueda en la API cuando se envían datos desde el formulario de búsqueda. Esto incluye la configuración de los estados de carga y la actualización de la data en la aplicación.
+
+- la consulta de la comidas por ejemplo **Beans**
+
+  - `https://www.themealdb.com/api/json/v1/1/search.php?s=beans`
+
+  ```json
+  {
+    "meals": [
+      {
+        "idMeal": "52943",
+        "strMeal": "Oxtail with broad beans",
+        "strDrinkAlternate": null,
+        "strCategory": "Beef",
+        "strArea": "Jamaican",
+        "strInstructions": "Toss the oxtail with the onion, spring onion, garlic, ginger, chilli, soy",
+        "strMealThumb": "https://www.themealdb.com/images/media/meals/1520083578.jpg",
+        "strTags": "Heavy,MainMeal,Speciality",
+        "strYoutube": "https://www.youtube.com/watch?v=DIhxk-98Hz8",
+        "strIngredient1": "Oxtail",
+        "strIngredient2": "Onion",
+        "strIngredient3": "Spring Onions",
+        "strIngredient4": "Garlic",
+        "strIngredient5": "Ginger",
+        "strSource": "",
+        "strImageSource": null,
+        "strCreativeCommonsConfirmed": null,
+        "dateModified": null
+      },
+      {
+        "idMeal": "53067",
+        "strMeal": "Stuffed Bell Peppers with Quinoa and Black Beans",
+        "strDrinkAlternate": null,
+        "strCategory": "Vegetarian",
+        "strArea": "Mexican",
+        "strInstructions": "1. Preheat your oven to 375°F.... chopped cilantro.",
+        "strMealThumb": "https://www.themealdb.com/images/media/meals/b66myb1683207208.jpg",
+        "strTags": null,
+        "strYoutube": "",
+        "strIngredient1": "Green Pepper",
+        "strIngredient2": "Olive Oil",
+        "strIngredient3": "Onion",
+        "strIngredient4": "Garlic",
+        "strIngredient5": "Quinoa",
+        "strSource": "",
+        "strImageSource": null,
+        "strCreativeCommonsConfirmed": null,
+        "dateModified": null
+      }
+    ]
+  }
+  ```
+
+  - recordemos que el Type de `Meal` es:
+
+  ```ts
+  export type Meal = {
+    //-----se le coloco el mismo nombre del objeto pero perfectamente se podria otro nombre
+    strMeal: string;
+    strMealThumb: string;
+    idMeal: string;
+  };
+  ```
+
+### Código actualizado del componente `App`:
+
+```typescript
+function App() {
+  const {
+    data: dataMeal,
+    loading: loadingMeal,
+    setData: setMeals, // Sacado del useHttpData para actualizar los datos al realizar una búsqueda.
+    setLoading: setLoadingMeal, // Sacado del useHttpData para manejar el estado de carga al realizar una búsqueda.
+  } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+
+  const searchApi = (SearchForm: SearchForm) => {
+    const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`;
+    setLoadingMeal(true); // Setea el estado de carga para mostrar el skeleton.
+    axios
+      .get<{ meals: Meal[] }>(url)
+      .then((response) => {
+        setMeals(response.data.meals); // Actualiza la data con los resultados de la búsqueda.
+        console.log('response', response);
+      })
+      .finally(() => {
+        console.log('finally');
+        setLoadingMeal(false); // Desactiva el estado de carga.
+      });
+  };
+
+  return (
+    <>
+      {/* Llamada al componente Header con la función de búsqueda */}
+      <Header onSubmit={searchApi}></Header>
+      {/* Otros componentes */}
+    </>
+  );
+}
+
+export default App;
+```
+
+## 11.2) Exportar `setData` y `setLoading` desde el custom hook
+
+### Ubicación del archivo:
+
+`meal-finder\src\hooks\useHttpData.ts`
+
+### Descripción:
+
+Se habilita la exportación de las funciones `setData` y `setLoading` desde el hook `useHttpData`, permitiendo un control más granular de los datos y el estado de carga.
+
+### Código del hook `useHttpData`:
+
+```typescript
+export default function useHttpData<T>(url: string, urlSearch?: string) {
+  //-----resto de codigo
+  {
+    codigo;
+  }
+  //-----Exporto setData, setLoading
+  return { data, loading, setData, setLoading };
+}
+
+export default useHttpData;
+```
+
+## 11.3) Búsqueda en la API con los datos del formulario, Forma 2 usando el customhook
+
+- ### Ubicación del archivo:
+
+  `App-11b-SearchconCustomHook.tsx`
+
+  ## Descripción
+
+  Este archivo define la lógica de búsqueda en la aplicación utilizando un custom hook para manejar datos dinámicos. Implementa un renderizado condicional para mostrar datos iniciales o resultados de búsqueda en función del estado del componente.
+
+  ## Código
+
+  ```tsx
+  ...
+      function App() {
+        ...
+        const {
+          data: dataMeal,
+          loading: loadingMeal,
+          // setData: setMeals, --------ya no uso esto
+          // setLoading: setLoadingMeal,--------ya no uso esto
+        } = useHttpData<Meal>(makeMealUrl(defaultCategory));
+          //-----------forma 2 de hacerlo la busqueda con el uso del custom hook
+          const [urlSearch, setUrlSearch] = useState<string>('');
+          const { data: searchData, loading: searchLoading } = useHttpData<Meal>(urlSearch, urlSearch);
+          const searchApi = (SearchForm: SearchForm) => {
+            setUrlSearch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${SearchForm.search}`);
+            console.log('urlSearch', urlSearch);
+            console.log('searchData', searchData);
+          };
+          //-----------fin forma 2 de hacerl la busqueda con el uso del custom hook
+          return(
+          ....
+            {/* forma 2 de hacerlo con el custom hook */}
+            {!searchData && <MainContent loading={loadingMeal} meals={dataMeal}></MainContent>}
+            {searchData && <MainContent loading={searchLoading} meals={searchData}></MainContent>}
+            {/* fin  forma 2 de hacerlo con el custom hook */}
+          )
+
+  ```
+
+### 11.3b) Ahora en el useHttpData solo agrego el state que me actualiza
+
+#### Ubicación: `meal-finder\src\hooks\useHttpData.ts`
+
+```typescript
+// Custom hook para manejo de datos HTTP
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+export default function useHttpData<T>(url: string, urlSearch?: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!url) return;
+
+    setLoading(true);
+    axios
+      .get<T>(url)
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setData(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    // Agrego este estado que hace que se ejecute el useEffect una vez cambie este
+  }, [urlSearch]); //-----Se agrega este estado para ejecutar useEffect cuando cambie la búsqueda
+
+  return { data, loading, setData, setLoading };
+}
+```

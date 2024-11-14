@@ -698,7 +698,7 @@ chackra:
       // //    <form onSubmit={handleSubmit(onSubmit)}> 
       // // .........)}
 
-  11.1) ahora creo en el App la el llamado de ese dato que se inserta en el search 
+  11.1) ahora creo en el App el llamado de ese dato que se inserta en el search 
     
     
     u: meal-finder\src\App.tsx
@@ -709,7 +709,7 @@ chackra:
         // // const {
         // //   data: dataMeal,
         // //   loading: loadingMeal,
-        // //   setData: setMeals, //--------saco del useHttpData esto para que cuando busque setee nuevamente la data a mostrar (data buscada)
+        // //   setData: setMeals, //--------saco del useHttpData esto para que cuando busque sete nuevamente la data a mostrar (data buscada)
         // //   setLoading: setLoadingMeal, //--------saco del useHttpData esto para que cuando busque setee nuevamente el skeleton  a mostrar (data buscada)
         // // } = useHttpData<Meal>(makeMealUrl(defaultCategory));
         // //....

@@ -5124,6 +5124,7 @@ Para recorrer un objeto e imprimir cada clave:
 - `sideNav:` Barra de navegación lateral.
 - `skeleton:` Estado de carga.
 - `layout:` Disposición de todos los elementos visuales.
+- `modal:` es un pop up.
 
 ## 30. HTML en React
 
