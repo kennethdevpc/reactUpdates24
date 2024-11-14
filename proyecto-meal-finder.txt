@@ -852,7 +852,7 @@ chackra:
       // //       <button style={{ cursor: 'pointer' }}>click opopen </button>
       // //       <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
       // //         {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
-      // // //--------le agrego  al MeaCArd el openRecipe pero le paso el argumento meal,
+      // // //--------le agrego  al MealCard el openRecipe pero le paso el argumento meal,
       // // //--------no sabia que se le podia pasar el meal:Meal y que se pudiera         
       // //         {!loading &&
       // //           meals.map((meal) => (
@@ -876,7 +876,7 @@ chackra:
       // //       ...
       // //       <Button onClick={openRecipe} colorScheme="white" bgColor={'blue.400'}>
       // //             Ver Receta
-      // //           </Button>
+      // //       </Button>
       // //       ...
       // //   )
       // // }

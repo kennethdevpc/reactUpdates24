@@ -1461,3 +1461,213 @@ export default function useHttpData<T>(url: string, urlSearch?: string) {
   return { data, loading, setData, setLoading };
 }
 ```
+
+# 12) Agregando Modal (Pop-Up)
+
+- #### Explicación de useDisclosure:
+
+  ```typescript
+  //------ useDisclosure es un Hool de Chakra UI.
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  ```
+
+  - **¿Qué hace cada uno?**
+  - **isOpen:** Es un estado booleano que indica si el componente (como el modal) está abierto (true) o cerrado (false).
+  - **onOpen:** Es una función que cambia el estado de isOpen a true. Se usa para abrir el modal.
+    - seria de tipo: `onOpen: () => void;`
+  - **onClose:** Es una función que cambia el estado de isOpen a false. Se usa para cerrar el modal.
+    - seria de tipo: `onClose: () => void;`
+
+#### Ubicación: `meal-finder\src\components\RecipeModal.tsx`
+
+```typescript
+// Importo componentes necesarios de Chakra UI
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from '@chakra-ui/react';
+
+// Defino las props necesarias para controlar el estado del modal
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+// Componente funcional para el modal
+function RecipeModal({ isOpen, onClose }: Props) {
+  return (
+    <>
+      {/* Modal de Chakra UI */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modal Title</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Holamundo</ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button variant="ghost">Secondary Action</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export default RecipeModal;
+```
+
+## 12.2) Configuración en el Componente Principal para Pasar Propiedades al Modal
+
+#### Ubicación: `meal-finder\src\App.tsx`
+
+```typescript
+// Importo los hooks y componentes necesarios
+import { useDisclosure } from '@chakra-ui/react';
+import RecipeModal from './components/RecipeModal';
+import MainContent from './components/MainContent';
+
+// Componente principal de la aplicación
+function App() {
+  // Hook de Chakra UI para manejar el estado del modal
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return (
+    <Grid templateAreas={`"header header" "nav main" "nav footer"`} gap="4">
+      {/* ----------------------Contenido principal con las cards */}
+
+      <GridItem p="4" bg="gray.300" area={'main'}>
+        {/*--------- Paso la función `onOpen` como prop para abrir el modal desde las cards */}
+        <MainContent openRecipe={onOpen} loading={loadingMeal} meals={dataMeal}></MainContent>
+        {/*--------------------------*/}
+      </GridItem>
+
+      {/* ----------------------Modal que queda fuera del flujo principal como pop-up */}
+      <RecipeModal isOpen={isOpen} onClose={onClose} />
+      {/*---------------------------*/}
+    </Grid>
+  );
+}
+
+export default App;
+```
+
+## 12.3) Modificaciones en el Componente `MainContent` para Manejar el Modal
+
+Callback en MealCard:
+
+La función `openRecipe` se pasa como **prop**, pero envuelta en una función anónima `(() => openRecipe(meal))`para enviar la información del `meal` al `modal`.
+
+#### Ubicación: `meal-finder\src\components\MainContent.tsx`
+
+```typescript
+// Importación de componentes y tipos necesarios
+import React from 'react';
+import { SimpleGrid } from '@chakra-ui/react';
+import SkeletonCard from './SkeletonCard';
+import MealCard from './MealCard';
+import { Meal } from '../types'; // Asegurarse de que `Meal` está correctamente definido y exportado
+
+// Definición de las propiedades del componente
+type Props = {
+  loading: boolean;
+  meals: Meal[];
+  openRecipe: (meal: Meal) => void; //------- Propiedad para abrir el modal con datos específicos
+};
+
+// Componente principal
+function MainContent({ loading, meals, openRecipe }: Props) {
+  // Esqueleto de cards para la carga
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  return (
+    <>
+      {/* Botón de prueba para abrir el modal */}
+      <button style={{ cursor: 'pointer' }}>click opopen</button>
+
+      {/* Grid de cards */}
+      <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+        {/* Renderizado de skeletons mientras se cargan los datos */}
+        {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+        {/* Renderizado de cards cuando se tiene la data */}
+        {/*-------le agrego al MealCard el openRecipe pero le paso el argumento meal, */}
+
+        {!loading &&
+          meals.map((meal) => (
+            //------------------`openRecipe` se pasa como callback con el `meal` correspondiente
+            <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+          ))}
+        {/*---------------------------*/}
+      </SimpleGrid>
+    </>
+  );
+}
+
+export default MainContent;
+```
+
+- hasta este punto sera un poco dificil entender porque fue posible pasarle al `MealCard`
+  el **openRecipe** con un atributo`<MealCard openRecipe={() => openRecipe(meal)} ...`, ya que el **openRecipe** venia desde el `App` principal como `<MainContent openRecipe={onOpen} ...` pues la explicacion es que mas adelante no sera el `onOpen` sino una funcion que recebira el parametro, asi que en el momento solo se hace asi para comprobar el `Pop up`, realmente el `onOpen` sera reemplazado por
+
+  ```tsx
+  const searchMealDetails = (meal: Meal) => {
+    onOpen();
+    const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`;
+    fetch(url);
+  };
+  ```
+
+  - Es decir en el `App` sera ejecutado el `MainContent` como :
+    ```tsx
+    <MainContent
+      openRecipe={searchMealDetails} //---------se le pasa el searchMealDetails
+      //------------ que ya es del Tipo:        openRecipe: (meal: Meal) => void;
+      loading={loadingMeal}
+      meals={dataMeal}
+    ></MainContent>
+    ```
+
+## 12.4) Modificaciones en el Componente `MealCard` para Manejar el Modal
+
+- #### recuerda que se paso al meal card lo siguiente:
+
+  ```tsx
+  <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+  ```
+
+  - Mucha **ATENCION** donde `openRecipe` es una funcion que como se ve no retorna nada `()=>void`
+    por ese motivo el `type` **_openRecipe_** es `openRecipe: () => void; `
+
+## Ubicación: `meal-finder\src\components\MealCard.tsx`
+
+```typescript
+// Definición de las propiedades del componente
+type Props = {
+  meal: Meal; // Información de la receta
+  openRecipe: () => void; // Callback para abrir el modal (sin argumentos aquí)
+};
+
+// Componente `MealCard`
+function MealCard({ openRecipe, meal }: Props) {
+  return (
+    <>
+      {/* Botón para abrir el modal con la receta */}
+      <Button onClick={openRecipe} colorScheme="white" bgColor={'blue.400'}>
+        Ver Receta
+      </Button>
+      {/* Puedes agregar más contenido relacionado con el `meal` aquí */}
+    </>
+  );
+}
+
+export default MealCard;
+```
