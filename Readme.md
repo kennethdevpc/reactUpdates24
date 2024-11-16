@@ -3554,7 +3554,7 @@ export default App;
   export default App;
   ```
 
-- ### 36.3 Estado de Error
+- ### 36.3 Estado de Error , Manejo de errores 400 o 500
 
   #### Descripción y Teoría:
 
@@ -4501,6 +4501,145 @@ function App() {
   };
   ```
 
+---
+
+# Uso de Objetos y Arrays en JavaScript
+
+## 1. Objetos en JavaScript
+
+Un **objeto** es una colección de propiedades, donde cada propiedad tiene un nombre (clave) y un valor asociado. Los objetos pueden almacenar cualquier tipo de dato, incluidos otros objetos y arrays.
+
+- puedes ver un ejemplo de uso de Objetos en este archivo:
+- #### Código en `meal-finder/src/components/RecipeModalContent.tsx`
+
+### 1.1 Creación de un Objeto
+
+```javascript
+let persona = {
+  nombre: 'Juan',
+  edad: 30,
+  ciudad: 'Madrid',
+};
+```
+
+### 1.2 Acceso a las Propiedades del Objeto
+
+Se pueden acceder a las propiedades de un objeto de dos maneras:
+
+#### 1.2.1 Usando la notación de punto
+
+```js
+console.log(persona.nombre); // "Juan"
+console.log(persona.edad); // 30
+```
+
+#### 1.2.2 Usando la notación de corchetes (útil para claves dinámicas)
+
+```javascript
+Copiar código
+console.log(persona["ciudad"]);  // "Madrid"
+```
+
+### 1.3 Modificar las Propiedades de un Objeto
+
+```javascript
+Copiar código
+persona.edad = 31; // Cambiar el valor de 'edad'
+persona["ciudad"] = "Barcelona"; // Cambiar el valor de 'ciudad'
+```
+
+### 1.4 Propiedades Dinámicas
+
+Los objetos también permiten agregar o acceder a propiedades de manera dinámica, lo que puede ser útil cuando no conoces todas las claves por adelantado.
+
+```javascript
+Copiar código
+let clave = "direccion";
+persona[clave] = "Calle Falsa 123"; // Agregar una propiedad dinámica
+console.log(persona.direccion); // "Calle Falsa 123"
+```
+
+## 2. Arrays en JavaScript
+
+Un array es una lista ordenada de elementos. Los arrays pueden contener cualquier tipo de datos y son accesibles mediante un índice numérico.
+
+### 2.1 Creación de un Array
+
+javascript
+Copiar código
+let frutas = ["manzana", "naranja", "plátano"];
+
+### 2.2 Acceso a los Elementos del Array
+
+El acceso a los elementos de un array se realiza usando índices. Los índices comienzan en 0.
+
+```javascript
+Copiar código
+console.log(frutas[0]); // "manzana"
+console.log(frutas[1]); // "naranja"
+
+```
+
+### 2.3 Modificar los Elementos de un Array
+
+```javascript
+Copiar código
+frutas[1] = "kiwi"; // Cambiar el segundo elemento
+console.log(frutas); // ["manzana", "kiwi", "plátano"]
+
+```
+
+### 2.4 Métodos Comunes de Arrays
+
+#### 2.4.1 push(): Añadir elementos al final del array
+
+```javascript
+Copiar código
+frutas.push("uva");
+console.log(frutas); // ["manzana", "kiwi", "plátano", "uva"]
+```
+
+#### 2.4.2 pop(): Eliminar el último elemento del array
+
+```javascript
+Copiar código
+frutas.pop();
+console.log(frutas); // ["manzana", "kiwi", "plátano"]
+
+```
+
+#### 2.4.3 shift(): Eliminar el primer elemento del array
+
+```javascript
+Copiar código
+frutas.shift();
+console.log(frutas); // ["kiwi", "plátano"]
+
+```
+
+#### 2.4.4 unshift(): Añadir un elemento al inicio del array
+
+```javascript
+Copiar código
+frutas.unshift("fresa");
+console.log(frutas); // ["fresa", "kiwi", "plátano"]
+```
+
+#### 2.4.5 forEach(): Iterar sobre los elementos del array
+
+```javascript
+Copiar código
+frutas.forEach((fruta) => {
+console.log(fruta);
+});
+// Imprime:
+// fresa
+// kiwi
+// plátano
+```
+
+---
+
 ## 5. Para poner un estado de array en vacío
 
 - Ejemplo:
@@ -4646,6 +4785,10 @@ function Button({ children, variant = 'primary' }: Props) {
 
   - **Exporta:**`export default Card;`
   - **Importa:**` import Card from './components/Card';`
+
+- **forma3**
+- **Exporta:**por ejemplo el archivo `reactUpdates24/meal-finder/src/hooks/useFetch.ts` es un hook que creamos y lo exportamos asi `export default <T>() => {}`
+- **Importa:**` import useFetch from './hooks/useFetch';`
 
 - **Importando de las dos maneras:**
   `import Card, { CardBody } from './components/Card';`
@@ -5102,7 +5245,7 @@ Cambiar el nombre de las variables al desestructurar.
 const { data: users, addData: addUser } = useHttpData < User > url;
 ```
 
-## 27. Recorrer Objetos por Clave
+## 27. Recorrer Objetos por Clave , por key
 
 Para recorrer un objeto e imprimir cada clave:
 
@@ -5160,3 +5303,7 @@ pos="sticky" top="60px"
 #### 30.4 Overflow en Eje Y
 
 - **overflowY="auto"** permite scroll en el eje vertical.
+
+```
+
+```
