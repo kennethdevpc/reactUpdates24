@@ -1671,3 +1671,575 @@ function MealCard({ openRecipe, meal }: Props) {
 
 export default MealCard;
 ```
+
+# 13) Creación de un Custom Hook para Llamado de Datos
+
+- podriamos usas `useHttpData` sin embargo tocaria empezar a cambiar muchas cosas que no resultan menis favorables por eso se crea el `useFetch`
+
+## Ubicación: `meal-finder\src\hooks\useFetch.ts`
+
+```typescript
+import axios from 'axios'; // Biblioteca para realizar solicitudes HTTP
+import { useState } from 'react'; // Hook para manejar estados
+
+// Definición del custom hook
+export default  <T>() {
+  // export default function useFetch<T>() {//-------tambien se podria exportar asi
+  const [loading, setLoading] = useState<boolean>(false); // Estado para gestionar el indicador de carga
+  const [data, setData] = useState<T>( ); // Estado para almacenar los datos obtenidos
+
+  const fetch = (url: string) => {
+    setLoading(true); // Activar indicador de carga
+    axios
+      .get(url) // Realizar la solicitud GET
+      .then((response) => {
+        console.log(response.data); // Verificar datos en la consola
+
+      })
+      .finally(() => {
+        setLoading(false); // Desactivar indicador de carga
+      });
+  };
+
+  return { loading, data, fetch }; // Exponer los estados y la función fetch
+}
+```
+
+## 13.1) Uso del Custom Hook `useFetch` para Imprimir Datos
+
+## Ubicación: `meal-finder\src\App.tsx`
+
+```typescript
+import { useEffect } from 'react';
+import useFetch from './hooks/useFetch'; // Importar el custom hook
+
+function App() {
+  const { fetch } = useFetch(); // Desestructurar la función `fetch` del hook
+
+  useEffect(() => {
+    console.log('fetch'); // Indica que el efecto se ejecutó
+    fetch('https://www.themealdb.com/api/json/v1/1/seauseFetchrch.php?s=Arrabiata'); // Llamada a la API para obtener datos
+  }, []); // Ejecuta el efecto solo una vez, al montar el componente
+
+  return <div>{/* Aquí iría el resto de tu aplicación */}</div>;
+}
+
+export default App;
+```
+
+# 14) Uso del Custom Hook para Llamar Detalles al Hacer Click en una Card
+
+- recoremos el tipo de `Meal` que aunque lo utilizaremos en este punto (14) mas adelante lo cambiaremos ya que solo se esta utilizando para poder mostrar el llamado de la informacion del detail
+
+```ts
+export type Meal = {
+  //-----se le coloco el mismo nombre del objeto pero perfectamente se podria otro nombre
+  strMeal: string;
+  strMealThumb: string;
+  idMeal: string; //-----------este seria el Id
+};
+```
+
+## Ubicación: `meal-finder\src\App.tsx`
+
+```typescript
+import { useDisclosure } from '@chakra-ui/react';
+import useFetch from './hooks/useFetch'; // Importar el custom hook
+
+function App() {
+  const { fetch } = useFetch<Meal>(); // Desestructurar `fetch` del custom hook
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Manejo de modales
+
+  // Función para buscar los detalles de la receta
+  const searchMealDetails = (meal: Meal) => {
+    onOpen(); // Abrir el modal
+    const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`; // Construir la URL con el ID de la receta
+    fetch(url); // Llamar a la API con el custom hook
+  };
+
+  return (
+    <>
+      <MainContent
+        openRecipe={searchMealDetails} // Pasar la función `searchMealDetails` al componente
+        loading={loadingMeal}
+        meals={dataMeal}
+      />
+      <RecipeModal isOpen={isOpen} onClose={onClose} />
+    </>
+  );
+}
+
+export default App;
+```
+
+## 14.1) MainContent: Pasando la Función y Enviando el ID al Hacer Click en el Botón
+
+#### Ubicación: `meal-finder\src\components\MainContent.tsx`
+
+#### Código
+
+```typescript
+import { SimpleGrid } from '@chakra-ui/react';
+import MealCard from './MealCard';
+import SkeletonCard from './SkeletonCard';
+
+type Props = {
+  loading: boolean;
+  meals: Meal[];
+  openRecipe: (meal: Meal) => void; // Función para manejar el evento al hacer clic en una tarjeta
+};
+
+function MainContent({ loading, meals, openRecipe }: Props) {
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8]; // Skeletons para mostrar mientras carga
+
+  return (
+    <>
+      <SimpleGrid columns={[1, 2, null, 3]} spacing="20px">
+        {loading && skeletons.map((skeleton) => <SkeletonCard key={skeleton} />)}
+        {!loading &&
+          meals.map((meal) => (
+            //------- Aquí se pasa `meal` al método `openRecipe`
+
+            <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+          ))}
+      </SimpleGrid>
+    </>
+  );
+}
+
+export default MainContent;
+```
+
+### 14.1.2) Ejecución de <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} /> la Función `openRecipe` desde el Componente MealCard
+
+- recuerda que el `App` tiene
+
+  ```jsx
+  // Función para buscar los detalles de la receta
+  const searchMealDetails = (meal: Meal) => {
+    onOpen(); // Abrir el modal
+    const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`; // Construir la URL con el ID de la receta
+    fetch(url); // Llamar a la API con el custom hook
+  };
+
+  //----
+  //----
+  <MainContent
+    openRecipe={searchMealDetails} // Pasar la función `searchMealDetails` al componente
+    loading={loadingMeal}
+    meals={dataMeal}
+  />;
+  ```
+
+- y el `Maincotent`
+  ```jsx
+  <MealCard openRecipe={() => openRecipe(meal)} key={meal.idMeal} meal={meal} />
+  ```
+- entonces se devuelde desde el Mealcard en secuencia
+
+#### Ubicación: `meal-finder\src\components\MealCard.tsx`
+
+##### Código
+
+```typescript
+import { Button } from '@chakra-ui/react';
+
+type Props = {
+  meal: Meal; // Datos del Meal
+  openRecipe: () => void; // Función que se ejecutará al hacer clic en el botón
+};
+
+function MealCard({ openRecipe, meal }: Props) {
+  return (
+    <>
+      {/* Al hacer clic, se ejecuta `openRecipe`, y como en 14.1 MainContent, se pasa el `meal`.
+          Esto desencadena la función `searchMealDetails` en `App.tsx`. */}
+      <Button onClick={openRecipe} colorScheme="white" bgColor={'blue.400'}>
+        Ver Receta
+      </Button>
+    </>
+  );
+}
+
+export default MealCard;
+```
+
+## 14.2) Estructura del Detalle de los Datos de una Meal
+
+## Formato JSON devuelto por el API:
+
+```json
+{
+  "meals": [
+    {
+      "idMeal": "52771",
+      "strMeal": "Spicy Arrabiata Penne",
+      "strDrinkAlternate": null,
+      "strCategory": "Vegetarian",
+      "strArea": "Italian",
+      "strInstructions": "Bring a large phen Reggiano flakes and more basil and serve warm.",
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+      "strTags": "Pasta,Curry",
+      "strYoutube": "https://www.youtube.com/watch?v=1IszT_guI08",
+      "strIngredient1": "penne rigate",
+      "strIngredient2": "olive oil",
+      "strIngredient3": "garlic",
+      "strIngredient4": "chopped tomatoes",
+      "strIngredient5": "red chilli flakes",
+      "strIngredient6": "italian seasoning",
+      "strIngredient7": "basil",
+      "strIngredient8": "Parmigiano-Reggiano",
+      "strIngredient9": "",
+      "strIngredient10": "",
+      "strIngredient11": "",
+      "strIngredient12": "",
+      "strIngredient13": "",
+      "strIngredient14": "",
+      "strIngredient15": "",
+      "strIngredient16": null,
+      "strIngredient17": null,
+      "strIngredient18": null,
+      "strIngredient19": null,
+      "strIngredient20": null,
+      "strMeasure1": "1 pound",
+      "strMeasure2": "1/4 cup",
+      "strMeasure3": "3 cloves",
+      "strMeasure4": "1 tin",
+      "strMeasure5": "1/2 teaspoon",
+      "strImageSource": null,
+      "strCreativeCommonsConfirmed": null,
+      "dateModified": null
+    }
+  ]
+}
+```
+
+### 14.2.2) Lectura de la Respuesta del Detalle en el Custom Hook
+
+- entonces la respuesta del detalle tocaria leerla asi: `"response.data.meals[0]"`
+
+#### Ubicación:
+
+`meal-finder\src\hooks\useFetch.ts`
+
+#### Código Modificado del Custom Hook
+
+```typescript
+import axios from 'axios';
+import { useState } from 'react';
+
+export default <T>() => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [data, setData] = useState<T>();
+
+  const fetch = (url: string) => {
+    setLoading(true);
+
+    axios
+      .get(url)
+      .then((response) => {
+        // Leer directamente el primer elemento de la respuesta.
+        setData(response.data.meals[0]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  return { loading, data, fetch };
+};
+```
+
+# 15) Objetos Dinámicos para Manejo de Datos JSON con Propiedades Homogéneas
+
+#### keywords: `claves repetidas, muchas claves del mismo tipo, evitarme colocar tipos`
+
+#### Contexto
+
+Cuando un JSON contiene muchas propiedades con valores homogéneos (por ejemplo, todas de tipo `string`), es más eficiente definir un tipo dinámico en lugar de declarar explícitamente cada propiedad. Esto simplifica el código y evita redundancia.
+
+#### Ejemplo de JSON
+
+```json
+{
+  "meals": [
+    {
+      "idMeal": "52772",
+      "strMeal": "Teriyaki Chicken Casserole",
+      "strDrinkAlternate": null,
+      "strCategory": "Chicken",
+      "strArea": "Japanese",
+      "strIngredient1": "soy sauce",
+      "strIngredient2": "water",
+      "strIngredient3": "brown sugar",
+      "strIngredient4": "ground ginger",
+      "strIngredient5": "minced garlic",
+      "strIngredient6": "cornstarch",
+      "strIngredient7": "chicken breasts",
+      "strIngredient8": "stir-fry vegetables",
+      "strIngredient9": "brown rice"
+    }
+  ]
+}
+```
+
+## 15.1) Uso de Tipos Dinámicos en TypeScript para Evitar Declaraciones Individuales de Propiedades
+
+#### Contexto
+
+Cuando trabajas con datos de una API que contiene muchas propiedades, puedes evitar definir cada una manualmente mediante la creación de un tipo dinámico. Esto es especialmente útil para datos homogéneos o estructuras flexibles.
+
+#### Archivo de Tipos: `meal-finder/src/types/index.ts`
+
+- Clave Dinámica `([key: string])`
+  - Define que las propiedades del objeto pueden tener cualquier nombre `(clave dinámica).`
+  - Todas las claves deben tener valores del tipo especificado, en este caso `string.`
+  - **Uso de Otros Tipos:** Si una clave puede tener valores de diferentes tipos, puedes combinar tipos:
+    ```tsx
+    export type MealDetails = {
+      [key: string]: string | null;
+    };
+    ```
+  - **Validaciones:** Asegúrate de validar que las claves existen antes de utilizarlas:
+    ```tsx
+    if (meal['strIngredient3']) {
+      console.log(meal['strIngredient3']);
+    }
+    ```
+
+#### Código
+
+```typescript
+export type MealDetails = {
+  // El key representa el nombre del objeto, y el value su tipo de dato.
+  // Puedes definirlo como string, pero también puede ser un tipo combinado (ejemplo: string | number).
+  [key: string]: string;
+};
+```
+
+## 15.2) Uso del Custom Hook para Obtener Detalles en `App.tsx`
+
+#### Código en `App.tsx`
+
+```typescript
+// Importa el custom hook para obtener datos de la comida
+const { fetch } = useFetch<MealDetails>();
+
+// Función para obtener detalles de la receta cuando se hace clic en una comida
+const searchMealDetails = (meal: Meal) => {
+  onOpen(); // Abre el modal o ventana de detalles
+  const url = `${baseUrl}/lookup.php?i=${meal.idMeal}`; // Crea la URL de la API con el ID de la comida
+  fetch(url); // Llama al custom hook para obtener los detalles
+};
+
+// Componente MainContent que recibe la función searchMealDetails como prop
+<GridItem p="4" bg="gray.300" area={'main'}>
+  <MainContent
+    openRecipe={searchMealDetails} // Le pasa la función para abrir detalles
+    loading={loadingMeal} // Estado de carga
+    meals={dataMeal} // Los datos de las comidas
+  ></MainContent>
+</GridItem>;
+```
+
+# 16) Skeleton para Modal de Receta
+
+#### Contexto
+
+En este paso, se crea un modal para mostrar los detalles de una receta al hacer clic en una tarjeta de comida. Usamos un `fetch` para obtener los datos detallados de la receta, los cuales luego se muestran dentro del modal. El estado `loading` maneja la carga de datos mientras se espera la respuesta de la API.
+
+### Código en `meal-finder/src/App.tsx`
+
+#### Paso 1: Obtención de los Detalles
+
+Primero, obtenemos los detalles de la receta utilizando un hook personalizado `useFetch` y su respectiva función `fetch`.
+
+```tsx
+const { fetch, loading: loadingMealDetail, data: mealDetailData } = useFetch<MealDetails>();
+```
+
+## 16.1) Agregar `fetch,loadingMealDetail, mealDetailData` en el Componente Modal
+
+#### Contexto
+
+En este paso, se definen los tipos de las propiedades que recibe el componente `RecipeModal`, lo que incluye el estado de carga (`loading`), los datos de la receta (`data`), y las funciones de control del modal (`isOpen`, `onClose`). Luego, en el JSX, se controla la visualización del contenido del modal, mostrando un esqueleto de carga (`RecipeModalSkeleton`) mientras los datos están siendo cargados.
+
+- en el `App ` llamo al componente, y el useftch para poder pasarle los datos al `RecipeModal`
+
+  ```jsx
+  function App()
+  {
+
+    //-----
+
+  const { fetch, loading: loadingMealDetail, data: mealDetailData } = useFetch<MealDetails>();
+
+   return (
+    <>
+  <RecipeModal
+        data={mealDetailData}
+        isOpen={isOpen}
+        onClose={onClose}
+        loading={loadingMealDetail}
+      />
+    </>
+  );
+  }
+
+  ```
+
+  <RecipeModal
+           data={mealDetailData}
+           isOpen={isOpen}
+           onClose={onClose}
+           loading={loadingMealDetail}
+         />
+
+- ### 16.1.1) Modificando `RecipeModal.tsx`
+
+  #### Código en `meal-finder/src/components/RecipeModal.tsx`
+
+  #### Paso 1: Definir el Tipo `Props`
+
+  Primero, se define el tipo `Props` que describe las propiedades que recibirá el componente `RecipeModal`. Estas propiedades incluyen:
+
+  - **`isOpen`**: Un booleano que determina si el modal está abierto o cerrado.
+  - **`onClose`**: Una función que cierra el modal.
+  - **`loading`**: Un booleano que indica si los datos están cargando.
+  - **`data`**: Los detalles de la receta, que pueden ser de tipo `MealDetails` o `undefined` si aún no se han cargado.
+
+  ```tsx
+  type Props = {
+    isOpen: boolean;
+    onClose: () => void;
+    loading: boolean;
+    data: MealDetails | undefined;
+  };
+  ```
+
+  #### Paso 2: Controlar la Visualización del Modal
+
+  Dentro del JSX, se controlan las vistas dependiendo de si los datos están siendo cargados (loading) o si ya están disponibles (data).
+
+  ```jsx
+  type Props = {
+    isOpen: boolean,
+    onClose: () => void,
+    loading: boolean,
+    data: MealDetails | undefined,
+  };
+
+  function RecipeModal({ isOpen, onClose, loading, data }: Props) {
+    console.log('loading', loading);
+    return (
+      <>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            {/*--------------aqui creo la validacion con el loading*/}
+            {loading ? <RecipeModalSkeleton /> : data && <RecipeModalContent data={data} />}
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button variant="ghost">Secondary Action</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
+    );
+  }
+
+  export default RecipeModal;
+  ```
+
+- ### 16.1.2) Crear el Componente `RecipeModalSkeleton`
+
+  #### Contexto
+
+  Se crea un componente `RecipeModalSkeleton` para mostrar un esqueleto de carga mientras los datos del modal están siendo procesados. Este esqueleto utiliza los componentes `Container` y `SkeletonText` de la librería `@chakra-ui/react`.
+
+  #### Código en `meal-finder/src/components/RecipeModalSkeleton.tsx`
+
+  ```tsx
+  import { Container, SkeletonText } from '@chakra-ui/react';
+  import React from 'react';
+
+  type Props = {};
+
+  function RecipeModalSkeleton({}: Props) {
+    return (
+      <Container>
+        <SkeletonText spacing="4" mt="4" mb={5} noOfLines={1} skeletonHeight={8} />
+        <SkeletonText spacing="4" mb={5} noOfLines={1} skeletonHeight={208} />
+        <SkeletonText spacing="4" mt="4" noOfLines={3} skeletonHeight={1} />
+      </Container>
+    );
+  }
+
+  export default RecipeModalSkeleton;
+  ```
+
+# 16.1.3) Crear el Componente `RecipeModalContent` para el Modal
+
+## Contexto
+
+Se crea el componente `RecipeModalContent` para mostrar los detalles de una receta dentro de un modal, utilizando los datos proporcionados por la API. Este componente maneja ingredientes dinámicamente y muestra otros detalles como la imagen, instrucciones y nombre del platillo.
+
+### Código en `meal-finder/src/components/RecipeModalContent.tsx`
+
+```tsx
+import React from 'react';
+import { MealDetails } from '../types';
+import {
+  Heading,
+  Image,
+  ListItem,
+  ModalBody,
+  ModalCloseButton,
+  ModalHeader,
+  OrderedList,
+  Text,
+} from '@chakra-ui/react';
+
+type Props = {
+  data: MealDetails;
+};
+
+function RecipeModalContent({ data }: Props) {
+  const joinIngredients = (data: MealDetails) => {
+    const ingredients = [];
+    for (let i = 1; i <= 20; i++) {
+      // Busco por el nombre de la key y si hay algo, lo agrego al array
+      if (data[`strIngredient${i}`]) {
+        ingredients.push(`${data[`strIngredient${i}`]} - ${data[`strMeasure${i}`]}`);
+      } else {
+        break;
+      }
+    }
+    return ingredients;
+  };
+
+  return (
+    <>
+      <ModalHeader>{data.strMeal}</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <Image width={'100%'} src={data.strMealThumb} alt={data.strMeal} />
+        <Heading size="md" mt="4" mb="4">
+          Ingredients
+        </Heading>
+        <OrderedList mb="4">
+          {joinIngredients(data).map((ingredient) => (
+            <ListItem key={ingredient}>{ingredient}</ListItem>
+          ))}
+        </OrderedList>
+
+        <Text whiteSpace="pre-line">{data.strInstructions}</Text>
+      </ModalBody>
+    </>
+  );
+}
+
+export default RecipeModalContent;
+```

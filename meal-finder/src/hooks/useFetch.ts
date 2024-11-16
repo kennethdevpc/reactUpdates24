@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 export default <T>() => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [data, setData] = useState<T>([]);
+  const [data, setData] = useState<T>();
   const fetch = (url: string) => {
     setLoading(true);
 
