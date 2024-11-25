@@ -1,5 +1,4 @@
-import { useContext } from 'react';
-import TodosContext from '../contexts/TodosContext';
+import useTodos from '../hooks/useTodos';
 type Props = {
   // --------ya no usaremos nuevamente las propiedades ya que usaremos context
   // todos: Todo[];
@@ -7,8 +6,8 @@ type Props = {
 };
 
 function TodoList({}: Props) {
-  // --------ahora si aqui uso el context ya con el estado global
-  const { todos, addTodo } = useContext(TodosContext);
+  // --------ahora si aqui uso el context ya con el estado global, en esta ocasion con el uso del hook
+  const { todos, addTodo } = useTodos();
   // --------el resto de codigo aqui no cambia sigue igual que antes ya que se conservan el nombre de las propiedades
   return (
     <>

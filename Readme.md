@@ -4688,7 +4688,7 @@ El proposito es que todos los componentes que equeremos renderizar y pasarles el
 
 - ## 2.1) entonces crear un componente de alto orden
 
-  #### ubicacion: `reactUpdates24/2-Gestion_estados/1-context/src/contexts/TodosContext.ts`
+  #### ubicacion: `reactUpdates24/2-Gestion_estados/1-context/src/providers/TodosProvider.tsxgit status`
 
   creo el comopnente que tendra un contexto el cual se podra reutilizar:
 
@@ -4723,8 +4723,77 @@ El proposito es que todos los componentes que equeremos renderizar y pasarles el
   export default TodosProvider;
   ```
 
--
--
+# 3) creacion del custom Hook
+
+en el momento en uqe queremos **cambiar el context** o queremos esconder la **implementacion de React**, es decir **no queremos**importar lo de react en nuestros componentes, pues entonces seria una buena idea crear un `hook`
+
+#### ubicacion: `reactUpdates24/2-Gestion_estados/1-context/src/hooks/useTodos.ts`
+
+```tsx
+import { useContext } from 'react';
+import TodosContext from '../contexts/TodosContext';
+
+function useTodos() {
+  return useContext(TodosContext);
+}
+
+export default useTodos;
+```
+
+- ahora voy al archivo donde se usa el context y modifico
+
+  - **ubicacion 1:** `reactUpdates24/2-Gestion_estados/1-context/src/components/Dashboard.tsx`
+  - **ubicacion 2:** `reactUpdates24/2-Gestion_estados/1-context/src/components/TodoList.tsx`
+
+- por ejemplo en el Dashboard
+
+  - **ubicacion 1:**
+
+  ```tsx
+  // import React, { useContext } from 'react';  //---------sin el hook se pondria esto
+  // import TodosContext from '../contexts/TodosContext';  //---------sin el hook se pondria esto
+  import useTodos from '../hooks/useTodos'; //-----------con el Hook
+  type Props = {};
+  function Dashboard({}: Props) {
+    // const { todos } = useContext(TodosContext);     //--------sin el hook se utiliza esto
+    //--------ahora si aqui uso el Hook
+    const { todos } = useTodos();
+
+    return <div>{todos.length}</div>;
+  }
+
+  export default Dashboard;
+  ```
+
+- **ubicacion 2:**
+
+  ```tsx
+  import useTodos from '../hooks/useTodos';
+  type Props = {};
+
+  function TodoList({}: Props) {
+    // --------ahora si aqui uso el Hook uso el context
+    const { todos, addTodo } = useTodos();
+    // --------el resto de codigo aqui no cambia sigue igual que antes ya que se conservan el nombre de las propiedades
+    return (
+      <>
+        <button
+          onClick={() => addTodo({ id: Math.random(), name: 'Texto agregado', completed: false })}
+        >
+          Agregar
+        </button>
+        <ul>
+          {todos.map((e) => {
+            return <li key={e.id}>{e.name}</li>;
+          })}
+        </ul>
+      </>
+    );
+  }
+
+  export default TodoList;
+  ```
+
 -
 -
 -

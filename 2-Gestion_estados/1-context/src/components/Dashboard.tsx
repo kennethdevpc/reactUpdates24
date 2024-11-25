@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import TodosContext from '../contexts/TodosContext';
+import useTodos from '../hooks/useTodos';
 
 type Props = {
   //-----se elimina esta propiedad ya que se utilizara la propiedad ahora como context
@@ -7,8 +6,8 @@ type Props = {
 };
 
 function Dashboard({}: Props) {
-  //--------ahora si aqui uso el context ya con el estado global
-  const { todos } = useContext(TodosContext);
+  //--------ahora si aqui uso el Hook para llamar el context
+  const { todos } = useTodos();
 
   return <div>{todos.length}</div>;
 }
