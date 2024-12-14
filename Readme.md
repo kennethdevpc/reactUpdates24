@@ -4723,6 +4723,29 @@ El proposito es que todos los componentes que equeremos renderizar y pasarles el
   export default TodosProvider;
   ```
 
+  Ahora me queda es llamarlo en el `App`
+
+  #### Ubicacion : `reactUpdates24/2-Gestion_estados/1-context/src/App.tsx`
+
+  ```ts
+  import './App.css';
+  import Dashboard from './components/Dashboard';
+  import MainContent from './components/MainContent';
+
+  import TodosProvider from './providers/TodosProvider';
+
+  function App() {
+    return (
+      <TodosProvider>
+        <Dashboard />
+        <MainContent />
+      </TodosProvider>
+    );
+  }
+
+  export default App;
+  ```
+
 # 3) creacion del custom Hook
 
 en el momento en uqe queremos **cambiar el context** o queremos esconder la **implementacion de React**, es decir **no queremos**importar lo de react en nuestros componentes, pues entonces seria una buena idea crear un `hook`
