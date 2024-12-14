@@ -3,3 +3,8 @@ export type Todo = {
   name: string;
   completed: boolean;
 };
+
+export type User = {
+  id: number;
+  name: string;
+};
