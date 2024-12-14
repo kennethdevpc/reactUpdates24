@@ -1,3 +1,4 @@
+import useTitle from '../hooks/useTitle';
 import TodoList from './TodoList';
 
 type Props = {
@@ -5,9 +6,13 @@ type Props = {
 };
 
 function MainContent({}: Props) {
+  const { title, updateTitle } = useTitle();
+
   return (
     <div>
-      <h2>Todos</h2>
+      <h2>{title.title}</h2>
+
+      <button onClick={updateTitle}>updatetitle</button>
 
       {/* -----asi se utilizaba sin el context */}
       {/* <TodoList todos={todos} addTodo={addTodo} /> */}
