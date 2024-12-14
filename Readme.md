@@ -4817,6 +4817,10 @@ export default useTodos;
   export default TodoList;
   ```
 
+  - #### resumen en foto:
+
+    ![alt text](https://github.com/kennethdevpc/reactUpdates24/blob/master/2-Gestion_estados/1-context/public/context.png?raw=true)
+
 -
 -
 -
