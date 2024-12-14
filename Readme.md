@@ -4821,6 +4821,139 @@ export default useTodos;
 
     ![alt text](https://github.com/kennethdevpc/reactUpdates24/blob/master/2-Gestion_estados/1-context/public/context.png?raw=true)
 
+# 4) usando reducers
+
+Primero un ejemplo cpon el `useState`
+
+- #### ubicacio: `reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx`
+
+  ```ts
+  import { useState } from 'preact/hooks';
+  import './app.css';
+
+  export function App() {
+    const [count, setCount] = useState(0);
+
+    return (
+      //----logica para incrementar y decrementar el contador
+      <>
+        <h1>{count}</h1>
+        <button onClick={() => setCount(count + 1)}> incrementar</button>
+        <button onClick={() => setCount(count - 1)}> decrementar</button>
+        <button onClick={() => setCount(0)}> resetear</button>
+      </>
+    );
+  }
+  ```
+
+  - #### utilizando el `reducer`
+
+    Cuando se hace `dispatch`, se ejecuta el `reducer`, y recibe en `action` los parametros que le pasamos desde el `dispatch`
+
+    ```ts
+    import './app.css';
+    import { useReducer } from 'react'; //----1) logica para usar reducer
+
+    //-----3) reducer recibe 2 parametro: (state, action)
+    //------- "state": es el estado actual
+    //------- "action": es la accion que se va a realizar y por convencion se pasa un objeto
+    //------- type Action = { type: string }; //----tmabien se podria hacer asi pero no es buena practica, ya que podria escribir una accion que no exista
+    //-------le puse "typex" solo para demostrar que la convencion es "type" pero se puede otro nombre
+    type Action = {
+      typex: 'INCREMENT' | 'DECREMENT' | 'RESET';
+      value: number;
+    }; //---EN TS uno usa | en js es un or pero en TS
+    const reducer = (count: number, action: Action) => {
+      switch (action.typex) {
+        case 'INCREMENT':
+          return count + action.value; //----uso de otro parametro pasado en el dispatch
+        case 'DECREMENT':
+          return count - 1;
+        case 'RESET':
+          return 0;
+      }
+      return count; //----siempre hay que retornar el estado
+    };
+
+    export function App() {
+      //-----2) useReducer recibe 2 parametro: useReducer(reducer, 0);
+      //-----"reducer": que es la logica para manejar el estado,recibe un objeto y dependiendo de ello es la accion que se va a realizar
+      //---- "initialState": que es el estado inicial
+      const [count, dispatch] = useReducer(reducer, 0);
+      return (
+        //----logica para usar reducer
+        <>
+          <h1>{count}</h1>
+          <button onClick={() => dispatch({ typex: 'INCREMENT', value: 3 })}> incrementar</button>
+          <button onClick={() => dispatch({ typex: 'DECREMENT', value: 1 })}> decrementar</button>
+          <button onClick={() => dispatch({ typex: 'RESET', value: 0 })}> resetear</button>
+        </>
+      );
+    }
+    ```
+
+## 4.2 uso de las `payload` en los reducers
+
+antes se utilizaban las payloadas pero ahora se suguiere utilizar para cada accion su propio typo
+
+```ts
+import './app.css';
+import { useReducer } from 'react'; //----1) logica para usar reducer
+
+//-------Cuando se hace "dispatch", se ejecuta el "reducer",
+//------- y recibe en "action" los parametros que le pasamos desde el dispatch
+
+type Todo = {
+  //----es un typo para el elemento de la lista
+  id: number;
+  name: string;
+};
+//------Esto es el tipo con el que vendra la informacion del dispatch
+type addAction = {
+  type: 'ADD';
+  todo: Todo;
+};
+type deleteAction = {
+  type: 'DELETE';
+  todoId: number;
+};
+//---como el action recibe un objeto con el typo y el payload, entonces se puede hacer asi:
+//---type Action = {type: "DELETE"  ;  todoId: number;} | {  type: "DELETE"  ;  todoId: number;};
+//---de una manera mas ordenaa para recibir 2 tipos pues se hace asi
+type Action = addAction | deleteAction;
+
+const reducer = (todos: Todo[], action: Action) => {
+  switch (action.type) {
+    case 'ADD':
+      return [...todos, { ...action.todo, id: action.todo.id * Math.random() }];
+    case 'DELETE':
+      return [...todos.filter((todo) => todo.id !== action.todoId)];
+  }
+  return todos; //----siempre hay que retornar el estado
+};
+
+export function App() {
+  const [todos, dispatch] = useReducer(reducer, []);
+  return (
+    //----logica para usar reducer
+    <>
+      <button onClick={() => dispatch({ type: 'ADD', todo: { id: 1, name: 'lista' } })}>
+        Incrementar
+      </button>
+      <ul></ul>
+      {todos.map((todo) => (
+        <li key={todo.id}>
+          Nombre {todo.name}
+          <button onClick={() => dispatch({ type: 'DELETE', todoId: todo.id })}>
+            Eliminar esta nota
+          </button>
+        </li>
+      ))}
+    </>
+  );
+}
+```
+
 -
 -
 -
