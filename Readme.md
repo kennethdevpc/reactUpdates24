@@ -4821,6 +4821,17 @@ export default useTodos;
 
     ![alt text](https://github.com/kennethdevpc/reactUpdates24/blob/master/2-Gestion_estados/1-context/public/context.png?raw=true)
 
+  ```
+   `nota curiosa:` sabias que `yagni` es un principio de desarrollo que significa `You Are Not Going To Need It` , que significa que no debes preocuparte por lo que no necesitas
+  ```
+
+  - **context** sirve para manejar estados globales en la aplicacion, y compartirlos.
+  - **useReducer**: para manejar estados mas complejos (lo tiene react)
+  - **reactquery**: sirve para hacer peticiones a la api, y queremos cachearlas,
+    - **query**: es un concepto de react que nos permite hacer peticiones a la api
+    - **mutaciones** es otro concepto
+  - **zustand**: es una biblioteca que nos permite manejar estados de manera sencilla, cuando estos estados son mucho mas complejos
+
 # 4) usando reducers
 
 Primero un ejemplo cpon el `useState`
@@ -4880,6 +4891,9 @@ Primero un ejemplo cpon el `useState`
       //-----"reducer": que es la logica para manejar el estado,recibe un objeto y dependiendo de ello es la accion que se va a realizar
       //---- "initialState": que es el estado inicial
       const [count, dispatch] = useReducer(reducer, 0);
+      //--al destructuring le saco el "estado" y el "dispatch"
+      //
+
       return (
         //----logica para usar reducer
         <>
@@ -4954,6 +4968,360 @@ export function App() {
 }
 ```
 
+## Optimizando el codigo:
+
+## 4.3 tenemos que crear un directorio de `reducers`
+
+- #### u: `reactUpdates24/2-Gestion_estados/3-reducers/src/reducers/todosReducer.ts`
+
+```ts
+export type Todo = {
+  //----es un typo para el elemento de la lista
+  id: number;
+  name: string;
+};
+//------Esto es el tipo con el que vendra la informacion del dispatch
+type addAction = {
+  type: 'ADD';
+  todo: Todo;
+};
+type deleteAction = {
+  type: 'DELETE';
+  todoId: number;
+};
+//---como el action recibe un objeto con el typo y el payload, entonces se puede hacer asi:
+//---type Action = {type: "DELETE"  ;  todoId: number;} | {  type: "DELETE"  ;  todoId: number;};
+//---de una manera mas ordenaa para recibir 2 tipos pues se hace asi
+export type TodoAction = addAction | deleteAction;
+
+export default (todos: Todo[], action: TodoAction) => {
+  switch (action.type) {
+    case 'ADD':
+      return [...todos, { ...action.todo, id: action.todo.id * Math.random() }];
+    case 'DELETE':
+      return [...todos.filter((todo) => todo.id !== action.todoId)];
+  }
+  return todos; //----siempre hay que retornar el estado
+};
+```
+
+## 4.4 uso de `useReducer` en el APP : `reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx`
+
+```tsx
+import './app.css';
+import { useReducer } from 'react';
+import todosReducer from './reducers/todosReducer'; //-----inserto el reducer creado
+
+export function App() {
+  const [todos, dispatch] = useReducer(todosReducer, []);
+  return (
+    //----logica para usar reducer
+    <>
+      <button onClick={() => dispatch({ type: 'ADD', todo: { id: 1, name: 'lista' } })}>
+        Incrementar
+      </button>
+      <ul></ul>
+      {todos.map((todo) => (
+        <li key={todo.id}>
+          Nombre {todo.name}
+          <button onClick={() => dispatch({ type: 'DELETE', todoId: todo.id })}>
+            Eliminar esta nota
+          </button>
+        </li>
+      ))}
+    </>
+  );
+}
+```
+
+## 4.5 creo un context, poder pasr los estados a todos los componentes:
+
+- #### u: `reactUpdates24/2-Gestion_estados/3-reducers/src/context/todosContext.tsx`
+
+  ```tsx
+  //----entonces este es el contexto para: "reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx"
+  //const [todos, dispatch] = useReducer(todosReducer, []);
+  import { createContext, Dispatch } from 'react';
+  import { Todo, TodoAction } from '../reducers/todosReducer';
+
+  type todosContextType = {
+    todos: Todo[];
+    dispatch: Dispatch<TodoAction>; //----este es el typo que se espera ya que el dispatch si me paro en el archivo "app " me deja ver que tipo es y recibe una accion y sabemos que la accion en el "todosReducer" es de tipo "TodoAction"
+  };
+  export default createContext<todosContextType>({} as todosContextType);
+  ```
+
+## 4.6 creo el provider
+
+- #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/providers/TodosProvider.tsx
+
+  ```tsx
+  import { ReactNode, useReducer } from 'react';
+  import todosReducer from '../reducers/todosReducer';
+  import TodosContext from '../contexts/todosContext';
+
+  type props = {
+    children: ReactNode;
+  };
+
+  export default function TodosProvider({ children }: props) {
+    const [todos, dispatch] = useReducer(todosReducer, []);
+
+    return <TodosContext.Provider value={{ todos, dispatch }}>{children}</TodosContext.Provider>;
+  }
+  ```
+
+## 4.7 uso el provider en el APP
+
+- #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx
+
+  ```tsx
+  import './app.css';
+  import MainContent from './components/MainContent';
+  import TodosProvider from './providers/TodosProvider';
+
+  export function App() {
+    // const [todos, dispatch] = useReducer(todosReducer, []);
+
+    return (
+      //----logica para usar reducer
+      <TodosProvider>
+        <MainContent />
+      </TodosProvider>
+    );
+  }
+  ```
+
+## 4.8 creo el MainContext:
+
+- #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/components/MainContent.tsx
+
+  ```tsx
+  import useTodos from '../hooks/useTodos';
+
+  type Props = {};
+
+  function MainContent({}: Props) {
+    const { todos, dispatch } = useTodos();
+    return (
+      <>
+        <button
+          onClick={() => {
+            const id = Math.random();
+            dispatch({ type: 'ADD', todo: { id, name: 'lista' } });
+          }}
+        >
+          Incrementar
+        </button>
+        <ul></ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            Nombre {todo.name}
+            <button onClick={() => dispatch({ type: 'DELETE', todoId: todo.id })}>
+              Eliminar esta nota ve
+            </button>
+          </li>
+        ))}
+      </>
+    );
+  }
+
+  export default MainContent;
+  ```
+
+  ### 4.8.2 creo el UseTodos que es el hook para el MainContent:
+
+  - #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/hooks/useTodos.ts
+
+    ```tsx
+    import { useContext } from 'preact/hooks';
+    import todosContext from '../contexts/todosContext';
+
+    export default function useTodos() {
+      return useContext(todosContext); // useContext(todosContext);
+    }
+    ```
+
+# Resumen cuando usar useState vs useReducer
+
+- si la logiaca esta compleja "useReducer"
+- si la logica es simple "useState"
+
+# 5 modulos
+
+- Ahor alo que queremos es que cada fucnionalidad haga parte de un modulo, ais por ejemplo para el Todos tendremos un modulo y todas sus fucnionalidades
+
+- entonces creo la carpeta :
+
+  - #### u:
+
+    - `todosContext: `reactUpdates24/2-Gestion_estados/3-reducers/src/todos/todosContext.ts
+    - `TodosProvider: `reactUpdates24/2-Gestion_estados/3-reducers/src/todos/TodosProvider.tsx
+    - `todosReducer: ` reactUpdates24/2-Gestion_estados/3-reducers/src/todos/todosReducer.ts
+    - `useTodos:`reactUpdates24/2-Gestion_estados/3-reducers/src/todos/useTodos.ts
+
+  - ## 5.1) refactoriizando el codigo:
+  - solo me quedara entonces los archivos:
+
+    - #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/todos/TodosProvider.tsx
+    - hago uso del codigo dentro de `todosReducer:` y borro a su vez el `todosReducer.ts`:
+
+    ```tsx
+    import { ReactNode, useReducer } from 'react';
+    import TodosContext from './todosContext';
+
+    //----todosReducer
+    export type Todo = {
+      id: number;
+      name: string;
+    };
+    type addAction = {
+      type: 'ADD';
+      todo: Todo;
+    };
+    type deleteAction = {
+      type: 'DELETE';
+      todoId: number;
+    };
+    export type TodoAction = addAction | deleteAction;
+
+    const todosReducer = (todos: Todo[], action: TodoAction) => {
+      switch (action.type) {
+        case 'ADD':
+          return [...todos, { ...action.todo, id: action.todo.id * Math.random() }];
+        case 'DELETE':
+          return [...todos.filter((todo) => todo.id !== action.todoId)];
+      }
+      return todos; //----siempre hay que retornar el estado
+    };
+
+    type props = {
+      children: ReactNode;
+    };
+
+    export default function TodosProvider({ children }: props) {
+      const [todos, dispatch] = useReducer(todosReducer, []);
+
+      return <TodosContext.Provider value={{ todos, dispatch }}>{children}</TodosContext.Provider>;
+    }
+    ```
+
+    - #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/todos/useTodos.ts
+    - hago uso del codigo dentro de `useTodos.ts:` y borro a su vez el `useTodos.ts`:
+
+    ```tsx
+    //----entonces este es el contexto para: "reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx"
+    //const [todos, dispatch] = useReducer(todosReducer, []);
+    import { createContext, Dispatch, useContext } from 'react';
+    import { Todo, TodoAction } from './TodosProvider';
+
+    type todosContextType = {
+      todos: Todo[];
+      dispatch: Dispatch<TodoAction>; //----este es el typo que se espera ya que el dispatch si me paro en el archivo "app " me deja ver que tipo es y recibe una accion y sabemos que la accion en el "todosReducer" es de tipo "TodoAction"
+    };
+    const todosContext = createContext<todosContextType>({} as todosContextType);
+    export default todosContext;
+
+    //---uso el hook aqui en vez de crearlo en un archivo aparte
+    export function useTodos() {
+      return useContext(todosContext); // useContext(todosContext);
+    }
+    ```
+
+  - ## 5.2) Usando el codigo desde un index para poder importar de uan manera mas lejible:
+
+        - #### u: `reactUpdates24/2-Gestion_estados/3-reducers/src/todos/index.ts`
+
+        ```tsx
+        export { default as TodosProvider } from './TodosProvider';
+        export { useTodos } from './todosContext';
+        ```
+        - ### 5.2.2) impoertando desde los componentes:
+        - #### u: reactUpdates24/2-Gestion_estados/3-reducers/src/components/MainContent.tsx
+
+        ```tsx
+          import { useTodos } from '../todos';
+        ```
+        - #### U: reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx
+
+        ```tsx
+        import { TodosProvider } from './todos';
+
+        ```
+
+# 6 Zustand
+
+- instlacion
+
+  ```terminal
+  npm install zustand@4.5.2
+  ```
+
+- ## 6.1 creo el store:
+
+  ```tsx
+  import { create } from 'zustand';
+  import { Todo } from './TodosProvider';
+
+  type todosStore = {
+    todos: Todo[];
+
+    add: (todo: Todo) => void;
+    destroy: (id: number) => void;
+  };
+  const useTodosStore = create<todosStore>((set) => ({
+    todos: [],
+    add: (todo) => set((state) => ({ todos: [todo, ...state.todos] })),
+    destroy: (id) => set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) })),
+  }));
+
+  export default useTodosStore;
+  ```
+
+- ## 6.2 uso el estado en los componentes:
+
+  ```tsx
+  import { useTodos } from '../todos';
+  import useTodosStore from '../todos/store';
+
+  type Props = {};
+
+  function MainContent({}: Props) {
+    // const { todos, dispatch } = useTodos();
+    const { todos, add, destroy } = useTodosStore(); //----uso el store credo en el zustand
+    return (
+      <>
+        {/* <button
+            onClick={() => {
+              const id = Math.random();
+              dispatch({ type: 'ADD', todo: { id, name: 'lista' } });
+            }}
+          > */}
+        <button
+          onClick={() => {
+            const id = Math.random();
+            add({ id, name: `lista ${id} ` });
+          }}
+        >
+          Incrementar
+        </button>
+        <ul></ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            Nombre {todo.name}
+            {/* <button onClick={() => dispatch({ type: 'DELETE', todoId: todo.id })}>
+                Eliminar esta nota ve
+              </button> */}
+            <button onClick={() => destroy(todo.id)}>Eliminar esta nota ve</button>
+          </li>
+        ))}
+      </>
+    );
+  }
+
+  export default MainContent;
+  ```
+
 -
 -
 -
@@ -4979,6 +5347,37 @@ export function App() {
     <summary style="font-weight: bold; text-decoration: underline; cursor: pointer;">💥 Teoría React💥</summary>
 
 - # Teoría React
+
+  ## 0. importar:
+
+  - si quiero exportar: por default
+
+  ```tsx
+  //-----`Por default`
+  export default function TodosProvider({ children }: props) {}
+
+  //-----`No por default, nombrada`
+  export function useTodos() {}
+  ```
+
+  - para importar:
+
+  ```tsx
+  //-----`Por default`
+  import TodosProvider from './TodosProvider';
+  //-----`No por default, nombrada`
+
+  import { useTodos } from './todosContext';
+  ```
+
+  - Para importar y exportar al mismo tiempo:
+
+  ```tsx
+  //----cuando se exporta de forma por default
+  export { default as TodosProvider } from './TodosProvider';
+  //----cuando se exporta de forma nombrada
+  export { useTodos } from './todosContext';
+  ```
 
   ## 1. Actualización de estado
 
@@ -5110,6 +5509,8 @@ export function App() {
   ***
 
   - # Uso de Objetos y Arrays en JavaScript
+
+  - En **typescript**: el operador `|` se le llaa `union type`: para indicarle que puede ser todos los valores que se le unan a ese operador `type: "INCREMENT"|"DECREMENT" | "RESET" ` y en **javascript** se le llama `or`.
 
 ## 1. Objetos en JavaScript
 
