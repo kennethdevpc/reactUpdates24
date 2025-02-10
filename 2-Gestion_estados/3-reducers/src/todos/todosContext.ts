@@ -1,7 +1,7 @@
 //----entonces este es el contexto para: "reactUpdates24/2-Gestion_estados/3-reducers/src/app.tsx"
 //const [todos, dispatch] = useReducer(todosReducer, []);
 import { createContext, Dispatch } from 'react';
-import { Todo, TodoAction } from '../reducers/todosReducer';
+import { Todo, TodoAction } from './todosReducer';
 
 type todosContextType = {
   todos: Todo[];
